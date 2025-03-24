@@ -31,6 +31,7 @@ function registerNode(LiteGraph: any, node: any) {
       });
     }
   }
+  console.log("Registering node:", node['name'])
 
   LiteGraph.registerNodeType(node['name'], customNode);
 }
