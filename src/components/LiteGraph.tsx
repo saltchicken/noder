@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useCallback } from "react";
+import {registerCustomNodes} from "../utils/pythonNodes";
 
 const LiteGraphComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -27,7 +28,7 @@ const LiteGraphComponent = () => {
       // graph.onNodeRemoved = () => handleGraphChange(graph);
       // graph.onConnectionChange = () => handleGraphChange(graph);
       const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
-      // registerCustomNodes(window.LiteGraph);
+      registerCustomNodes(window.LiteGraph);
       // graph.start();
       canvas.resize();
       isInitialized.current = true;
@@ -36,19 +37,26 @@ const LiteGraphComponent = () => {
   }, [handleGraphChange]);
 
   // Add methods to interact with the graph
-  // const addNewNode = useCallback((type: string, pos: [number, number]) => {
-  //   if (graphRef.current) {
-  //     const node = LiteGraph.createNode(type);
-  //     node.pos = pos;
-  //     graphRef.current.add(node);
-  //   }
-  // }, []);
+  const addNewNode = useCallback((type: string, pos: [number, number]) => {
+    if (graphRef.current) {
+      const node = LiteGraph.createNode(type);
+      node.pos = pos;
+      graphRef.current.add(node);
+    }
+  }, []);
 
   return (
+    <div>
       <canvas
         ref={canvasRef}
         style={{ width: "100%", height: "100%" }}
       ></canvas>
+      <div className="controls">
+        <button onClick={() => addNewNode("math/operation", [100, 100])}>
+          Add Math Node
+        </button>
+      </div>
+      </div>
   );
 };
 
