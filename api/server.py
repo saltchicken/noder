@@ -36,11 +36,8 @@ async def get_data():
 
 @app.post("/process")
 async def process_data(data: dict):
-    # TEST
-    random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-    graph.nodes[random_str] = "Hello"
-    # TEST
-    return {"response": f"Processed: {data['input']}"}
+    print(data)
+    return {"response": f"Replace this with something useful"}
 
 if __name__ == "__main__":
     import uvicorn
