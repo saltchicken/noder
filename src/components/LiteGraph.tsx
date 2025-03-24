@@ -25,14 +25,6 @@ const LiteGraphComponent = () => {
       // graph.onNodeRemoved = () => handleGraphChange(graph);
       // graph.onConnectionChange = () => handleGraphChange(graph);
       const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
-
-      
-      // Add nodes and setup graph as needed
-      const node = new window.LiteGraph.LGraphNode();
-      node.addInput("input", "number");
-      node.addOutput("output", "number");
-      graph.add(node);
-      
       // graph.start();
       canvas.resize();
    }

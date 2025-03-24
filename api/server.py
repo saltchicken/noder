@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import json
-import random # test
-import string # test
 
 class Node:
     def __init__(self, js_node, py_node):
