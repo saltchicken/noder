@@ -7,7 +7,7 @@ function App() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://10.0.0.7:8000/data")
+    fetch("http://10.0.0.7:8001/data")
     .then((res) => res.json())
     .then((data) => {
       setMessage(data.message);
@@ -15,7 +15,7 @@ function App() {
   }, []);
 
   const sendData = async () => {
-    const response = await fetch("http://10.0.0.7:8000/process", {
+    const response = await fetch("http://10.0.0.7:8001/process", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
