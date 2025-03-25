@@ -58,6 +58,65 @@ const LiteGraphComponent = () => {
   };
   }, []);
 
+  const saveGraph = useCallback(() => {
+    if (graphRef.current) {
+      const data = graphRef.current.serialize();
+      localStorage.setItem("savedGraph", JSON.stringify(data));
+      console.log("Graph saved to local storage");
+    }
+  }, []);
+
+  const loadGraph = useCallback(() => {
+    if (graphRef.current) {
+      const savedData = localStorage.getItem("savedGraph");
+      if (savedData) {
+        graphRef.current.configure(JSON.parse(savedData));
+        console.log("Graph loaded from local storage");
+      }
+    }
+  }, []);
+
+  const saveToFile = useCallback(() => {
+    if (graphRef.current) {
+      const data = JSON.stringify(graphRef.current.serialize());
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'graph.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  }, []);
+
+  const loadFromFile = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && graphRef.current) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const jsonData = JSON.parse(event.target?.result as string);
+            graphRef.current.configure(jsonData);
+            console.log("Graph loaded from file");
+          } catch (error) {
+            console.error("Error loading graph:", error);
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    
+    input.click();
+  }, []);
+
+
   useEffect(() => {
     if (window.LiteGraph && canvasRef.current && !isInitialized.current) {
       console.log("Doing the things");
@@ -102,6 +161,18 @@ const sendGraphData = useCallback(() => {
       <div className="controls">
         <button onClick={() => sendGraphData()}>
           Send Graph Data
+        </button>
+        <button onClick={() => saveGraph()}>
+          Save to Storage
+        </button>
+        <button onClick={() => loadGraph()}>
+          Load from Storage
+        </button>
+        <button onClick={() => saveToFile()}>
+          Save to File
+        </button>
+        <button onClick={() => loadFromFile()}>
+          Load from File
         </button>
       </div>
       </div>

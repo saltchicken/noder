@@ -113,7 +113,7 @@ app.add_middleware(
 
 @app.get("/data")
 async def get_data():
-    return {"message": json.dumps(graph.nodes)}
+    return {"message": "Fix this"}
 
 @app.post("/process")
 async def process_data(data: dict):
@@ -136,6 +136,7 @@ async def events():
             try:
                 yield f"data: {await graph.sse_queue.get()}\n\n"
             except asyncio.CancelledError:
+                print("Event needs to cancel")
                 break
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
