@@ -21,15 +21,75 @@ class Node:
     def __init__(self, js_node, py_node):
         self.setup(js_node)
         self.py_node = py_node
+
     def setup(self, js_node):
         self.id = js_node.get('id', None)
         self.name = js_node.get('name', None)
+        self.flags = js_node.get('flags', None)
+        self.mode = js_node.get('mode', None)
+        self.order = js_node.get('order', None)
+        self.inputs = js_node.get('inputs', None)
+        self.outputs = js_node.get('outputs', None)
+        self.properties = js_node.get('properties', None)
+
+    def execute(self, *args):
+        if hasattr(self.py_node, "instantiated"):
+            pass
+        else:
+            self.py_node = self.py_node()
+        if len(args) > 0:
+            self.py_node.run(*args)
+        else:
+            self.py_node.run()
 
 class Graph:
     def __init__(self):
         self.nodes = {}
     def add_node(self, node: Node):
         self.nodes[node.id] = node
+
+    def process_nodes(self, graph_data):
+        nodes_for_deletion = set()
+        for node in graph_data['nodes']:
+            for custom_class in custom_classes:
+                if custom_class['name'] == node['type']:
+                    node_class = custom_class['class']
+
+                    if node['id'] not in self.nodes:
+                        graph_node = Node(node, node_class)
+                        self.add_node(graph_node)
+                    else:
+                        self.nodes[node['id']].setup(node)
+                    break
+        current_keys = set(self.nodes.keys())
+        new_keys = {node['id'] for node in graph_data['nodes']}
+        nodes_for_deletion = current_keys - new_keys  # Find obsolete nodes
+
+        for id in nodes_for_deletion:
+            print(f"Removing node: {id}")
+            del self.nodes[id]
+
+        for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
+            previous_node_inputs = []
+            if node.inputs is not None:
+                for input in node.inputs:
+                    previous_node_inputs.append(self.search_nodes_for_output(input['link']))
+            if len(previous_node_inputs) == 0:
+                node.execute()
+            else:
+                node.execute(*previous_node_inputs)
+
+    def search_nodes_for_output(self, link):
+        for node in self.nodes.values():
+            for output_links in node.outputs:
+                if output_links['links'] is None:
+                    continue
+                for output_link in output_links['links']:
+                    if output_link == link:
+                        return node.py_node.output_results[output_links['slot_index']]
+        return None
+
+
 
 graph = Graph()
 app = FastAPI()
@@ -50,6 +110,9 @@ async def get_data():
 @app.post("/process")
 async def process_data(data: dict):
     print(data)
+    graph_data = data.get('graph', {})
+    print(graph_data)
+    graph.process_nodes(graph_data)
     return {"response": f"Replace this with something useful"}
 
 @app.post("/custom_nodes")

@@ -5,6 +5,7 @@ class Foo:
         self.instantiated = True
         # print("Foo initialized")
         self.output_results = []
+        print("Foo initialized")
 
     def run(self):
         self.output_results = []
@@ -20,6 +21,7 @@ class Bar:
         self.instantiated = True
         # print("Bar initialized")
         self.output_results = []
+        print("Bar initialized")
 
     def run(self, x, y):
         self.output_results = []

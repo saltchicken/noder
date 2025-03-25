@@ -15,7 +15,6 @@ export async function registerCustomNodes(LiteGraph: any) {
 function registerNode(LiteGraph: any, node: any) {
   function customNode() {
     this.title = node.title || "Node";
-    this.uniqueID = crypto.randomUUID();
     
     // Add inputs
     if (node.inputs) {
