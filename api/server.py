@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 import json
 
+import asyncio
 import inspect
 import sys
 import nodes
@@ -45,10 +47,12 @@ class Node:
 class Graph:
     def __init__(self):
         self.nodes = {}
+        self.sse_queue = asyncio.Queue()
+
     def add_node(self, node: Node):
         self.nodes[node.id] = node
 
-    def process_nodes(self, graph_data):
+    async def process_nodes(self, graph_data):
         nodes_for_deletion = set()
         for node in graph_data['nodes']:
             for custom_class in custom_classes:
@@ -70,6 +74,10 @@ class Graph:
             del self.nodes[id]
 
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
+            await self.sse_queue.put(json.dumps({
+                "node": node.name,
+                "id": str(node.id)
+            }))
             previous_node_inputs = []
             if node.inputs is not None:
                 for input in node.inputs:
@@ -112,7 +120,7 @@ async def process_data(data: dict):
     print(data)
     graph_data = data.get('graph', {})
     print(graph_data)
-    graph.process_nodes(graph_data)
+    await graph.process_nodes(graph_data)
     return {"response": f"Replace this with something useful"}
 
 @app.post("/custom_nodes")
@@ -120,6 +128,17 @@ async def custom_nodes_handler():
     """Handles POST requests for custom nodes."""
     custom_classes_without_class = [{k: v for k, v in d.items() if k != 'class'} for d in custom_classes]
     return {"status": "success", "nodes": custom_classes_without_class}
+
+@app.get('/events')
+async def events():
+    async def event_stream():
+        while True:
+            try:
+                yield f"data: {await graph.sse_queue.get()}\n\n"
+            except asyncio.CancelledError:
+                break
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
+
 
 if __name__ == "__main__":
     import uvicorn
