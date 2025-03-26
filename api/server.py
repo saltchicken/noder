@@ -7,9 +7,6 @@ import asyncio
 from node_utils import get_custom_classes
 
 custom_classes = get_custom_classes()
-print("CUSTOM CLASSES")
-print(custom_classes)
-print("CUSTOM CLASSES")
 
 class Node:
     def __init__(self, js_node, py_node):
@@ -26,11 +23,12 @@ class Node:
         self.outputs = js_node.get('outputs', None)
         self.properties = js_node.get('properties', None)
 
-    def execute(self, *args):
+    def execute(self, *args, widget_values=None):
         if hasattr(self.py_node, "instantiated"):
             pass
         else:
             self.py_node = self.py_node()
+        self.py_node.widget_values = widget_values
         if len(args) > 0:
             self.py_node._run(*args)
         else:
@@ -57,6 +55,8 @@ class Graph:
                         self.add_node(graph_node)
                     else:
                         self.nodes[node['id']].setup(node)
+                    widget_values = node.get('widget_values', None)
+                    self.nodes[node['id']].widget_values = widget_values
                     break
         current_keys = set(self.nodes.keys())
         new_keys = {node['id'] for node in graph_data['nodes']}
@@ -77,9 +77,9 @@ class Graph:
                 for input in node.inputs:
                     previous_node_inputs.append(self.search_nodes_for_output(input['link']))
             if len(previous_node_inputs) == 0:
-                node.execute()
+                node.execute(widget_values=node.widget_values)
             else:
-                node.execute(*previous_node_inputs)
+                node.execute(*previous_node_inputs, widget_values=node.widget_values)
         self.sse_active = False
 
     def search_nodes_for_output(self, link):
@@ -128,7 +128,7 @@ async def events():
         while True:
             try:
                 sse_message = await graph.sse_queue.get()
-                print(sse_message)
+                # print(sse_message)
                 yield f"data: {sse_message}\n\n"
                 if not graph.sse_active and graph.sse_queue.empty():
                     break

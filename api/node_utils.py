@@ -34,7 +34,7 @@ def get_returned_variables(source_code, function_name):
                             text_vars.append(target.id)
                             print(f"Found _text variable: {target.id}")
     
-    return returned_vars
+    return returned_vars, text_vars
 
 def get_run_methods(module):
     run_methods = {}
@@ -52,7 +52,7 @@ def get_run_methods(module):
                 except OSError:
                     source_code = ""
 
-                returned_vars = get_returned_variables(source_code, method_name)
+                returned_vars, text_vars = get_returned_variables(source_code, method_name)
 
                 # Handle inputs
                 inputs = []
@@ -79,7 +79,8 @@ def get_run_methods(module):
                     "returned_variables": returned_vars,
                     "file": inspect.getsourcefile(method),
                     "line": start_line,
-                    "outputs": outputs
+                    "outputs": outputs,
+                    "text_vars": text_vars
                 }
 
     return run_methods
@@ -98,16 +99,20 @@ def get_custom_classes():
 
     inputs = {}
     outputs= {}
+    text_vars = {}
     for name, info in run_methods.items():
         cls_name = name.split('.')[0]
         inputs[cls_name] = info["parameters"]
         outputs[cls_name] = info["outputs"]
+        text_vars[cls_name] = info["text_vars"]
+
 
     custom_classes = [
         {
             "name": cls_name,
             "inputs": inputs[cls_name],  # Will be None if inputs is an instance attribute
             "outputs": outputs[cls_name],  # Will be None if outputs is an instance attribute
+            "text_vars" : text_vars[cls_name],
             "class": cls_obj
         }
         for cls_name, cls_obj in inspect.getmembers(sys.modules['nodes'])

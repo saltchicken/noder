@@ -17,8 +17,8 @@ class Foo(Node):
         print("Foo initialized")
 
     def run(self):
-        _text = "hello"
-        FooOutput = "FooOutput"
+        test_text = self.widget_values[0]
+        FooOutput = test_text
         FooOutput2 = "FooOutput2"
 
         return FooOutput, FooOutput2

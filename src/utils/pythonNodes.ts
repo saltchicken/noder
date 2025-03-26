@@ -15,6 +15,13 @@ export async function registerCustomNodes(LiteGraph: any) {
 function registerNode(LiteGraph: any, node: any) {
   function customNode() {
     this.title = node.name;
+
+    for (let text_var of node.text_vars) {
+      this.addWidget("text", text_var, "Default", function (value) {
+        console.log("Text changed to : ", value);
+      });
+    }
+
     // this.addWidget("text","name","Default", function (value){
     //     console.log("Text changed to : ", value)
     //   }); 
