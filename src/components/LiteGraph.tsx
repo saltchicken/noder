@@ -86,7 +86,6 @@ const setupSSE = useCallback(() => {
                 if (node) {
                     if (data['running']) {
                       node.bgcolor = "#4CAF50"; // Green background while running
-                      console.log("change color")
                       node.setDirtyCanvas(true, false);
                     } else {
                       node.bgcolor = null; // Reset to default background
