@@ -18,7 +18,7 @@ class Node:
 
     def setup(self, js_node):
         self.id = js_node.get('id', None)
-        self.name = js_node.get('name', None)
+        self.name = js_node.get('type', None)
         self.flags = js_node.get('flags', None)
         self.mode = js_node.get('mode', None)
         self.order = js_node.get('order', None)
@@ -40,7 +40,7 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         self.sse_queue = asyncio.Queue()
-        self.sse_active = False
+        self.sse_active = True
 
     def add_node(self, node: Node):
         self.nodes[node.id] = node
@@ -127,9 +127,11 @@ async def events():
     async def event_stream():
         while True:
             try:
-                if not graph.sse_active:
+                sse_message = await graph.sse_queue.get()
+                print(sse_message)
+                yield f"data: {sse_message}\n\n"
+                if not graph.sse_active and graph.sse_queue.empty():
                     break
-                yield f"data: {await graph.sse_queue.get()}\n\n"
             except asyncio.CancelledError:
                 print("Event needs to cancel")
                 break

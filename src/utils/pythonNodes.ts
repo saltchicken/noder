@@ -14,10 +14,10 @@ export async function registerCustomNodes(LiteGraph: any) {
 
 function registerNode(LiteGraph: any, node: any) {
   function customNode() {
-    this.title = node.title || "Node";
-   this.addWidget("text","name","Default", function (value){
-      console.log("Text changed to : ", value)
-    }); 
+    this.title = node.name;
+    // this.addWidget("text","name","Default", function (value){
+    //     console.log("Text changed to : ", value)
+    //   }); 
     // Add inputs
     if (node.inputs) {
       node.inputs.forEach((input: any, i: number) => {

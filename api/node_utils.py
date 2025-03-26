@@ -10,19 +10,29 @@ import nodes
 
 def get_returned_variables(source_code, function_name):
     """
-    Parses the function's AST to extract returned variable names.
+    Parses the function's AST to extract returned variable names and _text variables.
     """
     tree = ast.parse(textwrap.dedent(source_code))
     returned_vars = []
+    text_vars = []
 
     for node in ast.walk(tree):
+        # Check for function definition
         if isinstance(node, ast.FunctionDef) and node.name == function_name:
+            # Look for return statements
             for stmt in ast.walk(node):
                 if isinstance(stmt, ast.Return):
                     if isinstance(stmt.value, ast.Name):
                         returned_vars.append(stmt.value.id)
                     elif isinstance(stmt.value, ast.Tuple):
                         returned_vars.extend([elt.id for elt in stmt.value.elts if isinstance(elt, ast.Name)])
+                
+                # Look for assignments with _text in the name
+                if isinstance(stmt, ast.Assign):
+                    for target in stmt.targets:
+                        if isinstance(target, ast.Name) and "_text" in target.id:
+                            text_vars.append(target.id)
+                            print(f"Found _text variable: {target.id}")
     
     return returned_vars
 

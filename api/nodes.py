@@ -17,6 +17,7 @@ class Foo(Node):
         print("Foo initialized")
 
     def run(self):
+        _text = "hello"
         FooOutput = "FooOutput"
         FooOutput2 = "FooOutput2"
 
@@ -30,5 +31,7 @@ class Bar(Node):
     def run(self, BarInput: str, BarInput2: str) -> Tuple[str, str]:
         BarOutput = BarInput[::-1]
         BarOutput2 = BarInput2[::-1]
+
+        print(f"{BarOutput} and {BarOutput2}")
 
         return BarOutput, BarOutput2

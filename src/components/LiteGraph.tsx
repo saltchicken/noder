@@ -60,36 +60,47 @@ const LiteGraphComponent = () => {
   //   };
   // }, []);
 
-  const setupSSE = useCallback(() => {
+const setupSSE = useCallback(() => {
     if (eventSourceRef.current) {
         eventSourceRef.current.close();
     }
 
-    const eventSource = new EventSource('http://10.0.0.7:8001/events'); // Replace with your actual SSE endpoint
+    const eventSource = new EventSource('http://10.0.0.7:8001/events');
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = function(event) {
-    try {
-      const data = JSON.parse(event.data);
-      console.log(data['id'])
-      if (graphRef.current) {
-        const node = graphRef.current.getNodeById(data['id']);
-        if (node) {
-          node.title = "TEST";
-          node.setDirtyCanvas(true, true);
+        try {
+            const data = JSON.parse(event.data);
+            console.log(data['id']);
+            if (graphRef.current) {
+                const node = graphRef.current.getNodeById(data['id']);
+                if (node) {
+                    node.title = "TEST";
+                    node.setDirtyCanvas(true, true);
+                }
+            }
+        } catch (error) {
+            console.error("Error parsing SSE data:", error);
         }
-      }
+    };
 
-    } catch (error) {
-      console.error("Error parsing SSE data:", error);
-    }
-  };
+    eventSource.onerror = function(error) {
+        console.log("SSE connection closed or errored");
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+        }
+    };
 
-  eventSource.onerror = function(error) {
-    console.error("SSE Error:", error);
-    eventSource.close(); // Close the connection on error
-  };
-  }, []);
+    // Add onclose handler
+    eventSource.addEventListener('close', function() {
+        console.log("SSE connection closed by server");
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+        }
+    });
+}, []);
 
   const saveGraph = useCallback(() => {
     if (graphRef.current) {
