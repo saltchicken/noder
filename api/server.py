@@ -55,7 +55,7 @@ class Graph:
                         self.add_node(graph_node)
                     else:
                         self.nodes[node['id']].setup(node)
-                    widget_values = node.get('widget_values', None)
+                    widget_values = node.get('widget_values', [])
                     self.nodes[node['id']].widget_values = widget_values
                     break
         current_keys = set(self.nodes.keys())

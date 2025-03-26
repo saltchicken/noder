@@ -1,6 +1,12 @@
 from typing import Tuple
 
 class Node:
+    def __init__(self):
+        self.instantiated = True
+        print(f"Node initialized {self.__class__.__name__}")
+
+        self.widget_values = []
+
     def run(self, *args, **kwargs):
         pass
 
@@ -12,22 +18,15 @@ class Node:
             self.output_results = [result]
 
 class Foo(Node):
-    def __init__(self):
-        self.instantiated = True
-        print("Foo initialized")
-
     def run(self):
         test_text = self.widget_values[0]
+        test_text2 = self.widget_values[1]
         FooOutput = test_text
         FooOutput2 = "FooOutput2"
 
         return FooOutput, FooOutput2
 
 class Bar(Node):
-    def __init__(self):
-        self.instantiated = True
-        print("Bar initialized")
-
     def run(self, BarInput: str, BarInput2: str) -> Tuple[str, str]:
         BarOutput = BarInput[::-1]
         BarOutput2 = BarInput2[::-1]
