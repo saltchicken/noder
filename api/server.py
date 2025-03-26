@@ -43,8 +43,7 @@ class Graph:
     def add_node(self, node: Node):
         self.nodes[node.id] = node
 
-    async def process_nodes(self, graph_data):
-        nodes_for_deletion = set()
+    async def add_nodes(self, graph_data):
         for node in graph_data['nodes']:
             for custom_class in custom_classes:
                 if custom_class['name'] == node['type']:
@@ -58,6 +57,9 @@ class Graph:
                     widget_values = node.get('widget_values', [])
                     self.nodes[node['id']].widget_values = widget_values
                     break
+
+    async def remove_missing_nodes(self, graph_data):
+        nodes_for_deletion = set()
         current_keys = set(self.nodes.keys())
         new_keys = {node['id'] for node in graph_data['nodes']}
         nodes_for_deletion = current_keys - new_keys  # Find obsolete nodes
@@ -66,21 +68,39 @@ class Graph:
             print(f"Removing node: {id}")
             del self.nodes[id]
 
+    async def execute_nodes(self):
         self.sse_active = True
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
             await self.sse_queue.put(json.dumps({
                 "node": node.name,
-                "id": str(node.id)
+                "id": str(node.id),
+                "running": True,
             }))
             previous_node_inputs = []
             if node.inputs is not None:
                 for input in node.inputs:
                     previous_node_inputs.append(self.search_nodes_for_output(input['link']))
-            if len(previous_node_inputs) == 0:
-                node.execute(widget_values=node.widget_values)
-            else:
-                node.execute(*previous_node_inputs, widget_values=node.widget_values)
+
+            async def execute_node():
+                if len(previous_node_inputs) == 0:
+                    node.execute(widget_values=node.widget_values)
+                else:
+                    node.execute(*previous_node_inputs, widget_values=node.widget_values)
+
+            await asyncio.create_task(execute_node())
+
+            await self.sse_queue.put(json.dumps({
+                "node": node.name,
+                "id": str(node.id),
+                "running": False,
+            }))
         self.sse_active = False
+
+    async def process_nodes(self, graph_data):
+        await self.add_nodes(graph_data)
+        await self.remove_missing_nodes(graph_data)
+        await self.execute_nodes()
+
 
     def search_nodes_for_output(self, link):
         for node in self.nodes.values():
