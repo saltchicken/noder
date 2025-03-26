@@ -51,17 +51,19 @@ const LiteGraphComponent = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   setupSSE();
-  //   return () => {
-  //     if (eventSourceRef.current) {
-  //       eventSourceRef.current.close();
-  //     }
-  //   };
-  // }, []);
+  useEffect(() => {
+    setupSSE();
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
 
 const setupSSE = useCallback(() => {
+    console.log("Setting up SSE");
     if (eventSourceRef.current) {
+      console.log("This shouldn't happen")
         eventSourceRef.current.close();
     }
 
@@ -70,9 +72,15 @@ const setupSSE = useCallback(() => {
 
     eventSource.onmessage = function(event) {
         try {
+        // if (event.data === "close") {
+        //     eventSourceRef.current.close();
+        //     eventSourceRef.current = null;
+        //     return;
+        // }
+        
             const data = JSON.parse(event.data);
             // console.log(data['id']);
-            console.log(data);
+            // console.log(data);
             if (graphRef.current) {
                 const node = graphRef.current.getNodeById(data['id']);
                 if (node) {
@@ -94,19 +102,20 @@ const setupSSE = useCallback(() => {
     eventSource.onerror = function(error) {
         console.log("SSE connection closed or errored");
         if (eventSourceRef.current) {
+            console.log(error);
             eventSourceRef.current.close();
             eventSourceRef.current = null;
         }
     };
 
     // Add onclose handler
-    eventSource.addEventListener('close', function() {
-        console.log("SSE connection closed by server");
-        if (eventSourceRef.current) {
-            eventSourceRef.current.close();
-            eventSourceRef.current = null;
-        }
-    });
+    // eventSource.addEventListener('close', function() {
+    //     console.log("SSE connection closed by server");
+    //     if (eventSourceRef.current) {
+    //         eventSourceRef.current.close();
+    //         eventSourceRef.current = null;
+    //     }
+    // });
 }, []);
 
   const saveGraph = useCallback(() => {
@@ -192,9 +201,6 @@ const setupSSE = useCallback(() => {
   // Add methods to interact with the graph
 const sendGraphData = useCallback(() => {
   if (graphRef.current) {
-  setupSSE();
-
-
     fetch("http://10.0.0.7:8001/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

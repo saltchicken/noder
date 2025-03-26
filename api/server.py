@@ -145,13 +145,16 @@ async def custom_nodes_handler():
 @app.get('/events')
 async def events():
     async def event_stream():
+        print("Starting up")
         while True:
             try:
                 sse_message = await graph.sse_queue.get()
                 # print(sse_message)
                 yield f"data: {sse_message}\n\n"
-                if not graph.sse_active and graph.sse_queue.empty():
-                    break
+                # if not graph.sse_active and graph.sse_queue.empty():
+                #     # yield f"data: {json.dumps({'event': 'close'})}\n\n"
+                #     yield "data: close\n\n"
+                #     break
             except asyncio.CancelledError:
                 print("Event needs to cancel")
                 break
