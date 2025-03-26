@@ -38,7 +38,7 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         self.sse_queue = asyncio.Queue()
-        self.sse_active = True
+        # self.sse_active = True
 
     def add_node(self, node: Node):
         self.nodes[node.id] = node
@@ -69,7 +69,7 @@ class Graph:
             del self.nodes[id]
 
     async def execute_nodes(self):
-        self.sse_active = True
+        # self.sse_active = True
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
             await self.sse_queue.put(json.dumps({
                 "node": node.name,
@@ -94,7 +94,7 @@ class Graph:
                 "id": str(node.id),
                 "running": False,
             }))
-        self.sse_active = False
+        # self.sse_active = False
 
     async def process_nodes(self, graph_data):
         await self.add_nodes(graph_data)
