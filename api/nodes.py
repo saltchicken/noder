@@ -1,4 +1,5 @@
 from typing import Tuple
+import time
 
 class Node:
     def __init__(self):
@@ -19,6 +20,7 @@ class Node:
 
 class Foo(Node):
     def run(self):
+        time.sleep(3)
         test_text = self.widget_values[0]
         test_text2 = self.widget_values[1]
         FooOutput = test_text
@@ -28,6 +30,7 @@ class Foo(Node):
 
 class Bar(Node):
     def run(self, BarInput: str, BarInput2: str) -> Tuple[str, str]:
+        time.sleep(2)
         BarOutput = BarInput[::-1]
         BarOutput2 = BarInput2[::-1]
 
