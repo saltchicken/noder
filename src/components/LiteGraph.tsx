@@ -1,6 +1,39 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import {registerCustomNodes} from "../utils/pythonNodes";
 
+function serializeGraph(graph) {
+    let data = graph.serialize(); // Get base graph data
+
+    // Manually add widget values to nodes
+    data.nodes.forEach(nodeData => {
+        let node = graph.getNodeById(nodeData.id);
+        if (node && node.widgets) {
+            nodeData.widget_values = node.widgets.map(widget => widget.value);
+        }
+    });
+
+  console.log(data)
+    return data;
+}
+
+function deserializeGraph(graph, data) {
+    graph.configure(data); // Load basic graph structure
+
+    // Restore widget values
+    data.nodes.forEach(nodeData => {
+        let node = graph.getNodeById(nodeData.id);
+        if (node && node.widgets && nodeData.widget_values) {
+            node.widgets.forEach((widget, i) => {
+                if (nodeData.widget_values[i] !== undefined) {
+                    widget.value = nodeData.widget_values[i];
+                }
+            });
+        }
+    });
+}
+
+
+
 const LiteGraphComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const graphRef = useRef(null);
@@ -13,7 +46,7 @@ const LiteGraphComponent = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        graph: graph.serialize() 
+        graph: serializeGraph(graph) 
       })
     });
   }, []);
@@ -60,7 +93,7 @@ const LiteGraphComponent = () => {
 
   const saveGraph = useCallback(() => {
     if (graphRef.current) {
-      const data = graphRef.current.serialize();
+      const data = serializeGraph(graphRef.current);
       localStorage.setItem("savedGraph", JSON.stringify(data));
       console.log("Graph saved to local storage");
     }
@@ -70,7 +103,7 @@ const LiteGraphComponent = () => {
     if (graphRef.current) {
       const savedData = localStorage.getItem("savedGraph");
       if (savedData) {
-        graphRef.current.configure(JSON.parse(savedData));
+        deserializeGraph(graphRef.current, JSON.parse(savedData));
         console.log("Graph loaded from local storage");
       }
     }
@@ -78,7 +111,7 @@ const LiteGraphComponent = () => {
 
   const saveToFile = useCallback(() => {
     if (graphRef.current) {
-      const data = JSON.stringify(graphRef.current.serialize());
+      const data = JSON.stringify(serializeGraph(graphRef.current));
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -102,8 +135,9 @@ const LiteGraphComponent = () => {
         const reader = new FileReader();
         reader.onload = (event) => {
           try {
-            const jsonData = JSON.parse(event.target?.result as string);
-            graphRef.current.configure(jsonData);
+            deserializeGraph(graphRef.current, JSON.parse(event.target?.result as string));
+            // const jsonData = JSON.parse(event.target?.result as string);
+            // graphRef.current.configure(jsonData);
             console.log("Graph loaded from file");
           } catch (error) {
             console.error("Error loading graph:", error);
@@ -147,7 +181,7 @@ const sendGraphData = useCallback(() => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        graph: graphRef.current.serialize() 
+        graph: serializeGraph(graphRef.current)
       })
     });
   }
