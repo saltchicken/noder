@@ -27,11 +27,8 @@ class Bar(Node):
         self.instantiated = True
         print("Bar initialized")
 
-    def run(self, BarInput: str, BarInput2: str) -> str:
-        output = BarInput[::-1]
-        print(BarInput2)
+    def run(self, BarInput: str, BarInput2: str) -> Tuple[str, str]:
+        BarOutput = BarInput[::-1]
+        BarOutput2 = BarInput2[::-1]
 
-        BarOutput = output
-        print(output)
-
-        return BarOutput
+        return BarOutput, BarOutput2
