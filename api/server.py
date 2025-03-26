@@ -40,6 +40,7 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         self.sse_queue = asyncio.Queue()
+        self.sse_active = False
 
     def add_node(self, node: Node):
         self.nodes[node.id] = node
@@ -65,6 +66,7 @@ class Graph:
             print(f"Removing node: {id}")
             del self.nodes[id]
 
+        self.sse_active = True
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
             await self.sse_queue.put(json.dumps({
                 "node": node.name,
@@ -78,6 +80,7 @@ class Graph:
                 node.execute()
             else:
                 node.execute(*previous_node_inputs)
+        self.sse_active = False
 
     def search_nodes_for_output(self, link):
         for node in self.nodes.values():
@@ -109,9 +112,7 @@ async def get_data():
 
 @app.post("/process")
 async def process_data(data: dict):
-    print(data)
     graph_data = data.get('graph', {})
-    print(graph_data)
     await graph.process_nodes(graph_data)
     return {"response": f"Replace this with something useful"}
 
@@ -126,6 +127,8 @@ async def events():
     async def event_stream():
         while True:
             try:
+                if not graph.sse_active:
+                    break
                 yield f"data: {await graph.sse_queue.get()}\n\n"
             except asyncio.CancelledError:
                 print("Event needs to cancel")

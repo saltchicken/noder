@@ -18,14 +18,14 @@ const LiteGraphComponent = () => {
     });
   }, []);
 
-  useEffect(() => {
-    setupSSE();
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   setupSSE();
+  //   return () => {
+  //     if (eventSourceRef.current) {
+  //       eventSourceRef.current.close();
+  //     }
+  //   };
+  // }, []);
 
   const setupSSE = useCallback(() => {
     if (eventSourceRef.current) {
@@ -140,6 +140,7 @@ const LiteGraphComponent = () => {
   // Add methods to interact with the graph
 const sendGraphData = useCallback(() => {
   if (graphRef.current) {
+  setupSSE();
 
 
     fetch("http://10.0.0.7:8001/process", {
