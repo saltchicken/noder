@@ -1,36 +1,37 @@
-class Foo:
-    inputs = ()
-    outputs = ({"name": "FooOutput", "type": "STRING"}, {"name": "FooOutput2", "type": "STRING"},)
+from typing import Tuple
+
+class Node:
+    def run(self, *args, **kwargs):
+        pass
+
+    def _run(self, *args, **kwargs):
+        result = self.run(*args, **kwargs)
+        if isinstance(result, tuple):
+            self.output_results = list(result)
+        else:
+            self.output_results = [result]
+
+class Foo(Node):
     def __init__(self):
         self.instantiated = True
-        # print("Foo initialized")
-        self.output_results = []
         print("Foo initialized")
 
     def run(self):
-        self.output_results = []
-        # print("Foo running")
-        self.output_results.append("FooOutput")
-        self.output_results.append("FooOutput2")
-        # return "FooOutput", "FooOutput2"
+        FooOutput = "FooOutput"
+        FooOutput2 = "FooOutput2"
 
-class Bar:
-    inputs = ({"name": "BarInput", "type": "STRING"}, {"name": "BarInput2", "type": "STRING"})
-    outputs = ({"name": "BarOutput", "type": "STRING"},)
+        return FooOutput, FooOutput2
+
+class Bar(Node):
     def __init__(self):
         self.instantiated = True
-        # print("Bar initialized")
-        self.output_results = []
         print("Bar initialized")
 
-    def run(self, x, y):
-        self.output_results = []
-        if x:
-            reversed_x = x[::-1]
-        if y:
-            reversed_y = y[::-1]
-        print(reversed_x)
-        self.output_results.append(reversed_x)
+    def run(self, BarInput: str, BarInput2: str) -> str:
+        output = BarInput[::-1]
+        print(BarInput2)
 
-        # print("Bar running")
+        BarOutput = output
+        print(output)
 
+        return BarOutput

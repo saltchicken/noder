@@ -4,20 +4,12 @@ from fastapi.responses import StreamingResponse
 import json
 
 import asyncio
-import inspect
-import sys
-import nodes
+from node_utils import get_custom_classes
 
-custom_classes = [
-    {
-        "name": cls_name,
-        "inputs": getattr(cls_obj, 'inputs', None),  # Will be None if inputs is an instance attribute
-        "outputs": getattr(cls_obj, 'outputs', None),  # Will be None if outputs is an instance attribute
-        "class": cls_obj
-    }
-    for cls_name, cls_obj in inspect.getmembers(sys.modules['nodes'])
-    if inspect.isclass(cls_obj)
-]
+custom_classes = get_custom_classes()
+print("CUSTOM CLASSES")
+print(custom_classes)
+print("CUSTOM CLASSES")
 
 class Node:
     def __init__(self, js_node, py_node):
@@ -40,9 +32,9 @@ class Node:
         else:
             self.py_node = self.py_node()
         if len(args) > 0:
-            self.py_node.run(*args)
+            self.py_node._run(*args)
         else:
-            self.py_node.run()
+            self.py_node._run()
 
 class Graph:
     def __init__(self):
