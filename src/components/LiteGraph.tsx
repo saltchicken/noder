@@ -71,12 +71,19 @@ const setupSSE = useCallback(() => {
     eventSource.onmessage = function(event) {
         try {
             const data = JSON.parse(event.data);
-            console.log(data['id']);
+            // console.log(data['id']);
+            console.log(data);
             if (graphRef.current) {
                 const node = graphRef.current.getNodeById(data['id']);
                 if (node) {
-                    node.title = "TEST";
-                    node.setDirtyCanvas(true, true);
+                    if (data['running']) {
+                      node.bgcolor = "#4CAF50"; // Green background while running
+                      console.log("change color")
+                      node.setDirtyCanvas(true, false);
+                    } else {
+                      node.bgcolor = null; // Reset to default background
+                      node.setDirtyCanvas(true, false);
+                    }
                 }
             }
         } catch (error) {
