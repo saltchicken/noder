@@ -34,7 +34,7 @@ def get_returned_variables(source_code, function_name):
                         if isinstance(target, ast.Name):
                             if isinstance(stmt.value, ast.Subscript):
                                 if 'attr' in stmt.value.value.__dict__:
-                                    if "widget_values" in stmt.value.value.__dict__['attr']:
+                                    if "text_widgets" in stmt.value.value.__dict__['attr']:
                                         assignments.append(target.id)
                         
                             # if target.startswith("self.widget_values"):

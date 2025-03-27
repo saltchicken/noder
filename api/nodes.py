@@ -6,7 +6,7 @@ class Node:
         self.instantiated = True
         print(f"Node initialized {self.__class__.__name__}")
         self.send_message = lambda msg: None
-        self.widget_values = []
+        self.text_widgets = []
 
     def run(self, *args, **kwargs):
         pass
@@ -21,8 +21,8 @@ class Node:
 class Foo(Node):
     def run(self):
         time.sleep(1)
-        test_text = self.widget_values[0]
-        test_text2 = self.widget_values[1]
+        test_text = self.text_widgets[0]
+        test = self.text_widgets[1]
         FooOutput = test_text
         FooOutput2 = "FooOutput2"
 
@@ -43,13 +43,13 @@ class Bar(Node):
 class OllamaQuery(Node):
     def run(self, model: str, system_message: str, prompt: str, host: str, port: str, temperature: str, seed: str) -> Tuple[str, str]:
         from ollama_query import ollama_query
-        model_text = self.widget_values[0]
-        system_message_text = self.widget_values[1]
-        prompt_text = self.widget_values[2]
-        host_text = self.widget_values[3]
-        port_text = self.widget_values[4]
-        temperature_text = self.widget_values[5]
-        seed_text = self.widget_values[6]
+        model_text = self.text_widgets[0]
+        system_message_text = self.text_widgets[1]
+        prompt_text = self.text_widgets[2]
+        host_text = self.text_widgets[3]
+        port_text = self.text_widgets[4]
+        temperature_text = self.text_widgets[5]
+        seed_text = self.text_widgets[6]
 
         if system_message_text == "":
             system_message_text = None
