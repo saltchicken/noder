@@ -69,9 +69,9 @@ class OllamaQuery(Node):
         response, debug_text = ollama_query(model=model_text, prompt=prompt_text, system_message=system_message_text, host=host_text, port=port_text, temperature=temperature_text)
 
         return (response, debug_text)
-# class ShowText(Node):
 
-#     def run(self, text: str) -> str:
-#         display_text = self.text_widgets[0]
-#         self.send_message({'name': "display_text", "value": text})
-#         return display_text
+class ShowText(Node):
+    def run(self, text: str) -> str:
+        display_text = self.text_widgets[0] # {"multiline": true, "height": 100, "width": 200}
+        self.send_message({'name': "display_text", "value": text})
+        return display_text

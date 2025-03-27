@@ -16,10 +16,17 @@ function registerNode(LiteGraph: any, node: any) {
   function customNode() {
     this.title = node.name;
 
+    const widgetComments = node.widget_comments || {};
+    // console.log(node.name);
+    // console.log(widgetComments);
+
+
     for (let text_var of node.text_vars) {
+      const widgetProps = widgetComments[text_var] || {};
+      console.log(widgetProps);
       this.addWidget("text", text_var, "Default", function (value) {
         console.log("Text changed to : ", value);
-      });
+      }, widgetProps);
     }
 
     for (let number_var of node.number_vars) {
