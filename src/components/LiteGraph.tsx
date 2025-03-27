@@ -38,14 +38,8 @@ const LiteGraphComponent = () => {
   const isInitialized = useRef(false); //Note: Only needed for dev testing
 
   const handleGraphChange = useCallback((graph) => {
-    // Send updated graph state to backend
-    fetch("http://10.0.0.7:8001/process", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        graph: serializeGraph(graph) 
-      })
-    });
+      saveGraph();
+    
   }, []);
 
   const saveGraph = useCallback(() => {
@@ -56,7 +50,7 @@ const LiteGraphComponent = () => {
     }
   }, []);
 
-  const loadGraph = useCallback(() => {
+  const loadGraph = useCallback(async () => {
     if (graphRef.current) {
       const savedData = localStorage.getItem("savedGraph");
       if (savedData) {
@@ -109,24 +103,28 @@ const LiteGraphComponent = () => {
 
 
   useEffect(() => {
-    if (window.LiteGraph && canvasRef.current && !isInitialized.current) {
-      console.log("Doing the things");
-      LiteGraph.clearRegisteredTypes(); //TODO: Use litegraph core and this isn't needed
-      const graph = new window.LiteGraph.LGraph();
-      graphRef.current = graph;
+    const initGraph = async () => {
+        if (window.LiteGraph && canvasRef.current && !isInitialized.current) {
+          console.log("Doing the things");
+          LiteGraph.clearRegisteredTypes(); //TODO: Use litegraph core and this isn't needed
+          const graph = new window.LiteGraph.LGraph();
+          graphRef.current = graph;
 
-      // Register graph events
-      // graph.onNodeAdded = () => handleGraphChange(graph);
-      // graph.onNodeRemoved = () => handleGraphChange(graph);
-      // graph.onConnectionChange = () => handleGraphChange(graph);
 
-      const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
-      registerCustomNodes(window.LiteGraph);
-      // graph.start();
-      canvas.resize();
-      isInitialized.current = true; //NOTE: Only needed for dev testing
-   }
-  }, [handleGraphChange]);
+          const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
+          await registerCustomNodes(window.LiteGraph);
+          // graph.start();
+          canvas.resize();
+          isInitialized.current = true; //NOTE: Only needed for dev testing
+          await loadGraph();
+          // Register graph events
+          graph.onNodeAdded = () => handleGraphChange(graph);
+          graph.onNodeRemoved = () => handleGraphChange(graph);
+          graph.onConnectionChange = () => handleGraphChange(graph);
+      }
+    };
+    initGraph();
+  }, [handleGraphChange, loadGraph]);
 
   // Add methods to interact with the graph
 const sendGraphData = useCallback(() => {
@@ -150,12 +148,6 @@ const sendGraphData = useCallback(() => {
       <div className="controls">
         <button onClick={() => sendGraphData()}>
           Send Graph Data
-        </button>
-        <button onClick={() => saveGraph()}>
-          Save to Storage
-        </button>
-        <button onClick={() => loadGraph()}>
-          Load from Storage
         </button>
         <button onClick={() => saveToFile()}>
           Save to File
