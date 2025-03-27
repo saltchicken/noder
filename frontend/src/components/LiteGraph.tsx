@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import {registerCustomNodes} from "../utils/pythonNodes";
+// import {registerShowText} from "../utils/javascriptNodes"
 
 function serializeGraph(graph) {
     let data = graph.serialize();
@@ -150,6 +151,7 @@ const LiteGraphComponent = () => {
 
           const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
           await registerCustomNodes(window.LiteGraph);
+          // registerShowText(window.LiteGraph);
           // graph.start();
           canvas.resize();
           isInitialized.current = true; //NOTE: Only needed for dev testing
@@ -158,6 +160,7 @@ const LiteGraphComponent = () => {
           graph.onNodeAdded = () => handleGraphChange(graph);
           graph.onNodeRemoved = () => handleGraphChange(graph);
           graph.onConnectionChange = () => handleGraphChange(graph);
+          // graph.start();
       }
     };
     initGraph();
