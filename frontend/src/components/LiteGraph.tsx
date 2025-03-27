@@ -130,7 +130,6 @@ const LiteGraphComponent = () => {
   useEffect(() => {
     const initGraph = async () => {
         if (window.LiteGraph && canvasRef.current && !isInitialized.current) {
-          console.log("Doing the things");
           LiteGraph.clearRegisteredTypes(); //TODO: Use litegraph core and this isn't needed
           const graph = new window.LiteGraph.LGraph();
           graphRef.current = graph;

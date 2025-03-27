@@ -23,7 +23,6 @@ function registerNode(LiteGraph: any, node: any) {
     }
 
     for (let number_var of node.number_vars) {
-      console.log("Number var:", number_var);
       this.addWidget("number", number_var, 0, function (value) {
         console.log("Number changed to : ", value);
       });
