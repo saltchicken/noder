@@ -37,8 +37,6 @@ class Node:
 class Graph:
     def __init__(self):
         self.nodes = {}
-        self.sse_queue = asyncio.Queue()
-        # self.sse_active = True
 
     def add_node(self, node: Node):
         self.nodes[node.id] = node
@@ -71,11 +69,6 @@ class Graph:
     async def execute_nodes(self):
         # self.sse_active = True
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
-            await self.sse_queue.put(json.dumps({
-                "node": node.name,
-                "id": str(node.id),
-                "running": True,
-            }))
             previous_node_inputs = []
             if node.inputs is not None:
                 for input in node.inputs:
@@ -88,13 +81,6 @@ class Graph:
                     node.execute(*previous_node_inputs, widget_values=node.widget_values)
 
             await asyncio.create_task(execute_node())
-
-            await self.sse_queue.put(json.dumps({
-                "node": node.name,
-                "id": str(node.id),
-                "running": False,
-            }))
-        # self.sse_active = False
 
     async def process_nodes(self, graph_data):
         await self.add_nodes(graph_data)
@@ -111,8 +97,6 @@ class Graph:
                     if output_link == link:
                         return node.py_node.output_results[output_links['slot_index']]
         return None
-
-
 
 graph = Graph()
 app = FastAPI()
@@ -141,25 +125,6 @@ async def custom_nodes_handler():
     """Handles POST requests for custom nodes."""
     custom_classes_without_class = [{k: v for k, v in d.items() if k != 'class'} for d in custom_classes]
     return {"status": "success", "nodes": custom_classes_without_class}
-
-@app.get('/events')
-async def events():
-    async def event_stream():
-        print("Starting up")
-        while True:
-            try:
-                sse_message = await graph.sse_queue.get()
-                # print(sse_message)
-                yield f"data: {sse_message}\n\n"
-                # if not graph.sse_active and graph.sse_queue.empty():
-                #     # yield f"data: {json.dumps({'event': 'close'})}\n\n"
-                #     yield "data: close\n\n"
-                #     break
-            except asyncio.CancelledError:
-                print("Event needs to cancel")
-                break
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
-
 
 if __name__ == "__main__":
     import uvicorn

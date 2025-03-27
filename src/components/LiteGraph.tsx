@@ -12,7 +12,7 @@ function serializeGraph(graph) {
         }
     });
 
-  // console.log(data)
+  console.log(data)
     return data;
 }
 
@@ -38,7 +38,6 @@ const LiteGraphComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const graphRef = useRef(null);
   const isInitialized = useRef(false); //Note: Only needed for dev testing
-  const eventSourceRef = useRef<EventSource | null>(null);
 
   const handleGraphChange = useCallback((graph) => {
     // Send updated graph state to backend
@@ -50,72 +49,6 @@ const LiteGraphComponent = () => {
       })
     });
   }, []);
-
-  useEffect(() => {
-    setupSSE();
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-    };
-  }, []);
-
-const setupSSE = useCallback(() => {
-    console.log("Setting up SSE");
-    if (eventSourceRef.current) {
-      console.log("This shouldn't happen")
-        eventSourceRef.current.close();
-    }
-
-    const eventSource = new EventSource('http://10.0.0.7:8001/events');
-    eventSourceRef.current = eventSource;
-
-    eventSource.onmessage = function(event) {
-        try {
-        // if (event.data === "close") {
-        //     eventSourceRef.current.close();
-        //     eventSourceRef.current = null;
-        //     return;
-        // }
-        
-            const data = JSON.parse(event.data);
-            // console.log(data['id']);
-            // console.log(data);
-            if (graphRef.current) {
-                const node = graphRef.current.getNodeById(data['id']);
-                if (node) {
-                    if (data['running']) {
-                      node.bgcolor = "#4CAF50"; // Green background while running
-                      node.setDirtyCanvas(true, false);
-                    } else {
-                      node.bgcolor = null; // Reset to default background
-                      node.setDirtyCanvas(true, false);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error parsing SSE data:", error);
-        }
-    };
-
-    eventSource.onerror = function(error) {
-        console.log("SSE connection closed or errored");
-        if (eventSourceRef.current) {
-            console.log(error);
-            eventSourceRef.current.close();
-            eventSourceRef.current = null;
-        }
-    };
-
-    // Add onclose handler
-    // eventSource.addEventListener('close', function() {
-    //     console.log("SSE connection closed by server");
-    //     if (eventSourceRef.current) {
-    //         eventSourceRef.current.close();
-    //         eventSourceRef.current = null;
-    //     }
-    // });
-}, []);
 
   const saveGraph = useCallback(() => {
     if (graphRef.current) {
