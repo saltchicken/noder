@@ -115,6 +115,19 @@ const LiteGraphComponent = () => {
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log(data);
+      if (data.type == "update_widget") {
+        if (graphRef.current) {
+          let node = graphRef.current.getNodeById(data.node_id);
+          if (node) {
+            for (let widget of node.widgets) { 
+              if (widget.name == data.message.name) {
+                widget.value = data.message.value;
+                node.setDirtyCanvas(true, false);
+              }
+            }
+          }
+        }
+      }
       // setMessages(prev => ({
       //   ...prev,
       //   [data.node_id]: data.message

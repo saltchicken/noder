@@ -32,7 +32,7 @@ class Node:
             self.py_node = self.py_node()
         self.py_node.text_widgets = text_widgets
         self.py_node.number_widgets = number_widgets
-        self.py_node.send_message = lambda msg: message_queue.put({"node_id": self.id, "message": msg})
+        self.py_node.send_message = lambda msg: message_queue.put({"node_id": self.id, "type": "update_widget", "message": msg})
         if len(args) > 0:
             self.py_node._run(*args)
         else:
