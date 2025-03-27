@@ -8,7 +8,7 @@ function serializeGraph(graph) {
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
         if (node && node.widgets) {
-            nodeData.text_widgets = node.widgets.map(widget => widget.value);
+            nodeData.widget_values = node.widgets.map(widget => widget.value);
         }
     });
     return data;
@@ -20,10 +20,10 @@ function deserializeGraph(graph, data) {
     // Restore widget values
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
-        if (node && node.widgets && nodeData.text_widgets) {
+        if (node && node.widgets && nodeData.widget_values) {
             node.widgets.forEach((widget, i) => {
-                if (nodeData.text_widgets[i] !== undefined) {
-                    widget.value = nodeData.text_widgets[i];
+                if (nodeData.widget_values[i] !== undefined) {
+                    widget.value = nodeData.widget_values[i];
                 }
             });
         }
