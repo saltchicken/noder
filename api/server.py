@@ -67,7 +67,6 @@ class Graph:
             del self.nodes[id]
 
     async def execute_nodes(self):
-        # self.sse_active = True
         for id, node in sorted(self.nodes.items(), key=lambda item: item[1].order):
             previous_node_inputs = []
             if node.inputs is not None:
