@@ -15,6 +15,7 @@ def get_returned_variables(source_code, function_name):
     tree = ast.parse(textwrap.dedent(source_code))
     returned_vars = []
     text_vars = []
+    assignments = []
 
     for node in ast.walk(tree):
         # Check for function definition
@@ -30,11 +31,19 @@ def get_returned_variables(source_code, function_name):
                 # Look for assignments with _text in the name
                 if isinstance(stmt, ast.Assign):
                     for target in stmt.targets:
-                        if isinstance(target, ast.Name) and "_text" in target.id:
-                            text_vars.append(target.id)
-                            print(f"Found _text variable: {target.id}")
+                        if isinstance(target, ast.Name):
+                            if isinstance(stmt.value, ast.Subscript):
+                                if 'attr' in stmt.value.value.__dict__:
+                                    if "text_widgets" in stmt.value.value.__dict__['attr']:
+                                        assignments.append(target.id)
+                        
+                            # if target.startswith("self.widget_values"):
+                            #     assignments.append(stmt.value.value)
+                            # if "_text" in target.id:
+                            #     text_vars.append(target.id)
+                            #     print(f"Found _text variable: {target.id}")
     
-    text_vars = list(set(text_vars))
+    text_vars = assignments
     return returned_vars, text_vars
 
 def get_run_methods(module):

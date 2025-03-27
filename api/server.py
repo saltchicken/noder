@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import json
 
+import queue
 import asyncio
 from node_utils import get_custom_classes
 
 custom_classes = get_custom_classes()
+message_queue = queue.Queue()
 
 class Node:
     def __init__(self, js_node, py_node):
@@ -23,12 +25,13 @@ class Node:
         self.outputs = js_node.get('outputs', None)
         self.properties = js_node.get('properties', None)
 
-    def execute(self, *args, widget_values=None):
+    def execute(self, *args, widgets=None):
         if hasattr(self.py_node, "instantiated"):
             pass
         else:
             self.py_node = self.py_node()
-        self.py_node.widget_values = widget_values
+        self.py_node.text_widgets = widgets
+        self.py_node.send_message = lambda msg: message_queue.put({"node_id": self.id, "message": msg})
         if len(args) > 0:
             self.py_node._run(*args)
         else:
@@ -52,8 +55,8 @@ class Graph:
                         self.add_node(graph_node)
                     else:
                         self.nodes[node['id']].setup(node)
-                    widget_values = node.get('widget_values', [])
-                    self.nodes[node['id']].widget_values = widget_values
+                    text_widgets = node.get('text_widgets', [])
+                    self.nodes[node['id']].text_widgets = text_widgets
                     break
 
     async def remove_missing_nodes(self, graph_data):
@@ -75,9 +78,9 @@ class Graph:
 
             async def execute_node():
                 if len(previous_node_inputs) == 0:
-                    node.execute(widget_values=node.widget_values)
+                    node.execute(widgets=node.text_widgets)
                 else:
-                    node.execute(*previous_node_inputs, widget_values=node.widget_values)
+                    node.execute(*previous_node_inputs, widgets=node.text_widgets)
 
             await asyncio.create_task(execute_node())
 
@@ -124,6 +127,17 @@ async def custom_nodes_handler():
     """Handles POST requests for custom nodes."""
     custom_classes_without_class = [{k: v for k, v in d.items() if k != 'class'} for d in custom_classes]
     return {"status": "success", "nodes": custom_classes_without_class}
+
+@app.get("/events")
+async def events():
+    async def event_generator():
+        while True:
+            if not message_queue.empty():
+                message = message_queue.get()
+                yield f"data: {json.dumps(message)}\n\n"
+            await asyncio.sleep(0.1)
+    
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
     import uvicorn
