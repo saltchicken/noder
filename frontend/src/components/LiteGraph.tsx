@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import {registerCustomNodes} from "../utils/pythonNodes";
 // import {registerShowText} from "../utils/javascriptNodes"
 
+
 function serializeGraph(graph) {
     let data = graph.serialize();
 

@@ -1,0 +1,14 @@
+.graphdialog .name {
+    display: None;
+}
+
+.graphdialog input, .graphdialog textarea, .graphdialog select {
+    margin: 3px;
+    min-width: 500px;
+    /*min-height: 5em;*/
+    background-color: black;
+    border: 0;
+    color: white;
+    padding-left: 10px;
+    outline: none;
+}
