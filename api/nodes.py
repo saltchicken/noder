@@ -7,6 +7,7 @@ class Node:
         print(f"Node initialized {self.__class__.__name__}")
         self.send_message = lambda msg: None
         self.text_widgets = []
+        self.number_widgets = []
 
     def run(self, *args, **kwargs):
         pass
@@ -21,10 +22,14 @@ class Node:
 class Foo(Node):
     def run(self):
         time.sleep(1)
-        test_text = self.text_widgets[0]
-        test = self.text_widgets[1]
-        FooOutput = test_text
-        FooOutput2 = "FooOutput2"
+        first = self.text_widgets[0]
+        second = self.text_widgets[1]
+        yes = self.number_widgets[0]
+        no = self.number_widgets[1]
+        print(f"Yes: {yes}")
+        print(f"No: {no}")
+        FooOutput = first
+        FooOutput2 = second
 
         self.send_message("Testing")
 

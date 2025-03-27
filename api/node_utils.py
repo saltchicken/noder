@@ -10,17 +10,15 @@ import nodes
 
 def get_returned_variables(source_code, function_name):
     """
-    Parses the function's AST to extract returned variable names and _text variables.
+    Parses the function's AST to extract returned variable names, text variables, and number variables.
     """
     tree = ast.parse(textwrap.dedent(source_code))
     returned_vars = []
-    text_vars = []
-    assignments = []
+    text_assignments = []
+    number_assignments = []
 
     for node in ast.walk(tree):
-        # Check for function definition
         if isinstance(node, ast.FunctionDef) and node.name == function_name:
-            # Look for return statements
             for stmt in ast.walk(node):
                 if isinstance(stmt, ast.Return):
                     if isinstance(stmt.value, ast.Name):
@@ -28,23 +26,17 @@ def get_returned_variables(source_code, function_name):
                     elif isinstance(stmt.value, ast.Tuple):
                         returned_vars.extend([elt.id for elt in stmt.value.elts if isinstance(elt, ast.Name)])
                 
-                # Look for assignments with _text in the name
                 if isinstance(stmt, ast.Assign):
                     for target in stmt.targets:
                         if isinstance(target, ast.Name):
                             if isinstance(stmt.value, ast.Subscript):
                                 if 'attr' in stmt.value.value.__dict__:
                                     if "text_widgets" in stmt.value.value.__dict__['attr']:
-                                        assignments.append(target.id)
-                        
-                            # if target.startswith("self.widget_values"):
-                            #     assignments.append(stmt.value.value)
-                            # if "_text" in target.id:
-                            #     text_vars.append(target.id)
-                            #     print(f"Found _text variable: {target.id}")
+                                        text_assignments.append(target.id)
+                                    elif "number_widgets" in stmt.value.value.__dict__['attr']:
+                                        number_assignments.append(target.id)
     
-    text_vars = assignments
-    return returned_vars, text_vars
+    return returned_vars, text_assignments, number_assignments
 
 def get_run_methods(module):
     run_methods = {}
@@ -62,7 +54,7 @@ def get_run_methods(module):
                 except OSError:
                     source_code = ""
 
-                returned_vars, text_vars = get_returned_variables(source_code, method_name)
+                returned_vars, text_vars, number_vars = get_returned_variables(source_code, method_name)
 
                 # Handle inputs
                 inputs = []
@@ -76,10 +68,8 @@ def get_run_methods(module):
 
                 # Handle outputs
                 outputs = []
-                # First check class-level outputs attribute
                 if hasattr(cls, 'outputs'):
                     outputs = cls.outputs
-                # If no class-level outputs, try to get from return annotation and variables
                 elif returned_vars:
                     outputs = [{"name": var, "type": "STRING"} for var in returned_vars]
 
@@ -90,7 +80,8 @@ def get_run_methods(module):
                     "file": inspect.getsourcefile(method),
                     "line": start_line,
                     "outputs": outputs,
-                    "text_vars": text_vars
+                    "text_vars": text_vars,
+                    "number_vars": number_vars
                 }
 
     return run_methods
@@ -108,21 +99,23 @@ def get_custom_classes():
     run_methods = get_run_methods(module)
 
     inputs = {}
-    outputs= {}
+    outputs = {}
     text_vars = {}
+    number_vars = {}
     for name, info in run_methods.items():
         cls_name = name.split('.')[0]
         inputs[cls_name] = info["parameters"]
         outputs[cls_name] = info["outputs"]
         text_vars[cls_name] = info["text_vars"]
-
+        number_vars[cls_name] = info["number_vars"]
 
     custom_classes = [
         {
             "name": cls_name,
-            "inputs": inputs[cls_name],  # Will be None if inputs is an instance attribute
-            "outputs": outputs[cls_name],  # Will be None if outputs is an instance attribute
-            "text_vars" : text_vars[cls_name],
+            "inputs": inputs[cls_name],
+            "outputs": outputs[cls_name],
+            "text_vars": text_vars[cls_name],
+            "number_vars": number_vars[cls_name],
             "class": cls_obj
         }
         for cls_name, cls_obj in inspect.getmembers(sys.modules['nodes'])

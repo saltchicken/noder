@@ -2,13 +2,20 @@ import React, { useEffect, useRef, useCallback } from "react";
 import {registerCustomNodes} from "../utils/pythonNodes";
 
 function serializeGraph(graph) {
-    let data = graph.serialize(); // Get base graph data
+    let data = graph.serialize();
 
-    // Manually add widget values to nodes
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
         if (node && node.widgets) {
-            nodeData.text_widgets = node.widgets.map(widget => widget.value);
+            nodeData.text_widgets = [];
+            nodeData.number_widgets = [];
+            node.widgets.forEach(widget => {
+                if (widget.type === "text") {
+                    nodeData.text_widgets.push(widget.value);
+                } else if (widget.type === "number") {
+                    nodeData.number_widgets.push(widget.value);
+                }
+            });
         }
     });
     return data;
@@ -20,16 +27,17 @@ function deserializeGraph(graph, data) {
     // Restore widget values
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
-        if (node && node.widgets && nodeData.text_widgets) {
+        if (node && node.widgets) {
             node.widgets.forEach((widget, i) => {
-                if (nodeData.text_widgets[i] !== undefined) {
-                    widget.value = nodeData.text_widgets[i];
+                if (widget.type === "text" && nodeData.text_widgets) {
+                    widget.value = nodeData.text_widgets.shift();
+                } else if (widget.type === "number" && nodeData.number_widgets) {
+                    widget.value = nodeData.number_widgets.shift();
                 }
             });
         }
     });
 }
-
 
 
 const LiteGraphComponent = () => {
