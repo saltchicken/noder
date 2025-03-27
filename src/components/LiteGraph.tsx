@@ -145,7 +145,7 @@ const sendGraphData = useCallback(() => {
         ref={canvasRef}
         style={{ width: "100%", height: "100%" }}
       ></canvas>
-      <div className="controls">
+      <div className="button-overlay">
         <button onClick={() => sendGraphData()}>
           Send Graph Data
         </button>

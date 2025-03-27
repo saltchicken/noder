@@ -6,7 +6,7 @@ import LiteGraphComponent from "./components/LiteGraph.tsx"
 function App() {
   return (
     <div>
-      <div style={{width: "100%", height: "80vh"}}>
+      <div>
       <LiteGraphComponent />
       </div>
     </div>
