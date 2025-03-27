@@ -34,6 +34,7 @@ def get_returned_variables(source_code, function_name):
                             text_vars.append(target.id)
                             print(f"Found _text variable: {target.id}")
     
+    text_vars = list(set(text_vars))
     return returned_vars, text_vars
 
 def get_run_methods(module):
