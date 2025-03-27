@@ -11,8 +11,6 @@ function serializeGraph(graph) {
             nodeData.widget_values = node.widgets.map(widget => widget.value);
         }
     });
-
-  console.log(data)
     return data;
 }
 
