@@ -1,19 +1,124 @@
-# Vite + Deno + React + TypeScript
+# LiteGraph Node Editor with Python Backend
 
-## Running
+A visual node editor built with LiteGraph.js and Python, allowing creation and execution of custom nodes with a React frontend.
 
-You need to have Deno v2.0.0 or later installed to run this repo.
+## Setup
 
-Start a dev server:
+### Requirements
+- Deno v2.0.0 or later
+- Python 3.7+
+- FastAPI
+
+### Installation
+
+1. Install Python dependencies:
+```bash
+pip install fastapi uvicorn
+```
+
+2. Install Deno dependencies:
+```bash
+cd frontend
+deno task dev
+```
+
+## Running the Project
+
+1. Start the Python backend:
+```bash
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
+```
+
+2. Start the frontend development server:
+```bash
+cd frontend
+deno task dev
+```
+
+The application will be available at `http://localhost:5173`
+
+## Creating Custom Nodes
+
+### Creating a Node in `nodes.py`
+
+1. Create a new class that inherits from `Node`:
+
+```python
+class MyCustomNode(Node):
+    def __init__(self):
+        super().__init__()
+        
+    def run(self, input_param: str) -> str:
+        # Access widget values using self.text_widgets and self.number_widgets
+        widget_value = self.text_widgets[0]
+        
+        # Your node logic here
+        result = f"{input_param}: {widget_value}"
+        
+        return result
+```
+
+2. Add widgets using comments:
+```python
+class MyCustomNode(Node):
+    def run(self, input_param: str) -> str:
+        # Basic text widget
+        text_input = self.text_widgets[0]  # {"multiline": false}
+        
+        # Multiline text widget with drawing
+        display_text = self.text_widgets[1]  # {"multiline": true, "draw_text": true}
+        
+        # Number widget
+        number_input = self.number_widgets[0]
+        
+        return "result"
+```
+
+### Widget Properties
+
+Available widget properties in comments:
+- `multiline`: (boolean) Enable multiline text input
+- `draw_text`: (boolean) Enable text drawing on node
+- `height`: (number) Widget height in pixels
+- `width`: (number) Widget width in pixels
+
+### Node Features
+
+1. Input/Output:
+- Input parameters in the `run` method become input slots
+- Return values become output slots
+- Use type hints for better clarity
+
+2. Widgets:
+- Access text widgets via `self.text_widgets[index]`
+- Access number widgets via `self.number_widgets[index]`
+
+3. Sending Messages:
+```python
+def run(self):
+    self.send_message({'name': 'display_text', 'value': 'Hello'})
+    return result
+```
+
+## Project Structure
 
 ```
-$ deno task dev
+├── backend/
+│   ├── nodes.py         # Custom node definitions
+│   ├── node_utils.py    # Node parsing utilities
+│   └── server.py        # FastAPI server
+├── frontend/
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   └── utils/       # Node registration logic
+│   ├── deno.json       # Deno configuration
+│   └── vite.config.ts  # Vite configuration
+└── README.md
 ```
 
-## Deploy
+## Building for Production
 
-Build production assets:
-
-```
-$ deno task build
-```
+```bash
+cd frontend
+deno task build
