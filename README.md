@@ -28,7 +28,7 @@ cd frontend
 deno task build && deno task serve
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:8000`
 
 ## Creating Custom Nodes
 
@@ -51,7 +51,7 @@ class MyCustomNode(Node):
         return result
 ```
 
-2. Add widgets using comments:
+2. Add properties to widgets using comments:
 ```python
 class MyCustomNode(Node):
     def run(self, input_param: str) -> str:
@@ -68,8 +68,6 @@ class MyCustomNode(Node):
 
 Available widget properties in comments:
 - `multiline`: (boolean) Enable multiline text input
-- `height`: (number) Widget height in pixels
-- `width`: (number) Widget width in pixels
 
 ### Node Features
 
@@ -104,9 +102,3 @@ def run(self):
 │   └── vite.config.ts  # Vite configuration
 └── README.md
 ```
-
-## Building for Production
-
-```bash
-cd frontend
-deno task build
