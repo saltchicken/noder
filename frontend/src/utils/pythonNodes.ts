@@ -24,11 +24,10 @@ function registerNode(LiteGraph: any, node: any) {
     for (let text_var of node.text_vars) {
       const widgetProps = widgetComments[text_var] || {};
       console.log(widgetProps);
-      this.addWidget("text", text_var, "Default", function (value) {
-        console.log("Text changed to : ", value);
-      }, widgetProps);
+        this.addWidget("text", text_var, "Default", function (value) {
+          console.log("Text changed to : ", value);
+        }, widgetProps);
       }
-    }
 
     for (let number_var of node.number_vars) {
       this.addWidget("number", number_var, 0, function (value) {
@@ -60,28 +59,29 @@ function registerNode(LiteGraph: any, node: any) {
 
   LiteGraph.registerNodeType(node['name'], customNode);
 }
-        //   this.writeText = function(ctx, text: string) {
-        //   const lineHeight = 20;
-        //   const lines = text.split('\n');
-        //
-        //   lines.forEach((line, index) => {
-        //     const y = 30 + lineHeight + (index * lineHeight);
-        //     ctx.fillText(line, 30, y);
-        //   });
-        // }
-        //
-        // this.onDrawForeground = function(ctx, graphcanvas) {
-        //   if(this.flags.collapsed){
-        //     return;
-        //   }
-        //   ctx.save();
-        //   ctx.fillColor = "black";
-        //   ctx.fillRect(30,30,this.size[0] - 60,this.size[1] - 60);
-        //   ctx.fillStyle = "white";
-        //   ctx.font = "12px Arial";
-        //   this.writeText(ctx, "Some text\nSome More\nAnd even some more");
-        //   ctx.restore();
-        // }
-        // this.onResize = function() {
-        //   this.setDirtyCanvas(true, true);
-        // }
+//   this.writeText = function(ctx, text: string) {
+//   const lineHeight = 20;
+//   const lines = text.split('\n');
+//
+//   lines.forEach((line, index) => {
+//     const y = 30 + lineHeight + (index * lineHeight);
+//     ctx.fillText(line, 30, y);
+//   });
+// }
+//
+// this.onDrawForeground = function(ctx, graphcanvas) {
+//   if(this.flags.collapsed){
+//     return;
+//   }
+//   ctx.save();
+//   ctx.fillColor = "black";
+//   ctx.fillRect(30,30,this.size[0] - 60,this.size[1] - 60);
+//   ctx.fillStyle = "white";
+//   ctx.font = "12px Arial";
+//   this.writeText(ctx, "Some text\nSome More\nAnd even some more");
+//   ctx.restore();
+// }
+// this.onResize = function() {
+//   this.setDirtyCanvas(true, true);
+// }
+// }
