@@ -8,6 +8,7 @@ class Node:
         self.send_message = lambda msg: None
         self.text_widgets = []
         self.number_widgets = []
+        self.select_widgets = []
 
     def run(self, *args, **kwargs):
         pass
@@ -26,8 +27,8 @@ class Foo(Node):
         second = self.text_widgets[1]
         yes = self.number_widgets[0]
         no = self.number_widgets[1]
-        print(f"Yes: {yes}")
-        print(f"No: {no}")
+        new = self.select_widgets[0] # {"values": ["1", "2", "3"]}
+        print(f"new: {new}")
         FooOutput = first
         FooOutput2 = second
 

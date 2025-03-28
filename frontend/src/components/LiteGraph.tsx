@@ -11,11 +11,14 @@ function serializeGraph(graph) {
         if (node && node.widgets) {
             nodeData.text_widgets = [];
             nodeData.number_widgets = [];
+            nodeData.select_widgets = [];
             node.widgets.forEach(widget => {
                 if (widget.type === "text") {
                     nodeData.text_widgets.push(widget.value);
                 } else if (widget.type === "number") {
                     nodeData.number_widgets.push(widget.value);
+                } else if (widget.type === "combo") {
+                  nodeData.select_widgets.push(widget.value);
                 }
             });
         }
@@ -35,6 +38,8 @@ function deserializeGraph(graph, data) {
                     widget.value = nodeData.text_widgets.shift();
                 } else if (widget.type === "number" && nodeData.number_widgets) {
                     widget.value = nodeData.number_widgets.shift();
+                } else if (widget.type === "combo" && nodeData.select_widgets) {
+                  widget.value = nodeData.select_widgets.shift();
                 }
             });
         }

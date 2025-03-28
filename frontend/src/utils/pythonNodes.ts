@@ -35,6 +35,14 @@ function registerNode(LiteGraph: any, node: any) {
       });
     }
 
+    for (let select_var of node.select_vars) {
+      const widgetProps = widgetComments[select_var] || {};
+      console.log(widgetProps);
+      this.addWidget("combo", select_var, "Default", function (value) {
+        console.log("Select changed to : ", value);
+      }, widgetProps);
+    }
+
     // this.addWidget("text","name","Default", function (value){
     //     console.log("Text changed to : ", value)
     //   }); 
