@@ -61,6 +61,7 @@ class MyCustomNode(Node):
         # Number widget
         number_input = self.number_widgets[0]
         
+        select_input = self.select_widgets[0] # {"values": ["1", "2", "3"]}
         return "result"
 ```
 
@@ -68,6 +69,8 @@ class MyCustomNode(Node):
 
 Available widget properties in comments:
 - `multiline`: (boolean) Enable multiline text input
+
+- `values`: (list) Required for select inputs. Dropdown selections
 
 ### Node Features
 
@@ -79,6 +82,7 @@ Available widget properties in comments:
 2. Widgets:
 - Access text widgets via `self.text_widgets[index]`
 - Access number widgets via `self.number_widgets[index]`
+- Access select widgets via `self.select_widgets[index]`
 
 3. Sending Messages:
 ```python
