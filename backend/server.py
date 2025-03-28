@@ -24,15 +24,18 @@ class Node:
         self.inputs = js_node.get('inputs', None)
         self.outputs = js_node.get('outputs', None)
         self.properties = js_node.get('properties', None)
+        self.text_widgets = js_node.get('text_widgets', [])
+        self.number_widgets = js_node.get('number_widgets', [])
+        self.select_widgets = js_node.get('select_widgets', [])
 
-    def execute(self, *args, text_widgets=None, number_widgets=None, select_widgets=None):
+    def execute(self, *args):
         if hasattr(self.py_node, "instantiated"):
             pass
         else:
             self.py_node = self.py_node()
-        self.py_node.text_widgets = text_widgets
-        self.py_node.number_widgets = number_widgets
-        self.py_node.select_widgets = select_widgets
+        self.py_node.text_widgets = self.text_widgets
+        self.py_node.number_widgets = self.number_widgets
+        self.py_node.select_widgets = self.select_widgets
         self.py_node.send_message = lambda msg: message_queue.put({"node_id": self.id, "type": "update_widget", "message": msg})
         if len(args) > 0:
             self.py_node._run(*args)
@@ -84,9 +87,9 @@ class Graph:
 
             async def execute_node():
                 if len(previous_node_inputs) == 0:
-                    node.execute(text_widgets=node.text_widgets, number_widgets=node.number_widgets, select_widgets=node.select_widgets)
+                    node.execute()
                 else:
-                    node.execute(*previous_node_inputs, text_widgets=node.text_widgets, number_widgets=node.number_widgets, select_widgets=node.select_widgets)
+                    node.execute(*previous_node_inputs)
 
             await asyncio.create_task(execute_node())
 
