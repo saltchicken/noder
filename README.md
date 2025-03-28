@@ -11,29 +11,21 @@ A visual node editor built with LiteGraph.js and Python, allowing creation and e
 
 ### Installation
 
-1. Install Python dependencies:
 ```bash
 pip install fastapi uvicorn
 ```
-
-2. Install Deno dependencies:
-```bash
-cd frontend
-deno task dev
-```
-
 ## Running the Project
 
 1. Start the Python backend:
 ```bash
 cd backend
-uvicorn server:app --reload --host 0.0.0.0 --port 8001
+python server.py
 ```
 
 2. Start the frontend development server:
 ```bash
 cd frontend
-deno task dev
+deno task build && deno task serve
 ```
 
 The application will be available at `http://localhost:5173`
@@ -66,9 +58,6 @@ class MyCustomNode(Node):
         # Basic text widget
         text_input = self.text_widgets[0]  # {"multiline": false}
         
-        # Multiline text widget with drawing
-        display_text = self.text_widgets[1]  # {"multiline": true, "draw_text": true}
-        
         # Number widget
         number_input = self.number_widgets[0]
         
@@ -79,7 +68,6 @@ class MyCustomNode(Node):
 
 Available widget properties in comments:
 - `multiline`: (boolean) Enable multiline text input
-- `draw_text`: (boolean) Enable text drawing on node
 - `height`: (number) Widget height in pixels
 - `width`: (number) Widget width in pixels
 
