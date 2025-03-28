@@ -60,6 +60,8 @@ function registerNode(LiteGraph: any, node: any) {
       });
     }
 
+    // this.serialize_widgets = true;
+
 
 
   }

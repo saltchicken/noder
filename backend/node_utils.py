@@ -33,33 +33,38 @@ def get_returned_variables(source_code, function_name):
                     for target in stmt.targets:
                         if isinstance(target, ast.Name):
                             if isinstance(stmt.value, ast.Subscript):
-                                if 'attr' in stmt.value.value.__dict__:
-                                    if "text_widgets" in stmt.value.value.__dict__['attr']:
-                                        text_assignments.append(target.id)
-                                        lineno = stmt.lineno
-                                        source_lines = source_code.splitlines()
-                                        if lineno - 1 < len(source_lines):
-                                            line = source_lines[lineno - 1]
-                                            if '#' in line:
-                                                comment = line[line.index('#')+1:].strip()
-                                                try:
-                                                    widget_comments[target.id] = json.loads(comment)
-                                                except:
-                                                    print("Failed to parse comment as JSON:", comment)
-                                    elif "number_widgets" in stmt.value.value.__dict__['attr']:
-                                        number_assignments.append(target.id)
-                                    elif "select_widgets" in stmt.value.value.__dict__['attr']:
-                                        select_assignments.append(target.id)
-                                        lineno = stmt.lineno
-                                        source_lines = source_code.splitlines()
-                                        if lineno - 1 < len(source_lines):
-                                            line = source_lines[lineno - 1]
-                                            if '#' in line:
-                                                comment = line[line.index('#')+1:].strip()
-                                                try:
-                                                    widget_comments[target.id] = json.loads(comment)
-                                                except:
-                                                    print("Failed to parse comment as JSON:", comment)
+                                if 'value' in stmt.value.value.__dict__:
+                                    if isinstance(stmt.value.value.value, ast.Attribute):
+                                        attr = stmt.value.value.value
+                                        if 'attr' in attr.__dict__ and attr.attr == 'widgets':
+                                            if isinstance(stmt.value.value.slice, ast.Constant):
+                                                widget_type = stmt.value.value.slice.value
+                                                if widget_type == "text":
+                                                    text_assignments.append(target.id)
+                                                    lineno = stmt.lineno
+                                                    source_lines = source_code.splitlines()
+                                                    if lineno - 1 < len(source_lines):
+                                                        line = source_lines[lineno - 1]
+                                                        if '#' in line:
+                                                            comment = line[line.index('#')+1:].strip()
+                                                            try:
+                                                                widget_comments[target.id] = json.loads(comment)
+                                                            except:
+                                                                print("Failed to parse comment as JSON:", comment)
+                                                elif widget_type == "number":
+                                                    number_assignments.append(target.id)
+                                                elif widget_type == 'select':
+                                                    select_assignments.append(target.id)
+                                                    lineno = stmt.lineno
+                                                    source_lines = source_code.splitlines()
+                                                    if lineno - 1 < len(source_lines):
+                                                        line = source_lines[lineno - 1]
+                                                        if '#' in line:
+                                                            comment = line[line.index('#')+1:].strip()
+                                                            try:
+                                                                widget_comments[target.id] = json.loads(comment)
+                                                            except:
+                                                                print("Failed to parse comment as JSON:", comment)
 
     print(widget_comments)
     return returned_vars, text_assignments, number_assignments, select_assignments, widget_comments

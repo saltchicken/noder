@@ -5,6 +5,7 @@ import {registerCustomNodes} from "../utils/pythonNodes";
 
 function serializeGraph(graph) {
     let data = graph.serialize();
+    console.log(data);
 
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);

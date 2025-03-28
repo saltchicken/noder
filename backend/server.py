@@ -24,18 +24,19 @@ class Node:
         self.inputs = js_node.get('inputs', None)
         self.outputs = js_node.get('outputs', None)
         self.properties = js_node.get('properties', None)
-        self.text_widgets = js_node.get('text_widgets', [])
-        self.number_widgets = js_node.get('number_widgets', [])
-        self.select_widgets = js_node.get('select_widgets', [])
+        self.widgets = {
+            'text': js_node.get('text_widgets', []),
+            'number': js_node.get('number_widgets', []),
+            'select': js_node.get('select_widgets', [])
+        }
+        
 
     def execute(self, *args):
         if hasattr(self.py_node, "instantiated"):
             pass
         else:
             self.py_node = self.py_node()
-        self.py_node.text_widgets = self.text_widgets
-        self.py_node.number_widgets = self.number_widgets
-        self.py_node.select_widgets = self.select_widgets
+        self.py_node.widgets = self.widgets
         self.py_node.send_message = lambda msg: message_queue.put({"node_id": self.id, "type": "update_widget", "message": msg})
         if len(args) > 0:
             self.py_node._run(*args)
@@ -60,12 +61,6 @@ class Graph:
                         self.add_node(graph_node)
                     else:
                         self.nodes[node['id']].setup(node)
-                    text_widgets = node.get('text_widgets', [])
-                    number_widgets = node.get('number_widgets', [])
-                    select_widgets = node.get('select_widgets', [])
-                    self.nodes[node['id']].text_widgets = text_widgets
-                    self.nodes[node['id']].number_widgets = number_widgets
-                    self.nodes[node['id']].select_widgets = select_widgets
                     break
 
     async def remove_missing_nodes(self, graph_data):
