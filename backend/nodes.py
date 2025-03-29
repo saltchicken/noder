@@ -39,6 +39,7 @@ class Bar(Node):
         time.sleep(2)
         BarOutput = BarInput[::-1]
         BarOutput2 = BarInput2[::-1]
+        test_test = self.widgets['display_text'][0]
 
         print(f"{BarOutput} and {BarOutput2}")
 

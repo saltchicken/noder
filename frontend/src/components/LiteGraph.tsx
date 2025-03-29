@@ -5,7 +5,6 @@ import {registerCustomNodes} from "../utils/pythonNodes";
 
 function serializeGraph(graph) {
     let data = graph.serialize();
-    console.log(data);
 
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
@@ -13,6 +12,7 @@ function serializeGraph(graph) {
             nodeData.text_widgets = [];
             nodeData.number_widgets = [];
             nodeData.select_widgets = [];
+            nodeData.display_text_widgets = [];
             node.widgets.forEach(widget => {
                 if (widget.type === "text") {
                     nodeData.text_widgets.push(widget.value);
@@ -20,6 +20,8 @@ function serializeGraph(graph) {
                     nodeData.number_widgets.push(widget.value);
                 } else if (widget.type === "combo") {
                   nodeData.select_widgets.push(widget.value);
+                } else if (widget.type === "display_text") {
+                  nodeData.display_text_widgets.push(widget.value)
                 }
             });
         }
@@ -34,15 +36,17 @@ function deserializeGraph(graph, data) {
     data.nodes.forEach(nodeData => {
         let node = graph.getNodeById(nodeData.id);
         if (node && node.widgets) {
-            node.widgets.forEach((widget, i) => {
-                if (widget.type === "text" && nodeData.text_widgets) {
-                    widget.value = nodeData.text_widgets.shift();
-                } else if (widget.type === "number" && nodeData.number_widgets) {
-                    widget.value = nodeData.number_widgets.shift();
-                } else if (widget.type === "combo" && nodeData.select_widgets) {
-                  widget.value = nodeData.select_widgets.shift();
-                }
-            });
+          node.widgets.forEach((widget, i) => {
+            if (widget.type === "text" && nodeData.text_widgets) {
+              widget.value = nodeData.text_widgets.shift();
+            } else if (widget.type === "number" && nodeData.number_widgets) {
+              widget.value = nodeData.number_widgets.shift();
+            } else if (widget.type === "combo" && nodeData.select_widgets) {
+              widget.value = nodeData.select_widgets.shift();
+            } else if (widget.type === "display_text" && nodeData.display_text_widgets) {
+              widget.value = nodeData.display_text_widgets.shift();
+            }
+          });
         }
     });
 }

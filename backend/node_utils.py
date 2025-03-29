@@ -18,6 +18,7 @@ def get_returned_variables(source_code, function_name):
     text_assignments = []
     number_assignments = []
     select_assignments = []
+    display_text_assignments = []
     widget_comments = {}
 
     for node in ast.walk(tree):
@@ -65,9 +66,12 @@ def get_returned_variables(source_code, function_name):
                                                                 widget_comments[target.id] = json.loads(comment)
                                                             except:
                                                                 print("Failed to parse comment as JSON:", comment)
+                                                elif widget_type == 'display_text':
+                                                    display_text_assignments.append(target.id)
 
     print(widget_comments)
-    return returned_vars, text_assignments, number_assignments, select_assignments, widget_comments
+    print(display_text_assignments)
+    return returned_vars, text_assignments, number_assignments, select_assignments, display_text_assignments, widget_comments
 
 def get_run_methods(module):
     run_methods = {}
@@ -85,7 +89,7 @@ def get_run_methods(module):
                 except OSError:
                     source_code = ""
 
-                returned_vars, text_vars, number_vars, select_vars, widget_comments = get_returned_variables(source_code, method_name)
+                returned_vars, text_vars, number_vars, select_vars, display_text_vars, widget_comments = get_returned_variables(source_code, method_name)
 
                 # Handle inputs
                 inputs = []
@@ -114,6 +118,7 @@ def get_run_methods(module):
                     "text_vars": text_vars,
                     "number_vars": number_vars,
                     "select_vars": select_vars,
+                    "display_text_vars": display_text_vars,
                     "widget_comments": widget_comments
 
                 }
@@ -137,6 +142,7 @@ def get_custom_classes():
     text_vars = {}
     number_vars = {}
     select_vars = {}
+    display_text_vars = {}
     widget_comments = {}
     for name, info in run_methods.items():
         cls_name = name.split('.')[0]
@@ -145,6 +151,7 @@ def get_custom_classes():
         text_vars[cls_name] = info["text_vars"]
         number_vars[cls_name] = info["number_vars"]
         select_vars[cls_name] = info["select_vars"]
+        display_text_vars[cls_name] = info["display_text_vars"]
         widget_comments[cls_name] = info["widget_comments"]
 
     custom_classes = [
@@ -155,6 +162,7 @@ def get_custom_classes():
             "text_vars": text_vars[cls_name],
             "number_vars": number_vars[cls_name],
             "select_vars": select_vars[cls_name],
+            "display_text_vars": display_text_vars[cls_name],
             "widget_comments": widget_comments[cls_name],
             "class": cls_obj
         }

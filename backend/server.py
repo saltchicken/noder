@@ -8,6 +8,7 @@ import asyncio
 from node_utils import get_custom_classes
 
 custom_classes = get_custom_classes()
+print(custom_classes)
 message_queue = queue.Queue()
 
 class Node:
@@ -27,7 +28,8 @@ class Node:
         self.widgets = {
             'text': js_node.get('text_widgets', []),
             'number': js_node.get('number_widgets', []),
-            'select': js_node.get('select_widgets', [])
+            'select': js_node.get('select_widgets', []),
+            'display_text': js_node.get('display_text_widgets', [])
         }
         
 

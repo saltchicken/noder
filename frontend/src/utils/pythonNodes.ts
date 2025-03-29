@@ -15,6 +15,9 @@ export async function registerCustomNodes(LiteGraph: any) {
 function registerNode(LiteGraph: any, node: any) {
   function customNode() {
     this.title = node.name;
+    console.log("Node")
+    console.log(node);
+    console.log("------------------")
 
     const widgetComments = node.widget_comments || {};
     // console.log(node.name);
@@ -43,6 +46,39 @@ function registerNode(LiteGraph: any, node: any) {
       }, widgetProps);
     }
 
+    for (let display_text_var of node.display_text_vars) {
+      const widgetProps = widgetComments[display_text_var] || {};
+      this.value = "Initial value";
+      const node_instance = this;
+      this.addWidget("display_text", display_text_var, "", function (value) {
+        node_instance.value = value;
+        node_instance.setDirtyCanvas(true, false);
+      });
+
+      this.writeText = function(ctx, text: string) {
+        const lineHeight = 20;
+        const lines = text.split('\n');
+
+        lines.forEach((line, index) => {
+          const y = 30 + lineHeight + (index * lineHeight);
+          ctx.fillText(line, 30, y);
+        });
+      }
+
+      this.onDrawBackground = function(ctx, graphcanvas) {
+        if(this.flags.collapsed){
+          return;
+        }
+        ctx.save();
+        ctx.fillColor = "black";
+        ctx.fillRect(30,30,this.size[0] - 60,this.size[1] - 60);
+        ctx.fillStyle = "white";
+        ctx.font = "12px Arial";
+        this.writeText(ctx, this.value);
+        ctx.restore();
+      }
+    }
+
     // this.addWidget("text","name","Default", function (value){
     //     console.log("Text changed to : ", value)
     //   }); 
@@ -69,29 +105,3 @@ function registerNode(LiteGraph: any, node: any) {
 
   LiteGraph.registerNodeType(node['name'], customNode);
 }
-//   this.writeText = function(ctx, text: string) {
-//   const lineHeight = 20;
-//   const lines = text.split('\n');
-//
-//   lines.forEach((line, index) => {
-//     const y = 30 + lineHeight + (index * lineHeight);
-//     ctx.fillText(line, 30, y);
-//   });
-// }
-//
-// this.onDrawForeground = function(ctx, graphcanvas) {
-//   if(this.flags.collapsed){
-//     return;
-//   }
-//   ctx.save();
-//   ctx.fillColor = "black";
-//   ctx.fillRect(30,30,this.size[0] - 60,this.size[1] - 60);
-//   ctx.fillStyle = "white";
-//   ctx.font = "12px Arial";
-//   this.writeText(ctx, "Some text\nSome More\nAnd even some more");
-//   ctx.restore();
-// }
-// this.onResize = function() {
-//   this.setDirtyCanvas(true, true);
-// }
-// }
