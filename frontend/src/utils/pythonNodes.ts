@@ -49,14 +49,47 @@ function registerNode(LiteGraph: any, node: any) {
 
       this.writeText = function(ctx, text: string) {
         const lineHeight = 20;
-        const lines = text.split('\n');
-
-        lines.forEach((line, index) => {
-          const y = 30 + lineHeight + (index * lineHeight);
-          ctx.fillText(line, 30, y);
+        const padding = 30;
+        const maxWidth = this.size[0] - (padding * 2);
+        
+        // Split input text into initial lines (by newline character)
+        const inputLines = text.split('\n');
+        const wrappedLines: string[] = [];
+        
+        // For each line, wrap text if it exceeds maxWidth
+        inputLines.forEach(inputLine => {
+          let words = inputLine.split(' ');
+          let currentLine = '';
+          
+          words.forEach(word => {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth && currentLine) {
+              wrappedLines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
+          });
+          
+          if (currentLine) {
+            wrappedLines.push(currentLine);
+          }
         });
-      }
 
+        // Draw the wrapped lines
+        wrappedLines.forEach((line, index) => {
+          const y = padding + lineHeight + (index * lineHeight);
+          ctx.fillText(line, padding, y);
+        });
+        
+        // Update node height to fit content if needed
+        const requiredHeight = (wrappedLines.length * lineHeight) + (padding * 2);
+        if (this.size[1] < requiredHeight) {
+          this.size[1] = requiredHeight;
+        }
+      }
       this.onDrawBackground = function(ctx, graphcanvas) {
         if(this.flags.collapsed){
           return;
