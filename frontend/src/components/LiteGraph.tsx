@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useCallback } from "react";
+import {LiteGraph} from 'litegraph.js';
+import 'litegraph.js/css/litegraph.css';
+import '../../public/override.css';
 import {registerCustomNodes} from "../utils/pythonNodes";
 // import {registerShowText} from "../utils/javascriptNodes"
 
@@ -155,14 +158,15 @@ const LiteGraphComponent = () => {
 
   useEffect(() => {
     const initGraph = async () => {
-        if (window.LiteGraph && canvasRef.current && !isInitialized.current) {
+    console.log("Hello")
+        if (canvasRef.current && !isInitialized.current) {
           LiteGraph.clearRegisteredTypes(); //TODO: Use litegraph core and this isn't needed
-          const graph = new window.LiteGraph.LGraph();
+          const graph = new LiteGraph.LGraph();
           graphRef.current = graph;
 
 
-          const canvas = new window.LiteGraph.LGraphCanvas(canvasRef.current, graph);
-          await registerCustomNodes(window.LiteGraph);
+          await registerCustomNodes(LiteGraph);
+          const canvas = new LiteGraph.LGraphCanvas(canvasRef.current, graph);
           // registerShowText(window.LiteGraph);
           // graph.start();
           canvas.resize();

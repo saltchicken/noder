@@ -5,6 +5,7 @@
     "npm:@types/react-dom@^19.0.4": "19.0.4_@types+react@19.0.12",
     "npm:@types/react@^19.0.10": "19.0.12",
     "npm:@vitejs/plugin-react@^4.3.4": "4.3.4_vite@6.2.2_@babel+core@7.26.10",
+    "npm:litegraph.js@~0.7.18": "0.7.18",
     "npm:react-dom@19": "19.0.0_react@19.0.0",
     "npm:react@19": "19.0.0",
     "npm:vite@*": "6.2.2",
@@ -449,6 +450,9 @@
     "json5@2.2.3": {
       "integrity": "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg=="
     },
+    "litegraph.js@0.7.18": {
+      "integrity": "sha512-1WEwjOO58j4FcLX8DvsuMXM371MEq4Y+8pBr3q2pBhJ9nDkwBtBd9Gj6bxArBKhW6i42bSOyv9ybeuez6NAxoQ=="
+    },
     "lru-cache@5.1.1": {
       "integrity": "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==",
       "dependencies": [
@@ -551,6 +555,7 @@
       "npm:@types/react-dom@^19.0.4",
       "npm:@types/react@^19.0.10",
       "npm:@vitejs/plugin-react@^4.3.4",
+      "npm:litegraph.js@~0.7.18",
       "npm:react-dom@19",
       "npm:react@19",
       "npm:vite@^6.1.1"

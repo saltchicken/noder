@@ -12,3 +12,7 @@
     padding-left: 10px;
     outline: none;
 }
+
+body {
+  display: block;
+}
