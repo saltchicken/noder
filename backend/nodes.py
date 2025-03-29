@@ -72,6 +72,8 @@ class OllamaQuery(Node):
 
 class ShowText(Node):
     def run(self, text: str) -> str:
-        display_text = self.widgets['text'][0] # {"multiline": true}
-        self.send_message({'name': "display_text", "value": text})
+        what_to_name = self.widgets['display_text'][0]
+        print(f"what_to_name {what_to_name}")
+        self.send_message({'name': "what_to_name", "value": text})
+        display_text = text
         return display_text

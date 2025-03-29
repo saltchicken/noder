@@ -15,18 +15,11 @@ export async function registerCustomNodes(LiteGraph: any) {
 function registerNode(LiteGraph: any, node: any) {
   function customNode() {
     this.title = node.name;
-    console.log("Node")
-    console.log(node);
-    console.log("------------------")
 
     const widgetComments = node.widget_comments || {};
-    // console.log(node.name);
-    // console.log(widgetComments);
-
 
     for (let text_var of node.text_vars) {
       const widgetProps = widgetComments[text_var] || {};
-      console.log(widgetProps);
         this.addWidget("text", text_var, "Default", function (value) {
           console.log("Text changed to : ", value);
         }, widgetProps);
@@ -40,7 +33,6 @@ function registerNode(LiteGraph: any, node: any) {
 
     for (let select_var of node.select_vars) {
       const widgetProps = widgetComments[select_var] || {};
-      console.log(widgetProps);
       this.addWidget("combo", select_var, widgetProps.values[0], function (value) {
         console.log("Select changed to : ", value);
       }, widgetProps);
@@ -79,9 +71,6 @@ function registerNode(LiteGraph: any, node: any) {
       }
     }
 
-    // this.addWidget("text","name","Default", function (value){
-    //     console.log("Text changed to : ", value)
-    //   }); 
     // Add inputs
     if (node.inputs) {
       node.inputs.forEach((input: any, i: number) => {

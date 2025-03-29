@@ -133,8 +133,9 @@ const LiteGraphComponent = () => {
           if (node) {
             for (let widget of node.widgets) { 
               if (widget.name == data.message.name) {
-                widget.value = data.message.value;
-                node.setDirtyCanvas(true, false);
+                // widget.value = data.message.value;
+                widget.callback(data.message.value);
+                // node.setDirtyCanvas(true, false);
               }
             }
           }
