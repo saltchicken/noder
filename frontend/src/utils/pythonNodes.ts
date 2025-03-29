@@ -40,7 +40,7 @@ function registerNode(LiteGraph: any, node: any) {
 
     for (let display_text_var of node.display_text_vars) {
       const widgetProps = widgetComments[display_text_var] || {};
-      this.value = "Initial value";
+      this.value = "";
       const node_instance = this;
       this.addWidget("display_text", display_text_var, "", function (value) {
         node_instance.value = value;
