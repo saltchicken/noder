@@ -29,14 +29,27 @@ const Flow = () => {
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
-      // Prevent native context menu from showing
       event.preventDefault();
-
-      // Calculate position of the context menu. We want to make sure it
-      // doesn't get positioned off-screen.
       const pane = ref.current.getBoundingClientRect();
       setMenu({
         id: node.id,
+        type: 'node',
+        top: event.clientY < pane.height - 200 && event.clientY,
+        left: event.clientX < pane.width - 200 && event.clientX,
+        right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
+        bottom:
+          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+      });
+    },
+    [setMenu],
+  );
+
+  const onPaneContextMenu = useCallback(
+    (event) => {
+      event.preventDefault();
+      const pane = ref.current.getBoundingClientRect();
+      setMenu({
+        type: 'pane',
         top: event.clientY < pane.height - 200 && event.clientY,
         left: event.clientX < pane.width - 200 && event.clientX,
         right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
@@ -51,22 +64,6 @@ const Flow = () => {
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
   const onPaneMove = useCallback(() => setMenu(null), [setMenu]);
 
-  const onSave = useCallback(() => {
-    const flow = {
-      nodes: nodes,
-      edges: edges,
-    };
-    const json = JSON.stringify(flow);
-    localStorage.setItem('flow', json);
-  }, [nodes, edges]);
-
-  const onRestore = useCallback(() => {
-    const flow = JSON.parse(localStorage.getItem('flow') || '');
-    if (flow) {
-      setNodes(flow.nodes);
-      setEdges(flow.edges);
-    }
-  }, [setNodes, setEdges]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -78,6 +75,7 @@ const Flow = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onPaneClick={onPaneClick}
+        onPaneContextMenu={onPaneContextMenu}
         onMove={onPaneMove}
         onNodeContextMenu={onNodeContextMenu}
         fitView

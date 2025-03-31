@@ -7,6 +7,7 @@ export default function ContextMenu({
   left,
   right,
   bottom,
+  type = 'default',
   ...props
 }) {
   const { getNode, setNodes, addNodes, setEdges } = useReactFlow();
@@ -31,17 +32,46 @@ export default function ContextMenu({
     setEdges((edges) => edges.filter((edge) => edge.source !== id));
   }, [id, setNodes, setEdges]);
 
+  const addNewNode = useCallback(() => {
+    const newNode = {
+      id: `node-${Math.random()}`, //TODO: Improve ID generation
+      position: { x: left, y: top },
+      data: { label: 'New Node' },
+    };
+    addNodes(newNode);
+  }, [left, top, addNodes]);
+
+  const renderMenuContent = () => {
+    switch (type) {
+      case 'node':
+        return (
+          <>
+            <p style={{ margin: '0.5em' }}>
+              <small>node: {id}</small>
+            </p>
+            <button onClick={duplicateNode}>duplicate</button>
+            <button onClick={deleteNode}>delete</button>
+          </>
+        );
+      case 'pane':
+        return (
+          <button onClick={addNewNode}>add node</button>
+        );
+      // Add more cases as needed
+      // case 'edge':
+      //   return (...);
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       style={{ top, left, right, bottom }}
       className="context-menu"
       {...props}
     >
-      <p style={{ margin: '0.5em' }}>
-        <small>node: {id}</small>
-      </p>
-      <button onClick={duplicateNode}>duplicate</button>
-      <button onClick={deleteNode}>delete</button>
+      {renderMenuContent()}
     </div>
   );
 }
