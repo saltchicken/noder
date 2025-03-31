@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { getMaxNodeId } from '../utils/flowUtils';
 
 export default function ContextMenu({
   id,
@@ -10,7 +11,7 @@ export default function ContextMenu({
   type = 'default',
   ...props
 }) {
-  const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition } = useReactFlow();
+  const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition, getNodes } = useReactFlow();
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
     const position = {
@@ -22,7 +23,7 @@ export default function ContextMenu({
       ...node,
       selected: false,
       dragging: false,
-      id: `${node.id}-copy`,
+      id: `${getMaxNodeId(getNodes()) + 1}`,
       position,
     });
   }, [id, getNode, addNodes]);
@@ -34,7 +35,7 @@ export default function ContextMenu({
 
   const addNewNode = useCallback(() => {
     const newNode = {
-      id: `node-${Math.random()}`, //TODO: Improve ID generation
+      id: `${getMaxNodeId(getNodes()) + 1}`, //TODO: Improve ID generation
       position: screenToFlowPosition({ x: left, y: top }),
       data: { label: 'New Node' },
     };
