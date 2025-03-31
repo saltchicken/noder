@@ -19,10 +19,21 @@ const ActionMenu = ({ nodes, edges, setNodes, setEdges }) => {
     }
   }, [setNodes, setEdges]);
 
+  const onProcess = useCallback(() => {
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+    const json = JSON.stringify(flow, (key, value) =>
+      key === "position" || key === "measured" ? undefined : value, 2);
+    console.log(json);
+  }, [nodes, edges]);
+
   return (
     <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 4 }}>
       <button onClick={onSave}>save</button>
       <button onClick={onRestore}>restore</button>
+      <button onClick={onProcess}>process</button>
     </div>
   );
 };
