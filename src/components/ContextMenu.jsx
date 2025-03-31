@@ -10,7 +10,7 @@ export default function ContextMenu({
   type = 'default',
   ...props
 }) {
-  const { getNode, setNodes, addNodes, setEdges } = useReactFlow();
+  const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition } = useReactFlow();
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
     const position = {
@@ -35,7 +35,7 @@ export default function ContextMenu({
   const addNewNode = useCallback(() => {
     const newNode = {
       id: `node-${Math.random()}`, //TODO: Improve ID generation
-      position: { x: left, y: top },
+      position: screenToFlowPosition({ x: left, y: top }),
       data: { label: 'New Node' },
     };
     addNodes(newNode);
