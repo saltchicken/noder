@@ -26,7 +26,7 @@ export default function ContextMenu({
       id: `${getMaxNodeId(getNodes()) + 1}`,
       position,
     });
-  }, [id, getNode, addNodes]);
+  }, [id, getNode, addNodes, getNodes]);
 
   const deleteNode = useCallback(() => {
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
@@ -40,7 +40,7 @@ export default function ContextMenu({
       data: { label: 'New Node' },
     };
     addNodes(newNode);
-  }, [left, top, addNodes]);
+  }, [left, top, addNodes, getNodes]);
 
   const renderMenuContent = () => {
     switch (type) {
