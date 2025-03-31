@@ -3,6 +3,7 @@ export const initialNodes = [
   { id: '2', position: { x: 0, y: 250 }, data: { label: 'b' } },
   { id: '3', position: { x: 175, y: 250 }, data: { label: 'c' } },
   { id: '4', position: { x: 350, y: 250 }, data: { label: 'd' } },
+  { id: '5', type: 'textUpdater', position: { x: 456, y: 234 }, data: { value: 'hello' } },
 ];
 
 export const initialEdges = [

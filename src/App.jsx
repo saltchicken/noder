@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
   ReactFlow,
-  ReactFlowProvider,
   Background,
   useNodesState,
   useEdgesState,
@@ -15,6 +14,12 @@ import '@xyflow/react/dist/style.css';
 import { initialNodes, initialEdges } from './initialElements';
 import ContextMenu from './components/ContextMenu';
 import ActionMenu from './components/ActionMenu';
+
+import TextUpdaterNode from './nodes/TextUpdaterNode.tsx';
+
+const nodeTypes = {
+  textUpdater: TextUpdaterNode
+};
 
 
 const Flow = () => {
@@ -79,6 +84,7 @@ const Flow = () => {
         onPaneContextMenu={onPaneContextMenu}
         onMove={onPaneMove}
         onNodeContextMenu={onNodeContextMenu}
+        nodeTypes={nodeTypes}
         fitView
         colorMode="dark"
       >
