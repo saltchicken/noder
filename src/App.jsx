@@ -5,6 +5,7 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  Controls,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -12,6 +13,7 @@ import '@xyflow/react/dist/style.css';
 
 import { initialNodes, initialEdges } from './initialElements';
 import ContextMenu from './components/ContextMenu';
+import ActionMenu from './components/ActionMenu';
 
 
 const Flow = () => {
@@ -49,6 +51,22 @@ const Flow = () => {
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
   const onPaneMove = useCallback(() => setMenu(null), [setMenu]);
 
+  const onSave = useCallback(() => {
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+    const json = JSON.stringify(flow);
+    localStorage.setItem('flow', json);
+  }, [nodes, edges]);
+
+  const onRestore = useCallback(() => {
+    const flow = JSON.parse(localStorage.getItem('flow') || '');
+    if (flow) {
+      setNodes(flow.nodes);
+      setEdges(flow.edges);
+    }
+  }, [setNodes, setEdges]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -67,6 +85,14 @@ const Flow = () => {
       >
         <Background />
         {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+
+        <Controls />
+        <ActionMenu
+          nodes={nodes}
+          edges={edges}
+          setNodes={setNodes}
+          setEdges={setEdges}
+        />
       </ReactFlow>
     </div>
   );
