@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { getMaxNodeId } from '../utils/flowUtils';
 
@@ -12,6 +12,10 @@ export default function ContextMenu({
   ...props
 }) {
   const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition, getNodes } = useReactFlow();
+  const [showSubmenu, setShowSubmenu] = useState(false);
+
+
+
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
     const position = {
@@ -33,14 +37,26 @@ export default function ContextMenu({
     setEdges((edges) => edges.filter((edge) => edge.source !== id));
   }, [id, setNodes, setEdges]);
 
-  const addNewNode = useCallback(() => {
+  const addNewNode = useCallback((nodeType = 'default') => {
     const newNode = {
       id: `${getMaxNodeId(getNodes()) + 1}`, //TODO: Improve ID generation
+      type: nodeType,
       position: screenToFlowPosition({ x: left, y: top }),
       data: { label: 'New Node' },
     };
     addNodes(newNode);
   }, [left, top, addNodes, getNodes]);
+
+  const renderSubmenu = () => {
+    if (!showSubmenu) return null;
+
+    return (
+      <div className="context-submenu">
+        <div className="context-menu-item" onClick={() => addNewNode('default')}>Default Node</div>
+        <div className="context-menu-item" onClick={() => addNewNode('textUpdater')}>Text Node</div>
+      </div>
+    );
+  };
 
   const renderMenuContent = () => {
     switch (type) {
@@ -50,22 +66,27 @@ export default function ContextMenu({
             <p style={{ margin: '0.5em' }}>
               <small>node: {id}</small>
             </p>
-            <button onClick={duplicateNode}>duplicate</button>
-            <button onClick={deleteNode}>delete</button>
+            <div className="context-menu-item" onClick={duplicateNode}>duplicate</div>
+            <div className="context-menu-item" onClick={deleteNode}>delete</div>
           </>
         );
       case 'pane':
         return (
-          <button onClick={addNewNode}>add node</button>
+          <>
+            <div
+              className="context-menu-item"
+              onMouseEnter={() => setShowSubmenu(true)}
+              onMouseLeave={() => setShowSubmenu(false)}
+            >
+              add node ►
+              {renderSubmenu()}
+            </div>
+          </>
         );
-      // Add more cases as needed
-      // case 'edge':
-      //   return (...);
       default:
         return null;
     }
   };
-
   return (
     <div
       style={{ top, left, right, bottom }}

@@ -11,7 +11,7 @@ body {
   width: 100vw;
   height: 100vh;
 }
- 
+
 .context-menu {
   background: white;
   border-style: solid;
@@ -19,15 +19,26 @@ body {
   position: absolute;
   z-index: 10;
 }
- 
-.context-menu button {
-  border: none;
-  display: block;
-  padding: 0.5em;
-  text-align: left;
-  width: 100%;
-}
- 
-.context-menu button:hover {
+
+.context-submenu {
+  position: absolute;
+  left: calc(100% - 1px);  /* Subtract the border width */
+  top: -1px;  /* Align with parent accounting for border */
   background: white;
+  border: 1px solid #ccc;  /* Match parent border */
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  min-width: 100px;
 }
+
+.context-menu-item {
+  padding: 0.5em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.context-menu-item:hover {
+  background: #f0f0f0;
+}
+
+
+
