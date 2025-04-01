@@ -26,12 +26,12 @@ function TextUpdaterNode({ data }) {
           />
           <span style={{
             position: 'absolute',
-            left: '20px',
+            left: '10px',
             top: inputs.length === 1 
               ? '50%' 
               : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%`,
             transform: 'translateY(-50%)',
-            fontSize: '12px',
+            fontSize: '8px',
             pointerEvents: 'none'
           }}>
             {inputId}
@@ -56,12 +56,12 @@ function TextUpdaterNode({ data }) {
           />
           <span style={{
             position: 'absolute',
-            right: '20px',
+            right: '10px',
             top: outputs.length === 1 
               ? '50%' 
               : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%`,
             transform: 'translateY(-50%)',
-            fontSize: '12px',
+            fontSize: '8px',
             pointerEvents: 'none'
           }}>
             {outputId}
