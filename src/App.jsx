@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
   ReactFlow,
+  Panel,
   Background,
   useNodesState,
   useEdgesState,
@@ -12,7 +13,6 @@ import '@xyflow/react/dist/style.css';
 
 
 import ContextMenu from './components/ContextMenu';
-import ActionMenu from './components/ActionMenu';
 
 import TextUpdaterNode from './nodes/TextUpdaterNode.tsx';
 
@@ -31,6 +31,34 @@ const Flow = () => {
     (params) => setEdges((els) => addEdge(params, els)),
     [setEdges],
   );
+
+  const onSave = useCallback(() => {
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+    const json = JSON.stringify(flow);
+    localStorage.setItem('flow', json);
+  }, [nodes, edges]);
+
+
+  const onRestore = useCallback(() => {
+    const flow = JSON.parse(localStorage.getItem('flow') || '');
+    if (flow) {
+      setNodes(flow.nodes);
+      setEdges(flow.edges);
+    }
+  }, [setNodes, setEdges]);
+
+  const onProcess = useCallback(() => {
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+    const json = JSON.stringify(flow, (key, value) =>
+      key === "position" || key === "measured" ? undefined : value, 2);
+    console.log(json);
+  }, [nodes, edges]);
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
@@ -91,12 +119,11 @@ const Flow = () => {
         {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
 
         <Controls />
-        <ActionMenu
-          nodes={nodes}
-          edges={edges}
-          setNodes={setNodes}
-          setEdges={setEdges}
-        />
+        <Panel position="top-left">
+          <button onClick={onRestore}>Restore</button>
+          <button onClick={onSave}>Save</button>
+          <button onClick={onProcess}>Process</button>
+        </Panel>
       </ReactFlow>
     </div>
   );
