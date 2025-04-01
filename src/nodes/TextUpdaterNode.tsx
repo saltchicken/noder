@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
-const handleStyle = { left: 10 };
-
 function TextUpdaterNode({ data }) {
   const onChange = useCallback((evt) => {
     console.log(evt.target.value);
@@ -15,36 +13,63 @@ function TextUpdaterNode({ data }) {
   return (
     <>
       {inputs.map((inputId, index) => (
-        <Handle 
-          key={inputId}
-          type="target" 
-          position={Position.Left} 
-          style={{ 
+        <div key={inputId}>
+          <Handle 
+            type="target" 
+            position={Position.Left} 
+            style={{ 
+              top: inputs.length === 1 
+                ? '50%' 
+                : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%` 
+            }} 
+            id={inputId}
+          />
+          <span style={{
+            position: 'absolute',
+            left: '20px',
             top: inputs.length === 1 
               ? '50%' 
-              : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%` 
-          }} 
-          id={inputId}
-        />
+              : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%`,
+            transform: 'translateY(-50%)',
+            fontSize: '12px',
+            pointerEvents: 'none'
+          }}>
+            {inputId}
+          </span>
+        </div>
       ))}
       <div>
         <label htmlFor="text">{data.label}</label>
         <input id="text" name="text" onChange={onChange} className="nodrag" />
       </div>
       {outputs.map((outputId, index) => (
-        <Handle 
-          key={outputId}
-          type="source" 
-          position={Position.Right} 
-          style={{ 
+        <div key={outputId}>
+          <Handle 
+            type="source" 
+            position={Position.Right} 
+            style={{ 
+              top: outputs.length === 1 
+                ? '50%' 
+                : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%` 
+            }} 
+            id={outputId}
+          />
+          <span style={{
+            position: 'absolute',
+            right: '20px',
             top: outputs.length === 1 
               ? '50%' 
-              : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%` 
-          }} 
-          id={outputId}
-        />
+              : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%`,
+            transform: 'translateY(-50%)',
+            fontSize: '12px',
+            pointerEvents: 'none'
+          }}>
+            {outputId}
+          </span>
+        </div>
       ))}
     </>
   );
 }
+
 export default TextUpdaterNode;
