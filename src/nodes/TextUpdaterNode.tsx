@@ -8,7 +8,8 @@ function TextUpdaterNode({ data }) {
 
   const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
   const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
-  const padding = 20;
+  const spacing = 10; // 5% spacing between handles
+  const topPadding = 10; // 10% padding from the top
 
   return (
     <>
@@ -17,19 +18,13 @@ function TextUpdaterNode({ data }) {
           <Handle 
             type="target" 
             position={Position.Left} 
-            style={{ 
-              top: inputs.length === 1 
-                ? '50%' 
-                : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%` 
-            }} 
+            style={{ top: `${topPadding + (index * spacing)}%` }} 
             id={inputId}
           />
           <span style={{
             position: 'absolute',
-            left: '10px',
-            top: inputs.length === 1 
-              ? '50%' 
-              : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%`,
+            left: '20px',
+            top: `${topPadding + (index * spacing)}%`,
             transform: 'translateY(-50%)',
             fontSize: '8px',
             pointerEvents: 'none'
@@ -47,19 +42,13 @@ function TextUpdaterNode({ data }) {
           <Handle 
             type="source" 
             position={Position.Right} 
-            style={{ 
-              top: outputs.length === 1 
-                ? '50%' 
-                : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%` 
-            }} 
+            style={{ top: `${topPadding + (index * spacing)}%` }} 
             id={outputId}
           />
           <span style={{
             position: 'absolute',
-            right: '10px',
-            top: outputs.length === 1 
-              ? '50%' 
-              : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%`,
+            right: '20px',
+            top: `${topPadding + (index * spacing)}%`,
             transform: 'translateY(-50%)',
             fontSize: '8px',
             pointerEvents: 'none'
@@ -73,3 +62,4 @@ function TextUpdaterNode({ data }) {
 }
 
 export default TextUpdaterNode;
+
