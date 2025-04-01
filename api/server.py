@@ -2,6 +2,9 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from node_utils import get_custom_classes
+
+custom_classes = get_custom_classes()
 
 app = FastAPI()
 
@@ -41,3 +44,10 @@ async def websocket_endpoint(websocket: WebSocket):
             await manager.broadcast(f"Client said: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+
+@app.post("/custom_nodes")
+async def custom_nodes_handler():
+    """Handles POST requests for custom nodes."""
+    custom_classes_without_class = [{k: v for k, v in d.items() if k != 'class'} for d in custom_classes]
+    return {"status": "success", "nodes": custom_classes_without_class}
+
