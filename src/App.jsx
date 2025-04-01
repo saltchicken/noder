@@ -28,14 +28,22 @@ const Flow = () => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const ref = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    const ws = new WebSocket('ws://10.0.0.3:8000/ws');
+  const connectWebSocket = useCallback(() => {
+    const WS_URL = `ws://${window.location.hostname}:8000/ws`;
+    console.log(WS_URL);
+    const ws = new WebSocket(WS_URL);
     
     ws.onopen = () => {
-      console.log('Connected to WebSocket4');
+      console.log('Connected to WebSocket');
       setSocket(ws);
       setIsConnected(true);
+      // Clear any existing reconnection timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
     };
 
     ws.onmessage = (event) => {
@@ -51,16 +59,33 @@ const Flow = () => {
     ws.onclose = () => {
       console.log('Disconnected from WebSocket');
       setIsConnected(false);
+      setSocket(null);
+      
+      // Schedule reconnection attempt
+      reconnectTimeoutRef.current = setTimeout(() => {
+        console.log('Attempting to reconnect...');
+        connectWebSocket();
+      }, 2000); // Try to reconnect after 2 seconds
     };
+
+    return ws;
+  }, []);
+
+  useEffect(() => {
+    const ws = connectWebSocket();
 
     // Cleanup on component unmount
     return () => {
       if (ws) {
         ws.close();
-        setIsConnected(false);
       }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      setIsConnected(false);
+      setSocket(null);
     };
-  }, []);
+  }, [connectWebSocket]);
 
   const sendToWebSocket = useCallback((data) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
