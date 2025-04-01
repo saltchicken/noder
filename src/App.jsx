@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Panel,
@@ -25,7 +25,48 @@ const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [menu, setMenu] = useState(null);
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
   const ref = useRef(null);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://10.0.0.3:8000/ws');
+    
+    ws.onopen = () => {
+      console.log('Connected to WebSocket4');
+      setSocket(ws);
+      setIsConnected(true);
+    };
+
+    ws.onmessage = (event) => {
+      console.log('Received:', event.data);
+      // Handle incoming messages here
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setIsConnected(false);
+    };
+
+    ws.onclose = () => {
+      console.log('Disconnected from WebSocket');
+      setIsConnected(false);
+    };
+
+    // Cleanup on component unmount
+    return () => {
+      if (ws) {
+        ws.close();
+        setIsConnected(false);
+      }
+    };
+  }, []);
+
+  const sendToWebSocket = useCallback((data) => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(data));
+    }
+  }, [socket]);
 
   const onConnect = useCallback(
     (params) => setEdges((els) => addEdge(params, els)),
@@ -58,7 +99,8 @@ const Flow = () => {
     const json = JSON.stringify(flow, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
     console.log(json);
-  }, [nodes, edges]);
+    sendToWebSocket(flow); //TODO: JSON.stringify is called twice. Here and in sendToWebSocket
+  }, [nodes, edges, sendToWebSocket]);
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
@@ -123,6 +165,9 @@ const Flow = () => {
           <button onClick={onRestore}>Restore</button>
           <button onClick={onSave}>Save</button>
           <button onClick={onProcess}>Process</button>
+          <div style={{ color: 'white' }}>
+            Status: {isConnected ? 'Connected' : 'Disconnected'}
+          </div>
         </Panel>
       </ReactFlow>
     </div>
