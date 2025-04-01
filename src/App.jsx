@@ -27,8 +27,31 @@ const Flow = () => {
   const [menu, setMenu] = useState(null);
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [customNodes, setCustomNodes] = useState([]);
   const ref = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    const fetchCustomNodes = async () => {
+      try {
+        const API_URL = `http://${window.location.hostname}:8000/custom_nodes`;
+        const response = await fetch(API_URL, {
+          method: "POST"
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch custom nodes');
+        }
+        const data = await response.json();
+        console.log('Custom nodes:', data.nodes);
+        setCustomNodes(data.nodes);
+      } catch (error) {
+        console.error('Error fetching custom nodes:', error);
+      }
+    };
+
+    fetchCustomNodes();
+  }, []);
+
 
   const connectWebSocket = useCallback(() => {
     const WS_URL = `ws://${window.location.hostname}:8000/ws`;
