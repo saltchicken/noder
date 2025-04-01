@@ -8,17 +8,43 @@ function TextUpdaterNode({ data }) {
     console.log(evt.target.value);
   }, []);
 
+  const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
+  const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
+  const padding = 20;
+
   return (
     <>
-      <Handle type="target" position={Position.Top} />
+      {inputs.map((inputId, index) => (
+        <Handle 
+          key={inputId}
+          type="target" 
+          position={Position.Left} 
+          style={{ 
+            top: inputs.length === 1 
+              ? '50%' 
+              : `${padding + (index * ((100 - (padding * 2)) / (inputs.length - 1)))}%` 
+          }} 
+          id={inputId}
+        />
+      ))}
       <div>
-        <label htmlFor="text">Text:</label>
+        <label htmlFor="text">{data.label}</label>
         <input id="text" name="text" onChange={onChange} className="nodrag" />
       </div>
-      <Handle type="source" position={Position.Bottom} id="a" />
-      <Handle type="source" position={Position.Bottom} id="b" style={handleStyle} />
+      {outputs.map((outputId, index) => (
+        <Handle 
+          key={outputId}
+          type="source" 
+          position={Position.Right} 
+          style={{ 
+            top: outputs.length === 1 
+              ? '50%' 
+              : `${padding + (index * ((100 - (padding * 2)) / (outputs.length - 1)))}%` 
+          }} 
+          id={outputId}
+        />
+      ))}
     </>
   );
 }
-
 export default TextUpdaterNode;

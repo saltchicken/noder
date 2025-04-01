@@ -42,7 +42,7 @@ export default function ContextMenu({
       id: `${getMaxNodeId(getNodes()) + 1}`, //TODO: Improve ID generation
       type: nodeType,
       position: screenToFlowPosition({ x: left, y: top }),
-      data: { label: 'New Node' },
+      data: { label: 'New Node', inputs: ['input1', 'input2'], outputs: ['output1', 'output2'] },
     };
     addNodes(newNode);
   }, [left, top, addNodes, getNodes]);
