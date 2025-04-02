@@ -21,10 +21,11 @@ function CustomNode({ data }) {
 
   return (
     <>
+      <div style={{ width: '100%' }}>
       <div style={{ padding: '0px', position: 'relative' }}>
         <span style={{
           position: 'absolute',
-          left: '5px',
+          left: '15px',
           top: '3px',
           fontSize: '6px',
           color: '#666',
@@ -39,13 +40,14 @@ function CustomNode({ data }) {
           onChange={onChange} 
           className="nodrag" 
           style={{
-            width: '100%',
+            width: 'calc(100% - 40px)',
             padding: '8px',
             border: '1px solid #ccc',
             borderRadius: '4px',
             fontSize: '12px'
           }}
         />
+        </div>
       </div>
 
 
