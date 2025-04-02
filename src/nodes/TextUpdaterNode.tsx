@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
+import SingleConnectionHandle from '../components/SingleConnectionHandle.jsx'
+
 function TextUpdaterNode({ data }) {
   const onChange = useCallback((evt) => {
     console.log(evt.target.value);
@@ -15,7 +17,7 @@ function TextUpdaterNode({ data }) {
     <>
       {inputs.map((inputId, index) => (
         <div key={inputId}>
-          <Handle 
+          <SingleConnectionHandle 
             type="target" 
             position={Position.Left} 
             style={{ top: `${topPadding + (index * spacing)}%` }} 
@@ -39,7 +41,7 @@ function TextUpdaterNode({ data }) {
       </div>
       {outputs.map((outputId, index) => (
         <div key={outputId}>
-          <Handle 
+          <SingleConnectionHandle  
             type="source" 
             position={Position.Right} 
             style={{ top: `${topPadding + (index * spacing)}%` }} 
