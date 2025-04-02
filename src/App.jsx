@@ -15,10 +15,15 @@ import '@xyflow/react/dist/style.css';
 import ContextMenu from './components/ContextMenu';
 
 import CustomNode from './nodes/CustomNode.tsx';
+import CustomEdge from './edges/CustomEdge.jsx';
 
 const nodeTypes = {
   customNode: CustomNode
 };
+
+const edgeTypes = {
+  custom: CustomEdge
+}
 
 
 const Flow = () => {
@@ -202,6 +207,9 @@ const Flow = () => {
         onMove={onPaneMove}
         onNodeContextMenu={onNodeContextMenu}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={{ type: 'custom' }}
+        connectionLineStyle={{ stroke: '#33FF71' , strokeWidth: 3 }}
         fitView
         colorMode="dark"
       >
