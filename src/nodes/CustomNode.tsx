@@ -28,10 +28,10 @@ function CustomNode({ data }) {
       <div style={{ padding: '0px', position: 'relative' }}>
         <span style={{
           position: 'absolute',
-          left: '15px',
-          top: '3px',
+          left: '20px',
+          top: '5px',
           fontSize: '6px',
-          color: '#666',
+          color: '#AAA',
           zIndex: 1,
           pointerEvents: 'none'
         }}>
@@ -45,9 +45,13 @@ function CustomNode({ data }) {
           style={{
             width: 'calc(100% - 40px)',
             padding: '8px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '12px'
+            border: '1px solid #333',
+            borderRadius: '5px',
+            fontSize: '12px',
+            backgroundColor: '#1e1e1e',
+            color: '#fff',
+            paddingLeft: '7px',
+            paddingTop: '12px'
           }}
         />
         </div>
