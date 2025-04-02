@@ -41,4 +41,25 @@ body {
 }
 
 
+.react-flow__edge.selectable:hover .react-flow__edge-path,
+.react-flow__edge.selectable.selected .react-flow__edge-path {
+    /* stroke: var(--xy-theme-edge-hover); */
+    stroke: #FFF;
+    stroke-width: 7px;
+    cursor: pointer;
+}
 
+.react-flow__edge-path {
+    stroke: #555; /* This sets the default color for all edges */
+}
+
+/* This sets the color for selected edges */
+.react-flow__edge.selected .react-flow__edge-path {
+    stroke: var(--xy-theme-selected);
+}
+
+/* This sets the color for connected edges */
+.react-flow__edge .react-flow__edge-path {
+    stroke: #33FF71; /* You can change this color to whatever you want */
+    stroke-width: 3px; /* Optional: you can also adjust the width */
+}
