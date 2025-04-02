@@ -50,7 +50,7 @@ function CustomNode({ data }) {
       </div>
       {outputs.map((outputId, index) => (
         <div key={outputId}>
-          <SingleConnectionHandle  
+          <Handle  
             type="source" 
             position={Position.Right} 
             style={{ top: `${topPadding + (index * spacing)}%` }} 
