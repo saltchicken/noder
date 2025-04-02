@@ -19,9 +19,12 @@ function CustomNode({ data }) {
   const spacing = 15; // 5% spacing between handles
   const topPadding = 15; // 10% padding from the top
 
+  const maxHandles = Math.max(inputs.length, outputs.length);
+  const widgetTopPadding = topPadding + (maxHandles * spacing);
+
   return (
     <>
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
       <div style={{ padding: '0px', position: 'relative' }}>
         <span style={{
           position: 'absolute',
