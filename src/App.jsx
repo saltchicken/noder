@@ -14,10 +14,10 @@ import '@xyflow/react/dist/style.css';
 
 import ContextMenu from './components/ContextMenu';
 
-import TextUpdaterNode from './nodes/TextUpdaterNode.tsx';
+import CustomNode from './nodes/CustomNode.tsx';
 
 const nodeTypes = {
-  textUpdater: TextUpdaterNode
+  customNode: CustomNode
 };
 
 

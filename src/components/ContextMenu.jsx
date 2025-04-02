@@ -54,7 +54,7 @@ export default function ContextMenu({
     return (
       <div className="context-submenu">
         <div className="context-menu-item" onClick={() => addNewNode('default')}>Default Node</div>
-        <div className="context-menu-item" onClick={() => addNewNode('textUpdater')}>Text Node</div>
+        <div className="context-menu-item" onClick={() => addNewNode('customNode')}>Custom Node</div>
       </div>
     );
   };

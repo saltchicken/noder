@@ -9,7 +9,7 @@ const controlStyle = {
   border: 'none',
 };
 
-function TextUpdaterNode({ data }) {
+function CustomNode({ data }) {
   const onChange = useCallback((evt) => {
     console.log(evt.target.value);
   }, []);
@@ -95,5 +95,5 @@ function ResizeIcon() {
   );
 }
 
-export default memo(TextUpdaterNode);
+export default memo(CustomNode);
 
