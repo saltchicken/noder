@@ -21,6 +21,35 @@ function CustomNode({ data }) {
 
   return (
     <>
+      <div style={{ padding: '0px', position: 'relative' }}>
+        <span style={{
+          position: 'absolute',
+          left: '5px',
+          top: '3px',
+          fontSize: '6px',
+          color: '#666',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}>
+          {data.label}
+        </span>
+        <input 
+          id="text" 
+          name="text" 
+          onChange={onChange} 
+          className="nodrag" 
+          style={{
+            width: '100%',
+            padding: '8px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '12px'
+          }}
+        />
+      </div>
+
+
+
       <NodeResizeControl style={controlStyle} minWidth={100} minHeight={50}>
         <ResizeIcon />
       </NodeResizeControl>
@@ -44,10 +73,6 @@ function CustomNode({ data }) {
           </span>
         </div>
       ))}
-      <div>
-        <label htmlFor="text">{data.label}</label>
-        <input id="text" name="text" onChange={onChange} className="nodrag" />
-      </div>
       {outputs.map((outputId, index) => (
         <div key={outputId}>
           <Handle  
