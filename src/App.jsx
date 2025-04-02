@@ -121,6 +121,14 @@ const Flow = () => {
     [setEdges],
   );
 
+const onConnectEnd = useCallback(
+  (event, params) => {
+      console.log(event);
+      console.log(params);
+  },
+  []
+);
+
   const onSave = useCallback(() => {
     const flow = {
       nodes: nodes,
@@ -197,6 +205,7 @@ const Flow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onConnectEnd={onConnectEnd}
         onPaneClick={onPaneClick}
         onPaneContextMenu={onPaneContextMenu}
         onMove={onPaneMove}
