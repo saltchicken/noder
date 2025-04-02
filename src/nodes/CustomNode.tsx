@@ -16,8 +16,8 @@ function CustomNode({ data }) {
 
   const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
   const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
-  const spacing = 10; // 5% spacing between handles
-  const topPadding = 10; // 10% padding from the top
+  const spacing = 15; // 5% spacing between handles
+  const topPadding = 15; // 10% padding from the top
 
   return (
     <>
@@ -29,13 +29,13 @@ function CustomNode({ data }) {
           <SingleConnectionHandle 
             type="target" 
             position={Position.Left} 
-            style={{ top: `${topPadding + (index * spacing)}%` }} 
+            style={{ top: `${topPadding + (index * spacing)}px` }} 
             id={inputId}
           />
           <span style={{
             position: 'absolute',
             left: '20px',
-            top: `${topPadding + (index * spacing)}%`,
+            top: `${topPadding + (index * spacing)}px`,
             transform: 'translateY(-50%)',
             fontSize: '8px',
             pointerEvents: 'none'
@@ -53,13 +53,13 @@ function CustomNode({ data }) {
           <Handle  
             type="source" 
             position={Position.Right} 
-            style={{ top: `${topPadding + (index * spacing)}%` }} 
+            style={{ top: `${topPadding + (index * spacing)}px` }} 
             id={outputId}
           />
           <span style={{
             position: 'absolute',
             right: '20px',
-            top: `${topPadding + (index * spacing)}%`,
+            top: `${topPadding + (index * spacing)}px`,
             transform: 'translateY(-50%)',
             fontSize: '8px',
             pointerEvents: 'none'
