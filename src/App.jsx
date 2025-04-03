@@ -43,7 +43,9 @@ const Flow = () => {
         }
         const data = await response.json();
         console.log('Custom nodes:', data.nodes);
-        setCustomNodes(data.nodes);
+        // Examples custom nodes data
+        const nodes = [{name: 'first', inputs: ['a', 'b'], outputs: ['x', 'y']}, {name: 'second', inputs: ['c', 'd'], outputs: ['w', 'v']}]
+        setCustomNodes(nodes);
       } catch (error) {
         console.error('Error fetching custom nodes:', error);
       }
@@ -215,7 +217,7 @@ const onConnectEnd = useCallback(
         colorMode="dark"
       >
         <Background />
-        {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+        {menu && <ContextMenu onClick={onPaneClick} customNodes={customNodes} {...menu} />}
 
         <Controls />
         <Panel position="top-left">

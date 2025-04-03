@@ -9,6 +9,7 @@ export default function ContextMenu({
   right,
   bottom,
   type = 'default',
+  customNodes,
   ...props
 }) {
   const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition, getNodes } = useReactFlow();
@@ -37,24 +38,36 @@ export default function ContextMenu({
     setEdges((edges) => edges.filter((edge) => edge.source !== id));
   }, [id, setNodes, setEdges]);
 
-  const addNewNode = useCallback((nodeType = 'default') => {
+  const addNewNode = useCallback((nodeType) => {
+    const customNode = customNodes.find(node => node.name === nodeType);
     const newNode = {
-      id: `${getMaxNodeId(getNodes()) + 1}`, //TODO: Improve ID generation
-      type: nodeType,
+      id: `${getMaxNodeId(getNodes()) + 1}`,
+      type: 'customNode',
       position: screenToFlowPosition({ x: left, y: top }),
       style: { width: '300px', height: '100px'},
-      data: { label: 'New Node', inputs: ['input1', 'input2'], outputs: ['output1', 'output2'] },
+      data: { 
+        label: nodeType,
+        inputs: customNode.inputs,
+        outputs: customNode.outputs
+      },
     };
     addNodes(newNode);
-  }, [left, top, addNodes, getNodes]);
+  }, [left, top, addNodes, getNodes, customNodes]);
 
   const renderSubmenu = () => {
     if (!showSubmenu) return null;
 
     return (
       <div className="context-submenu">
-        <div className="context-menu-item" onClick={() => addNewNode('default')}>Default Node</div>
-        <div className="context-menu-item" onClick={() => addNewNode('customNode')}>Custom Node</div>
+        {customNodes.map(node => (
+          <div 
+            key={node.name}
+            className="context-menu-item" 
+            onClick={() => addNewNode(node.name)}
+          >
+            {node.name}
+          </div>
+        ))}
       </div>
     );
   };
