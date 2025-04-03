@@ -1,88 +1,11 @@
 import { memo } from 'react';
 import { useCallback, memo, useMemo } from 'react';
-import { Handle, Position , NodeResizeControl} from '@xyflow/react';
 
-import SingleConnectionHandle from '../components/SingleConnectionHandle.jsx'
+import { NodeResizeControl} from '@xyflow/react';
+import InputWidget from './widgets/InputWidget.tsx';
+import NodeInput from './handles/NodeInput.tsx';
+import NodeOutput from './handles/NodeOutput.tsx';
 
-const controlStyle = {
-  background: 'transparent',
-  border: 'none',
-};
-
-const NodeWidget = ({ widget, onChange }) => (
-  <div key={widget.name} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
-    <span style={{
-      position: 'absolute',
-      left: '20px',
-      top: '5px',
-      fontSize: '6px',
-      color: '#AAA',
-      zIndex: 1,
-      pointerEvents: 'none'
-    }}>
-      {widget.name}
-    </span>
-    <input 
-      id={widget.name}
-      name={widget.name}
-      onChange={onChange} 
-      className="nodrag" 
-      style={{
-        width: 'calc(100% - 40px)',
-        padding: '8px',
-        border: '1px solid #333',
-        borderRadius: '5px',
-        fontSize: '12px',
-        backgroundColor: '#1e1e1e',
-        color: '#fff',
-        paddingLeft: '7px',
-        paddingTop: '12px'
-      }}
-    />
-  </div>
-);
-
-const NodeInput = ({ input, topPadding, index, spacing }) => (
-  <div key={input.name}>
-    <SingleConnectionHandle 
-      type="target" 
-      position={Position.Left} 
-      style={{ top: `${topPadding + (index * spacing)}px` }} 
-      id={input.name}
-    />
-    <span style={{
-      position: 'absolute',
-      left: '20px',
-      top: `${topPadding + (index * spacing)}px`,
-      transform: 'translateY(-50%)',
-      fontSize: '8px',
-      pointerEvents: 'none'
-    }}>
-      {input.name}
-    </span>
-  </div>
-);
-
-const NodeOutput = ({ output, topPadding, index, spacing }) => (
-  <div key={output.name}>
-    <Handle  
-      type="source" 
-      position={Position.Right} 
-      style={{ top: `${topPadding + (index * spacing)}px` }} 
-      id={output.name}
-    />
-    <span style={{
-      position: 'absolute',
-      right: '20px',
-      top: `${topPadding + (index * spacing)}px`,
-      transform: 'translateY(-50%)',
-      fontSize: '8px',
-      pointerEvents: 'none'
-    }}>
-      {output.name}
-    </span>
-  </div>
-);
 
 function PythonNode({ data }) {
   const onChange = useCallback((evt) => {
@@ -124,10 +47,10 @@ function PythonNode({ data }) {
       ))}
       <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
         {widgets.map((widget) => (
-          <NodeWidget key={widget.name} widget={widget} onChange={onChange} />
+          <InputWidget key={widget.name} widget={widget} onChange={onChange} />
         ))}
       </div>
-      <NodeResizeControl style={controlStyle} minWidth={100} minHeight={50}>
+      <NodeResizeControl style={{ background: 'transparent', border: 'none' }} minWidth={100} minHeight={50}>
         <ResizeIcon />
       </NodeResizeControl>
     </>
