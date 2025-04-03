@@ -9,7 +9,7 @@ export default function ContextMenu({
   right,
   bottom,
   type = 'default',
-  customNodes,
+  pythonNodes,
   ...props
 }) {
   const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition, getNodes } = useReactFlow();
@@ -39,28 +39,28 @@ export default function ContextMenu({
   }, [id, setNodes, setEdges]);
 
   const addNewNode = useCallback((nodeType) => {
-    const customNode = customNodes.find(node => node.name === nodeType);
+    const pythonNode = pythonNodes.find(node => node.name === nodeType);
     const newNode = {
       id: `${getMaxNodeId(getNodes()) + 1}`,
-      type: 'customNode',
+      type: 'pythonNode',
       position: screenToFlowPosition({ x: left, y: top }),
-      style: { width: '300px', height: `${100 + (customNode.widgets.length * 40)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
+      style: { width: '300px', height: `${100 + (pythonNode.widgets.length * 40)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
       data: { 
         label: nodeType,
-        inputs: customNode.inputs,
-        outputs: customNode.outputs,
-        widgets: customNode.widgets
+        inputs: pythonNode.inputs,
+        outputs: pythonNode.outputs,
+        widgets: pythonNode.widgets
       },
     };
     addNodes(newNode);
-  }, [left, top, addNodes, getNodes, customNodes]);
+  }, [left, top, addNodes, getNodes, pythonNodes]);
 
   const renderSubmenu = () => {
     if (!showSubmenu) return null;
 
     return (
       <div className="context-submenu">
-        {customNodes.map(node => (
+        {pythonNodes.map(node => (
           <div 
             key={node.name}
             className="context-menu-item" 

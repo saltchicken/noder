@@ -9,7 +9,7 @@ const controlStyle = {
   border: 'none',
 };
 
-function CustomNode({ data }) {
+function PythonNode({ data }) {
   const onChange = useCallback((evt) => {
     console.log(evt.target.value);
   }, []);
@@ -135,7 +135,7 @@ const ResizeIcon = memo(() => (
   ));
 
 
-export default memo(CustomNode, (prevProps, nextProps) => {
+export default memo(PythonNode, (prevProps, nextProps) => {
   return JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data);
 });
 

@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple
 import time
 
 class Node:
@@ -8,7 +8,7 @@ class Node:
         self.send_message = lambda msg: None
         self.widgets = []
 
-    def run(self, *args, **kwargs) -> Any:
+    def run(self, *args, **kwargs):
         pass
 
     def _run(self, *args, **kwargs):

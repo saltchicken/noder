@@ -14,10 +14,10 @@ import '@xyflow/react/dist/style.css';
 
 import ContextMenu from './components/ContextMenu';
 
-import CustomNode from './nodes/CustomNode.tsx';
+import PythonNode from './nodes/PythonNode.tsx';
 
 const nodeTypes = {
-  customNode: CustomNode
+  pythonNode: PythonNode
 };
 
 
@@ -27,31 +27,29 @@ const Flow = () => {
   const [menu, setMenu] = useState(null);
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [customNodes, setCustomNodes] = useState([]);
+  const [pythonNodes, setPythonNodes] = useState([]);
   const ref = useRef(null);
   const reconnectTimeoutRef = useRef(null);
 
   useEffect(() => {
-    const fetchCustomNodes = async () => {
+    const fetchPythonNodes = async () => {
       try {
-        const API_URL = `http://${window.location.hostname}:8000/custom_nodes`;
+        const API_URL = `http://${window.location.hostname}:8000/python_nodes`;
         const response = await fetch(API_URL, {
           method: "POST"
         });
         if (!response.ok) {
-          throw new Error('Failed to fetch custom nodes');
+          throw new Error('Failed to fetch python nodes');
         }
         const data = await response.json();
-        console.log('Custom nodes:', data.nodes);
-        // Examples custom nodes data
-        // const nodes = [{name: 'first', inputs: ['a', 'b'], outputs: ['x', 'y'], 'widgets': ['text', 'text']}, {name: 'second', inputs: ['c', 'd'], outputs: ['w', 'v'], widgets: ['text']}]
-        setCustomNodes(data.nodes);
+        console.log('Python nodes:', data.nodes);
+        setPythonNodes(data.nodes);
       } catch (error) {
-        console.error('Error fetching custom nodes:', error);
+        console.error('Error fetching python nodes:', error);
       }
     };
 
-    fetchCustomNodes();
+    fetchPythonNodes();
   }, []);
 
 
@@ -217,7 +215,7 @@ const onConnectEnd = useCallback(
         colorMode="dark"
       >
         <Background />
-        {menu && <ContextMenu onClick={onPaneClick} customNodes={customNodes} {...menu} />}
+        {menu && <ContextMenu onClick={onPaneClick} pythonNodes={pythonNodes} {...menu} />}
 
         <Controls />
         <Panel position="top-left">

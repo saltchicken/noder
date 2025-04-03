@@ -103,7 +103,7 @@ def load_script(script_path):
     return module
 
 # Example usage
-def get_custom_classes():
+def get_python_classes():
     script_path = "nodes.py"
     module = load_script(script_path)
     run_methods = get_run_methods(module)
@@ -117,7 +117,7 @@ def get_custom_classes():
         outputs[cls_name] = info["outputs"]
         widgets[cls_name] = info['widgets']
 
-    custom_classes = [
+    python_classes = [
         {
             "name": cls_name,
             "inputs": inputs[cls_name],
@@ -129,4 +129,4 @@ def get_custom_classes():
         if inspect.isclass(cls_obj) and cls_name != "Node"
     ]
 
-    return custom_classes
+    return python_classes
