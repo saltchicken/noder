@@ -6,7 +6,7 @@ class Node:
         self.instantiated = True
         print(f"Node initialized {self.__class__.__name__}")
         self.send_message = lambda msg: None
-        self.widgets = {}
+        self.widgets = []
 
     def run(self, *args, **kwargs):
         pass
@@ -21,11 +21,11 @@ class Node:
 class Foo(Node):
     def run(self):
         time.sleep(1)
-        first = self.widgets['text'][0]
-        second = self.widgets['text'][1]
-        yes = self.widgets['number'][0]
-        no = self.widgets['number'][1]
-        new = self.widgets['select'][0] # {"values": ["1", "2", "3"]}
+        first = self.widgets[0]
+        second = self.widgets[1]
+        yes = self.widgets[2]
+        no = self.widgets[3]
+        new = self.widgets[4] # {"values": ["1", "2", "3"]}
         print(f"new: {new}")
         FooOutput = first
         FooOutput2 = second
@@ -39,7 +39,7 @@ class Bar(Node):
         time.sleep(2)
         BarOutput = BarInput[::-1]
         BarOutput2 = BarInput2[::-1]
-        test_test = self.widgets['display_text'][0]
+        test_test = self.widgets[0]
 
         print(f"{BarOutput} and {BarOutput2}")
 
@@ -48,13 +48,13 @@ class Bar(Node):
 class OllamaQuery(Node):
     def run(self, model: str, system_message: str, prompt: str, host: str, port: str, temperature: str, seed: str) -> Tuple[str, str]:
         from ollama_query import ollama_query
-        model_text = self.widgets['text'][0]
-        system_message_text = self.widgets['text'][1]
-        prompt_text = self.widgets['text'][2]
-        host_text = self.widgets['text'][3]
-        port_text = self.widgets['text'][4]
-        temperature_text = self.widgets['text'][5]
-        seed_text = self.widgets['text'][6]
+        model_text = self.widgets[0]
+        system_message_text = self.widgets[1]
+        prompt_text = self.widgets[2]
+        host_text = self.widgets[3]
+        port_text = self.widgets[4]
+        temperature_text = self.widgets[5]
+        seed_text = self.widgets[6]
 
         if system_message_text == "":
             system_message_text = None
@@ -72,7 +72,7 @@ class OllamaQuery(Node):
 
 class ShowText(Node):
     def run(self, text: str) -> str:
-        what_to_name = self.widgets['display_text'][0]
+        what_to_name = self.widgets[0]
         print(f"what_to_name {what_to_name}")
         self.send_message({'name': "what_to_name", "value": text})
         display_text = text

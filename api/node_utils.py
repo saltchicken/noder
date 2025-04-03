@@ -15,11 +15,7 @@ def get_returned_variables(source_code, function_name):
     """
     tree = ast.parse(textwrap.dedent(source_code))
     returned_vars = []
-    text_assignments = []
-    number_assignments = []
-    select_assignments = []
-    display_text_assignments = []
-    widget_comments = {}
+    widgets = []
 
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef) and node.name == function_name:
@@ -35,43 +31,22 @@ def get_returned_variables(source_code, function_name):
                         if isinstance(target, ast.Name):
                             if isinstance(stmt.value, ast.Subscript):
                                 if 'value' in stmt.value.value.__dict__:
-                                    if isinstance(stmt.value.value.value, ast.Attribute):
-                                        attr = stmt.value.value.value
-                                        if 'attr' in attr.__dict__ and attr.attr == 'widgets':
-                                            if isinstance(stmt.value.value.slice, ast.Constant):
-                                                widget_type = stmt.value.value.slice.value
-                                                if widget_type == "text":
-                                                    text_assignments.append(target.id)
-                                                    lineno = stmt.lineno
-                                                    source_lines = source_code.splitlines()
-                                                    if lineno - 1 < len(source_lines):
-                                                        line = source_lines[lineno - 1]
-                                                        if '#' in line:
-                                                            comment = line[line.index('#')+1:].strip()
-                                                            try:
-                                                                widget_comments[target.id] = json.loads(comment)
-                                                            except:
-                                                                print("Failed to parse comment as JSON:", comment)
-                                                elif widget_type == "number":
-                                                    number_assignments.append(target.id)
-                                                elif widget_type == 'select':
-                                                    select_assignments.append(target.id)
-                                                    lineno = stmt.lineno
-                                                    source_lines = source_code.splitlines()
-                                                    if lineno - 1 < len(source_lines):
-                                                        line = source_lines[lineno - 1]
-                                                        if '#' in line:
-                                                            comment = line[line.index('#')+1:].strip()
-                                                            try:
-                                                                widget_comments[target.id] = json.loads(comment)
-                                                            except:
-                                                                print("Failed to parse comment as JSON:", comment)
-                                                elif widget_type == 'display_text':
-                                                    display_text_assignments.append(target.id)
+                                    if stmt.value.value.attr == "widgets":
+                                        widget = {'name': target.id}
+                                        lineno = stmt.lineno
+                                        source_lines = source_code.splitlines()
+                                        if lineno - 1 < len(source_lines):
+                                            line = source_lines[lineno - 1]
+                                            if '#' in line:
+                                                comment = line[line.index('#')+1:].strip()
+                                                try:
+                                                    widget = {**widget, **json.loads(comment)}
+                                                except:
+                                                    print("Failed to parse comment as JSON:", comment)
+                                        widgets.append(widget)
 
-    print(widget_comments)
-    print(display_text_assignments)
-    return returned_vars, text_assignments, number_assignments, select_assignments, display_text_assignments, widget_comments
+    print(widgets)
+    return returned_vars, widgets
 
 def get_run_methods(module):
     run_methods = {}
@@ -89,7 +64,7 @@ def get_run_methods(module):
                 except OSError:
                     source_code = ""
 
-                returned_vars, text_vars, number_vars, select_vars, display_text_vars, widget_comments = get_returned_variables(source_code, method_name)
+                returned_vars, widgets = get_returned_variables(source_code, method_name)
 
                 # Handle inputs
                 inputs = []
@@ -115,11 +90,7 @@ def get_run_methods(module):
                     "file": inspect.getsourcefile(method),
                     "line": start_line,
                     "outputs": outputs,
-                    "text_vars": text_vars,
-                    "number_vars": number_vars,
-                    "select_vars": select_vars,
-                    "display_text_vars": display_text_vars,
-                    "widget_comments": widget_comments
+                    "widgets": widgets,
 
                 }
 
@@ -139,31 +110,19 @@ def get_custom_classes():
 
     inputs = {}
     outputs = {}
-    text_vars = {}
-    number_vars = {}
-    select_vars = {}
-    display_text_vars = {}
-    widget_comments = {}
+    widgets = {}
     for name, info in run_methods.items():
         cls_name = name.split('.')[0]
         inputs[cls_name] = info["parameters"]
         outputs[cls_name] = info["outputs"]
-        text_vars[cls_name] = info["text_vars"]
-        number_vars[cls_name] = info["number_vars"]
-        select_vars[cls_name] = info["select_vars"]
-        display_text_vars[cls_name] = info["display_text_vars"]
-        widget_comments[cls_name] = info["widget_comments"]
+        widgets[cls_name] = info['widgets']
 
     custom_classes = [
         {
             "name": cls_name,
             "inputs": inputs[cls_name],
             "outputs": outputs[cls_name],
-            "text_vars": text_vars[cls_name],
-            "number_vars": number_vars[cls_name],
-            "select_vars": select_vars[cls_name],
-            "display_text_vars": display_text_vars[cls_name],
-            "widget_comments": widget_comments[cls_name],
+            "widgets" : widgets[cls_name],
             "class": cls_obj
         }
         for cls_name, cls_obj in inspect.getmembers(sys.modules['nodes'])

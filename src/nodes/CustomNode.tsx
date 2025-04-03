@@ -20,14 +20,17 @@ function CustomNode({ data }) {
   const spacing = 15; // 5% spacing between handles
   const topPadding = 15; // 10% padding from the top
 
+
+  console.log(inputs);
+
   const maxHandles = Math.max(inputs.length, outputs.length);
   const widgetTopPadding = topPadding + (maxHandles * spacing);
 
   return (
     <>
       <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
-        {widgets.map((varName, index) => (
-          <div key={varName} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
+        {widgets.map((widget, index) => (
+          <div key={widget.name} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
             <span style={{
               position: 'absolute',
               left: '20px',
@@ -37,11 +40,11 @@ function CustomNode({ data }) {
               zIndex: 1,
               pointerEvents: 'none'
             }}>
-              {varName}
+              {widget.name}
             </span>
             <input 
-              id={varName}
-              name={varName}
+              id={widget.name}
+              name={widget.name}
               onChange={onChange} 
               className="nodrag" 
               style={{
@@ -65,13 +68,13 @@ function CustomNode({ data }) {
       <NodeResizeControl style={controlStyle} minWidth={100} minHeight={50}>
         <ResizeIcon />
       </NodeResizeControl>
-      {inputs.map((inputId, index) => (
-        <div key={inputId}>
+      {inputs.map((input, index) => (
+        <div key={input.name}>
           <SingleConnectionHandle 
             type="target" 
             position={Position.Left} 
             style={{ top: `${topPadding + (index * spacing)}px` }} 
-            id={inputId}
+            id={input.name}
           />
           <span style={{
             position: 'absolute',
@@ -81,17 +84,17 @@ function CustomNode({ data }) {
             fontSize: '8px',
             pointerEvents: 'none'
           }}>
-            {inputId}
+            {input.name}
           </span>
         </div>
       ))}
-      {outputs.map((outputId, index) => (
-        <div key={outputId}>
+      {outputs.map((output, index) => (
+        <div key={output.name}>
           <Handle  
             type="source" 
             position={Position.Right} 
             style={{ top: `${topPadding + (index * spacing)}px` }} 
-            id={outputId}
+            id={output.name}
           />
           <span style={{
             position: 'absolute',
@@ -101,7 +104,7 @@ function CustomNode({ data }) {
             fontSize: '8px',
             pointerEvents: 'none'
           }}>
-            {outputId}
+            {output.name}
           </span>
         </div>
       ))}
