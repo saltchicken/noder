@@ -44,7 +44,7 @@ const Flow = () => {
         const data = await response.json();
         console.log('Custom nodes:', data.nodes);
         // Examples custom nodes data
-        const nodes = [{name: 'first', inputs: ['a', 'b'], outputs: ['x', 'y']}, {name: 'second', inputs: ['c', 'd'], outputs: ['w', 'v']}]
+        const nodes = [{name: 'first', inputs: ['a', 'b'], outputs: ['x', 'y'], 'widgets': ['text', 'text']}, {name: 'second', inputs: ['c', 'd'], outputs: ['w', 'v'], widgets: ['text']}]
         setCustomNodes(nodes);
       } catch (error) {
         console.error('Error fetching custom nodes:', error);

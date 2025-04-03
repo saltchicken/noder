@@ -16,6 +16,7 @@ function CustomNode({ data }) {
 
   const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
   const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
+  const widgets = Array.isArray(data.widgets) ? data.widgets : [];
   const spacing = 15; // 5% spacing between handles
   const topPadding = 15; // 10% padding from the top
 
@@ -25,36 +26,38 @@ function CustomNode({ data }) {
   return (
     <>
       <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
-      <div style={{ padding: '0px', position: 'relative' }}>
-        <span style={{
-          position: 'absolute',
-          left: '20px',
-          top: '5px',
-          fontSize: '6px',
-          color: '#AAA',
-          zIndex: 1,
-          pointerEvents: 'none'
-        }}>
-          {data.label}
-        </span>
-        <input 
-          id="text" 
-          name="text" 
-          onChange={onChange} 
-          className="nodrag" 
-          style={{
-            width: 'calc(100% - 40px)',
-            padding: '8px',
-            border: '1px solid #333',
-            borderRadius: '5px',
-            fontSize: '12px',
-            backgroundColor: '#1e1e1e',
-            color: '#fff',
-            paddingLeft: '7px',
-            paddingTop: '12px'
-          }}
-        />
-        </div>
+        {widgets.map((varName, index) => (
+          <div key={varName} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
+            <span style={{
+              position: 'absolute',
+              left: '20px',
+              top: '5px',
+              fontSize: '6px',
+              color: '#AAA',
+              zIndex: 1,
+              pointerEvents: 'none'
+            }}>
+              {varName}
+            </span>
+            <input 
+              id={varName}
+              name={varName}
+              onChange={onChange} 
+              className="nodrag" 
+              style={{
+                width: 'calc(100% - 40px)',
+                padding: '8px',
+                border: '1px solid #333',
+                borderRadius: '5px',
+                fontSize: '12px',
+                backgroundColor: '#1e1e1e',
+                color: '#fff',
+                paddingLeft: '7px',
+                paddingTop: '12px'
+              }}
+            />
+          </div>
+        ))}
       </div>
 
 
