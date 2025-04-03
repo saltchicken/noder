@@ -44,7 +44,7 @@ export default function ContextMenu({
       id: `${getMaxNodeId(getNodes()) + 1}`,
       type: 'pythonNode',
       position: screenToFlowPosition({ x: left, y: top }),
-      style: { width: '300px', height: `${100 + (pythonNode.widgets.length * 40)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
+      style: { minWidth: '300px', minHeight: `${100 + (pythonNode.widgets.length * 40)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
       data: { 
         label: nodeType,
         inputs: pythonNode.inputs,
