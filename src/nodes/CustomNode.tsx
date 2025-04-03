@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useCallback } from 'react';
+import { useCallback, memo, useMemo } from 'react';
 import { Handle, Position , NodeResizeControl} from '@xyflow/react';
 
 import SingleConnectionHandle from '../components/SingleConnectionHandle.jsx'
@@ -14,17 +14,22 @@ function CustomNode({ data }) {
     console.log(evt.target.value);
   }, []);
 
-  const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
-  const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
-  const widgets = Array.isArray(data.widgets) ? data.widgets : [];
-  const spacing = 15; // 5% spacing between handles
-  const topPadding = 15; // 10% padding from the top
+  const {inputs, outputs, widgets, widgetTopPadding, spacing, topPadding } = useMemo(() => {
+    const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
+    const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
+    const widgets = Array.isArray(data.widgets) ? data.widgets : [];
+    const spacing = 15; // 5% spacing between handles
+    const topPadding = 15; // 10% padding from the top
 
 
-  console.log(inputs);
+    console.log(inputs);
 
-  const maxHandles = Math.max(inputs.length, outputs.length);
-  const widgetTopPadding = topPadding + (maxHandles * spacing);
+    const maxHandles = Math.max(inputs.length, outputs.length);
+    const widgetTopPadding = topPadding + (maxHandles * spacing);
+
+    return { inputs, outputs, widgets, widgetTopPadding, spacing, topPadding };
+  }, [data.inputs, data.outputs, data.widgets]);
+
 
   return (
     <>
@@ -112,8 +117,7 @@ function CustomNode({ data }) {
   );
 }
 
-function ResizeIcon() {
-  return (
+const ResizeIcon = memo(() => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="20"
@@ -132,8 +136,10 @@ function ResizeIcon() {
       <polyline points="8 4 4 4 4 8" />
       <line x1="4" y1="4" x2="10" y2="10" />
     </svg>
-  );
-}
+  ));
 
-export default memo(CustomNode);
+
+export default memo(CustomNode, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data);
+});
 
