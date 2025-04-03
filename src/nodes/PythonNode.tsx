@@ -3,6 +3,7 @@ import { useCallback, memo, useMemo } from 'react';
 
 import { NodeResizeControl} from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
+import DropdownWidget from './widgets/DropdownWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -11,6 +12,15 @@ function PythonNode({ data }) {
   const onChange = useCallback((evt) => {
     console.log(evt.target.value);
   }, []);
+
+  const renderWidget = (widget) => {
+    switch (widget.type) {
+      case 'dropdown':
+        return <DropdownWidget key={widget.name} widget={widget} onChange={onChange} />;
+      default:
+        return <InputWidget key={widget.name} widget={widget} onChange={onChange} />;
+    }
+  };
 
   const {inputs, outputs, widgets, widgetTopPadding, spacing, topPadding } = useMemo(() => {
     const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
@@ -46,9 +56,7 @@ function PythonNode({ data }) {
         />
       ))}
       <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
-        {widgets.map((widget) => (
-          <InputWidget key={widget.name} widget={widget} onChange={onChange} />
-        ))}
+        {widgets.map((widget) => renderWidget(widget))}
       </div>
       <NodeResizeControl style={{ background: 'transparent', border: 'none' }} minWidth={100} minHeight={50}>
         <ResizeIcon />

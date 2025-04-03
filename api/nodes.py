@@ -25,7 +25,7 @@ class Foo(Node):
         second = self.widgets[1]
         yes = self.widgets[2]
         no = self.widgets[3]
-        new = self.widgets[4] # {"values": ["1", "2", "3"]}
+        new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
         print(f"new: {new}")
         FooOutput = first
         FooOutput2 = second
