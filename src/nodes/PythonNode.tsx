@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useCallback, memo, useMemo } from 'react';
 
 import { NodeResizeControl} from '@xyflow/react';
