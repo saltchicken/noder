@@ -20,10 +20,6 @@ function CustomNode({ data }) {
     const widgets = Array.isArray(data.widgets) ? data.widgets : [];
     const spacing = 15; // 5% spacing between handles
     const topPadding = 15; // 10% padding from the top
-
-
-    console.log(inputs);
-
     const maxHandles = Math.max(inputs.length, outputs.length);
     const widgetTopPadding = topPadding + (maxHandles * spacing);
 
