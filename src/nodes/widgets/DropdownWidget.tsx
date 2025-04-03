@@ -17,7 +17,7 @@ const DropdownWidget = ({ widget, onChange }) => (
       onChange={onChange}
       className="nodrag"
       style={{
-        width: 'calc(100% - 40px)',
+        width: 'calc(100% - 22px)',
         padding: '8px',
         border: '1px solid #333',
         borderRadius: '5px',
