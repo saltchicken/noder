@@ -112,7 +112,7 @@ const Flow = () => {
 
   const sendToWebSocket = useCallback((data) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(data));
+      socket.send(data);
     }
   }, [socket]);
 
@@ -174,7 +174,7 @@ const onRestore = useCallback(() => {
     const json = JSON.stringify(flow, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
     console.log(json);
-    sendToWebSocket(flow); //TODO: JSON.stringify is called twice. Here and in sendToWebSocket
+    sendToWebSocket(json);
   }, [nodes, edges, sendToWebSocket]);
 
   const onNodeContextMenu = useCallback(

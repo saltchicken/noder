@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from typing import List
 import os
+import json
 from api.node_utils import get_python_classes  # Updated import path
 
 app = FastAPI()
@@ -57,8 +58,19 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"Websocket received: {data}")
-            await manager.broadcast(f"Client said: {data}")
+            try:
+                json_data = json.loads(data)
+                print(f"{json_data}")
+                # await manager.broadcast(json.dumps({
+                #     "status": "received",
+                #     "data": json_data
+                # }))
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}")
+                await websocket.send_json({
+                    "status": "error",
+                    "message": "Invalid JSON format"
+                })
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
