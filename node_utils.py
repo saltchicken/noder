@@ -9,6 +9,8 @@ import sys
 import nodes
 
 from typing import Dict, List, Optional
+from collections import defaultdict, deque
+
 
 class ReactflowNode:
     def __init__(self, node_data: Dict):
@@ -63,6 +65,49 @@ class ReactflowGraph:
             'inputs': input_nodes,
             'outputs': output_nodes
         }
+
+    def get_execution_order(self) -> List[ReactflowNode]:
+        """
+        Determines node execution order using topological sort.
+        Returns a list of nodes in execution order.
+        """
+        # Create adjacency list and in-degree count
+        adj_list = defaultdict(list)
+        in_degree = defaultdict(int)
+        
+        # Build the graph representation
+        for edge in self.edges:
+            source_id = edge['source']
+            target_id = edge['target']
+            adj_list[source_id].append(target_id)
+            in_degree[target_id] += 1
+            
+        # Initialize queue with nodes that have no inputs
+        queue = deque()
+        for node in self.nodes:
+            if in_degree[node.id] == 0:
+                queue.append(node)
+        
+        # Process the queue
+        execution_order = []
+        while queue:
+            current_node = queue.popleft()
+            execution_order.append(current_node)
+            
+            # Process children
+            for target_id in adj_list[current_node.id]:
+                in_degree[target_id] -= 1
+                if in_degree[target_id] == 0:
+                    target_node = self.get_node_by_id(target_id)
+                    if target_node:
+                        queue.append(target_node)
+        
+        # Check for cycles
+        if len(execution_order) != len(self.nodes):
+            raise ValueError("Graph contains cycles")
+            
+        return execution_order
+
 
 
 

@@ -6,8 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from typing import List
 import os
 import json
-from node_utils import get_python_classes, ReactflowGraph  # Updated import path
-
+from node_utils import get_python_classes, ReactflowGraph, ReactflowNode  # Updated import path
 
 
 app = FastAPI()
@@ -62,15 +61,24 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             try:
                 json_data = json.loads(data)
-                # Create a ReactflowGraph instance from the JSON data
                 graph = ReactflowGraph(json_data)
-                # Example of using the graph
-                for node in graph.nodes:
-                    print(f"Node {node.id} ({node.label}):")
-                    print(f"  Widget values: {node.widget_values}")
-                    connected = graph.get_connected_nodes(node.id)
-                    print(f"  Input nodes: {[n.id for n in connected['inputs']]}")
-                    print(f"  Output nodes: {[n.id for n in connected['outputs']]}")
+                
+                # Get execution order
+                try:
+                    ordered_nodes = graph.get_execution_order()
+                    print("Execution order:")
+                    for node in ordered_nodes:
+                        print(f"  {node.id} ({node.label})")
+                        connected = graph.get_connected_nodes(node.id)
+                        print(f"    Input nodes: {[n.id for n in connected['inputs']]}")
+                        print(f"    Output nodes: {[n.id for n in connected['outputs']]}")
+                except ValueError as e:
+                    print(f"Error determining execution order: {e}")
+                    await websocket.send_json({
+                        "status": "error",
+                        "message": "Graph contains cycles"
+                    })
+                    
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
                 await websocket.send_json({
