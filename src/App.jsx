@@ -139,13 +139,25 @@ const onConnectEnd = useCallback(
   }, [nodes, edges]);
 
 
-  const onRestore = useCallback(() => {
-    const flow = JSON.parse(localStorage.getItem('flow') || '');
-    if (flow) {
-      setNodes(flow.nodes);
-      setEdges(flow.edges);
-    }
-  }, [setNodes, setEdges]);
+const onRestore = useCallback(() => {
+  const flowString = localStorage.getItem('flow');
+  if (!flowString) return;
+  
+  const flow = JSON.parse(flowString);
+  if (flow) {
+    // Ensure widgetValues are properly restored for each node
+    const nodesWithRestoredWidgets = flow.nodes.map(node => ({
+      ...node,
+      data: {
+        ...node.data,
+        widgetValues: node.data.widgetValues || {}  // Preserve or initialize widgetValues
+      }
+    }));
+    
+    setNodes(nodesWithRestoredWidgets);
+    setEdges(flow.edges);
+  }
+}, [setNodes, setEdges]);
 
   const onProcess = useCallback(() => {
     const flow = {

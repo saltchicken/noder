@@ -1,4 +1,4 @@
-import { useCallback, memo, useMemo, useState } from 'react';
+import { useCallback, memo, useMemo, useState, useEffect } from 'react';
 
 import { NodeResizeControl} from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
@@ -10,6 +10,10 @@ import NodeOutput from './handles/NodeOutput.tsx';
 
 function PythonNode({ data }) {
   const [widgetValues, setWidgetValues] = useState(() =>{
+
+    if (data.widgetValues && Object.keys(data.widgetValues). length > 0) {
+      return {...data.widgetValues};
+    }
     const values = {};
     data.widgets?.forEach(widget => {
       values[widget.name] = widget.value || (
@@ -24,17 +28,22 @@ function PythonNode({ data }) {
     return values;
   });
 
+  useEffect(() => {
+    if (data.widgetValues) {
+      // console.log("Updating widget values from data:", data.widgetValues);
+      setWidgetValues(data.widgetValues);
+    }
+  }, [data.widgetValues]);
+
   const onChange = useCallback((evt) => {
     const { name, value } = evt.target;
-    setWidgetValues(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    data.widgetValues = {
-      ...data.widgetValues,
+    const newValues = {
+      ...widgetValues,
       [name]: value
     };
-  }, [data]);
+    setWidgetValues(newValues);
+    data.widgetValues = newValues;
+  }, [widgetValues]);
 
   const renderWidget = (widget) => {
     switch (widget.type) {
