@@ -149,7 +149,14 @@ const onConnectEnd = useCallback(
 
   const onProcess = useCallback(() => {
     const flow = {
-      nodes: nodes,
+      nodes: nodes.map(node => ({
+        ...node,
+        // Only include necessary data
+        data: {
+          ...node.data,
+          widgetValues: node.data.widgetValues || {},
+        }
+      })),
       edges: edges,
     };
     const json = JSON.stringify(flow, (key, value) =>

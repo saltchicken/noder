@@ -1,4 +1,4 @@
-import { useCallback, memo, useMemo } from 'react';
+import { useCallback, memo, useMemo, useState } from 'react';
 
 import { NodeResizeControl} from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
@@ -9,9 +9,25 @@ import NodeOutput from './handles/NodeOutput.tsx';
 
 
 function PythonNode({ data }) {
+  const [widgetValues, setWidgetValues] = useState(() =>{
+    const values = {};
+    data.widgets?.forEach(widget => {
+      values[widget.name] = widget.value;
+    });
+    return values;
+  });
+
   const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
+    const { name, value } = evt.target;
+    setWidgetValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    data.widgetValues = {
+      ...data.widgetValues,
+      [name]: value
+    };
+  }, [data]);
 
   const renderWidget = (widget) => {
     switch (widget.type) {

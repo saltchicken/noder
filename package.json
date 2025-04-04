@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "builder": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "serve": "vite build && bun run server.ts"
