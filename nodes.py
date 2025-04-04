@@ -13,10 +13,11 @@ class Node:
 
     def _run(self, *args, **kwargs):
         result = self.run(*args, **kwargs)
-        if isinstance(result, tuple):
-            self.output_results = list(result)
-        else:
-            self.output_results = [result]
+        # Don't wrap the result in a list if it's already a tuple/list
+        if isinstance(result, (tuple, list)):
+            return result
+        # Wrap single values in a list
+        return [result] if result is not None else []
 
 class Foo(Node):
     def run(self):

@@ -8,6 +8,7 @@ import os
 import json
 from node_utils import get_python_classes, ReactflowGraph, ReactflowNode  # Updated import path
 
+python_classes = get_python_classes()
 
 app = FastAPI()
 
@@ -61,15 +62,14 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             try:
                 json_data = json.loads(data)
-                graph = ReactflowGraph(json_data)
+                graph = ReactflowGraph(json_data, python_classes)
                 
                 try:
-                    # Execute all nodes
-                    # results = graph.execute_nodes()
-                    ordered_nodes = graph.get_execution_order()
-                    print(ordered_nodes)
-                    
-                    # Send success response
+                    print(graph.nodes)
+                    # # Execute all nodes
+                    results = graph.execute_nodes()
+                    #
+                    # # Send success response
                     # await websocket.send_json({
                     #     "status": "success",
                     #     "results": {
@@ -100,7 +100,6 @@ async def websocket_endpoint(websocket: WebSocket):
 async def python_nodes_handler(request: Request):
     """Handles both POST and GET requests for python nodes."""
     try:
-        python_classes = get_python_classes()
         python_classes_without_class = [{k: v for k, v in d.items() if k != 'class'} for d in python_classes]
         return JSONResponse(
             content={"status": "success", "nodes": python_classes_without_class},

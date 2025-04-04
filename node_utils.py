@@ -19,6 +19,7 @@ class ReactflowNode:
         self.position: Dict[str, float] = node_data.get('position', {})
         self.data: Dict = node_data.get('data', {})
         self.widget_values: Dict = self.data.get('widgetValues', {})
+        self.python_class = None
         
     @property
     def label(self) -> str:
@@ -37,12 +38,18 @@ class ReactflowNode:
         return self.data.get('widgets', [])
 
 class ReactflowGraph:
-    def __init__(self, json_data: Dict):
+    def __init__(self, json_data: Dict, python_classes):
         self.nodes: List[ReactflowNode] = [
             ReactflowNode(node) for node in json_data.get('nodes', [])
         ]
+
+        for node in self.nodes:
+            for python_class in python_classes:
+                if node.data['label'] == python_class['name']:
+                    node.python_class = python_class['class']
+                    print(node.python_class)
         self.edges: List[Dict] = json_data.get('edges', [])
-    
+     
     def get_node_by_id(self, node_id: str) -> Optional[ReactflowNode]:
         return next((node for node in self.nodes if node.id == node_id), None)
     
@@ -158,6 +165,49 @@ class ReactflowGraph:
             
         return execution_order
 
+    def execute_nodes(self):
+        """
+        Executes all nodes in order, passing outputs to connected inputs.
+        """
+        node_results = {}
+        ordered_nodes = self.get_execution_order()
+        
+        for node in ordered_nodes:
+            if not hasattr(node.python_class, 'instantiated'):
+                node.python_class = node.python_class()
+                
+            node.python_class.send_message = lambda msg: print(f"Message from {node.label}: {msg}")
+            node.python_class.widgets = list(node.widget_values.values())
+            
+            connections = self.get_connected_nodes(node.id)
+            input_args = {}
+            
+            for conn in connections['inputs']:
+                source_results = node_results[conn['node'].id]
+                # Ensure the source index is valid
+                if conn['source_index'] < len(source_results):
+                    input_args[conn['target_handle']] = source_results[conn['source_index']]
+                else:
+                    raise ValueError(
+                        f"Node {node.label} connection error:\n"
+                        f"- Trying to connect to output index {conn['source_index']} from {conn['node'].label}\n"
+                        f"- But {conn['node'].label} only has {len(source_results)} outputs\n"
+                        f"- Available outputs: {source_results}"
+                    )
+            
+            try:
+                result = node.python_class._run(**input_args)
+                # Ensure result is always a list
+                node_results[node.id] = list(result) if isinstance(result, (list, tuple)) else [result]
+                
+                print(f"Executed {node.label} with inputs {input_args}")
+                print(f"Got outputs: {node_results[node.id]}")
+                
+            except Exception as e:
+                print(f"Error executing node {node.label}: {str(e)}")
+                raise
+        
+        return node_results
 
 
 
