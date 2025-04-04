@@ -13,7 +13,10 @@ function PythonNode({ data }) {
     const values = {};
     data.widgets?.forEach(widget => {
       values[widget.name] = widget.value;
+      console.log(widget.name);
+      console.log(widget.value);
     });
+    data.widgetValues = values;
     return values;
   });
 
