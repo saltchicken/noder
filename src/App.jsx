@@ -42,7 +42,7 @@ const Flow = () => {
           throw new Error('Failed to fetch python nodes');
         }
         const data = await response.json();
-        console.log('Python nodes:', data.nodes);
+        // console.log('Python nodes:', data.nodes);
         setPythonNodes(data.nodes);
       } catch (error) {
         console.error('Error fetching python nodes:', error);
@@ -55,7 +55,6 @@ const Flow = () => {
 
   const connectWebSocket = useCallback(() => {
     const WS_URL = `ws://${window.location.hostname}:3000/ws`;
-    console.log(WS_URL);
     const ws = new WebSocket(WS_URL);
     
     ws.onopen = () => {
@@ -173,7 +172,7 @@ const onRestore = useCallback(() => {
     };
     const json = JSON.stringify(flow, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
-    console.log(json);
+    // console.log(json);
     sendToWebSocket(json);
   }, [nodes, edges, sendToWebSocket]);
 

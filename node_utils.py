@@ -39,20 +39,49 @@ class ReactflowNode:
 
 class ReactflowGraph:
     def __init__(self, json_data: Dict, python_classes):
-        self.nodes: List[ReactflowNode] = [
-            ReactflowNode(node) for node in json_data.get('nodes', [])
-        ]
+        self.python_classes = python_classes
+        self.nodes: List[ReactflowNode] = []
+        self.edges: List[Dict] = []
+        self.node_instances = {}  # Store instantiated node classes
+        self.update_from_json(json_data)
 
-        for node in self.nodes:
-            for python_class in python_classes:
-                if node.data['label'] == python_class['name']:
-                    node.python_class = python_class['class']
-                    print(node.python_class)
-        self.edges: List[Dict] = json_data.get('edges', [])
-     
+    def update_from_json(self, json_data: Dict):
+        """Updates the graph with new JSON data while preserving existing node instances"""
+        new_nodes = json_data.get('nodes', [])
+        self.edges = json_data.get('edges', [])
+        
+        # Update existing nodes and add new ones
+        updated_nodes = []
+        for node_data in new_nodes:
+            node_id = node_data['id']
+            
+            # Find existing node with same ID
+            existing_node = next((node for node in self.nodes if node.id == node_id), None)
+            
+            if existing_node:
+                # Update existing node's data
+                existing_node.position = node_data.get('position', {})
+                existing_node.data = node_data.get('data', {})
+                existing_node.widget_values = node_data.get('data', {}).get('widgetValues', {})
+                updated_nodes.append(existing_node)
+            else:
+                # Create new node
+                new_node = ReactflowNode(node_data)
+                # Find and assign python class
+                for python_class in self.python_classes:
+                    if new_node.data['label'] == python_class['name']:
+                        new_node.python_class = python_class['class']
+                        if hasattr(new_node.python_class, 'instantiated'):
+                            # Create new instance only for new nodes
+                            new_node.python_class = new_node.python_class()
+                updated_nodes.append(new_node)
+        
+        # Remove nodes that no longer exist in the new data
+        self.nodes = updated_nodes
+
     def get_node_by_id(self, node_id: str) -> Optional[ReactflowNode]:
         return next((node for node in self.nodes if node.id == node_id), None)
-    
+ 
     def get_connected_nodes(self, node_id: str) -> Dict[str, List[Dict]]:
         """
         Returns dict with 'inputs' and 'outputs' lists of connected nodes.
@@ -200,8 +229,8 @@ class ReactflowGraph:
                 # Ensure result is always a list
                 node_results[node.id] = list(result) if isinstance(result, (list, tuple)) else [result]
                 
-                print(f"Executed {node.label} with inputs {input_args}")
-                print(f"Got outputs: {node_results[node.id]}")
+                # print(f"Executed {node.label} with inputs {input_args}")
+                # print(f"Got outputs: {node_results[node.id]}")
                 
             except Exception as e:
                 print(f"Error executing node {node.label}: {str(e)}")
@@ -249,7 +278,7 @@ def get_returned_variables(source_code, function_name):
                                                     print("Failed to parse comment as JSON:", comment)
                                         widgets.append(widget)
 
-    print(widgets)
+    # print(widgets)
     return returned_vars, widgets
 
 def get_run_methods(module):

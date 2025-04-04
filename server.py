@@ -9,6 +9,7 @@ import json
 from node_utils import get_python_classes, ReactflowGraph, ReactflowNode  # Updated import path
 
 python_classes = get_python_classes()
+global_graph = ReactflowGraph({"nodes": [], "edges": []}, python_classes)
 
 app = FastAPI()
 
@@ -62,22 +63,17 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             try:
                 json_data = json.loads(data)
-                graph = ReactflowGraph(json_data, python_classes)
+                # Update the existing graph instead of creating a new one
+                global_graph.update_from_json(json_data)
                 
                 try:
-                    print(graph.nodes)
-                    # # Execute all nodes
-                    results = graph.execute_nodes()
-                    #
-                    # # Send success response
-                    # await websocket.send_json({
-                    #     "status": "success",
-                    #     "results": {
-                    #         node_id: {
-                    #             "outputs": [str(output) for output in outputs]
-                    #         } for node_id, outputs in results.items()
-                    #     }
-                    # })
+                    # print(global_graph.nodes)
+                    results = global_graph.execute_nodes()
+
+                    # Send success response
+                    await websocket.send_json({
+                        "status": "success",
+                    })
                     
                 except ValueError as e:
                     print(f"Error in execution: {e}")

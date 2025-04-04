@@ -21,8 +21,6 @@ function PythonNode({ data }) {
       widget.type === 'slider' ? (widget.min || 0 ) :
             ''
       );
-      console.log(widget.name);
-      console.log(widget.value);
     });
     data.widgetValues = values;
     return values;
