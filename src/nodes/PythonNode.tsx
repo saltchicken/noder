@@ -12,7 +12,11 @@ function PythonNode({ data }) {
   const [widgetValues, setWidgetValues] = useState(() =>{
     const values = {};
     data.widgets?.forEach(widget => {
-      values[widget.name] = widget.value;
+      values[widget.name] = widget.value || (
+      widget.type === 'dropdown' ? widget.options[0] :
+      widget.type === 'slider' ? (widget.min || 0 ) :
+            ''
+      );
       console.log(widget.name);
       console.log(widget.value);
     });
@@ -35,14 +39,25 @@ function PythonNode({ data }) {
   const renderWidget = (widget) => {
     switch (widget.type) {
       case 'dropdown':
-        return <DropdownWidget key={widget.name} widget={widget} onChange={onChange} />;
+        return <DropdownWidget 
+          // key={widget.name} 
+          widget={{...widget, value: widgetValues[widget.name]}} 
+          onChange={onChange} 
+        />;
       case 'slider':
-        return <SliderWidget key={widget.name} widget={widget} onChange={onChange} />;
+        return <SliderWidget 
+          // key={widget.name} 
+          widget={{...widget, value: widgetValues[widget.name]}} 
+          onChange={onChange} 
+        />;
       default:
-        return <InputWidget key={widget.name} widget={widget} onChange={onChange} />;
+        return <InputWidget 
+          // key={widget.name} 
+          widget={{...widget, value: widgetValues[widget.name]}} 
+          onChange={onChange} 
+        />;
     }
   };
-
   const {inputs, outputs, widgets, widgetTopPadding, spacing, topPadding } = useMemo(() => {
     const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
     const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];

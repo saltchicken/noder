@@ -14,6 +14,7 @@ const DropdownWidget = ({ widget, onChange }) => (
     <select
       id={widget.name}
       name={widget.name}
+      value = {widget.value || widget.options[0]}
       onChange={onChange}
       className="nodrag"
       style={{

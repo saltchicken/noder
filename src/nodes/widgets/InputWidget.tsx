@@ -1,5 +1,5 @@
 const InputWidget = ({ widget, onChange }) => (
-  <div key={widget.name} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
+  <div style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
     <span style={{
       position: 'absolute',
       left: '20px',
@@ -14,6 +14,7 @@ const InputWidget = ({ widget, onChange }) => (
     <input 
       id={widget.name}
       name={widget.name}
+      value={widget.value || ''}
       onChange={onChange} 
       className="nodrag" 
       style={{
