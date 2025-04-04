@@ -34,7 +34,7 @@ const Flow = () => {
   useEffect(() => {
     const fetchPythonNodes = async () => {
       try {
-        const API_URL = `http://${window.location.hostname}:8000/python_nodes`;
+        const API_URL = `http://${window.location.hostname}:3000/python_nodes`;
         const response = await fetch(API_URL, {
           method: "POST"
         });
@@ -54,7 +54,7 @@ const Flow = () => {
 
 
   const connectWebSocket = useCallback(() => {
-    const WS_URL = `ws://${window.location.hostname}:8000/ws`;
+    const WS_URL = `ws://${window.location.hostname}:3000/ws`;
     console.log(WS_URL);
     const ws = new WebSocket(WS_URL);
     
