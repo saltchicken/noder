@@ -8,6 +8,63 @@ import inspect
 import sys
 import nodes
 
+from typing import Dict, List, Optional
+
+class ReactflowNode:
+    def __init__(self, node_data: Dict):
+        self.id: str = node_data.get('id', '')
+        self.type: str = node_data.get('type', '')
+        self.position: Dict[str, float] = node_data.get('position', {})
+        self.data: Dict = node_data.get('data', {})
+        self.widget_values: Dict = self.data.get('widgetValues', {})
+        
+    @property
+    def label(self) -> str:
+        return self.data.get('label', '')
+    
+    @property
+    def inputs(self) -> List[Dict]:
+        return self.data.get('inputs', [])
+    
+    @property
+    def outputs(self) -> List[Dict]:
+        return self.data.get('outputs', [])
+    
+    @property
+    def widgets(self) -> List[Dict]:
+        return self.data.get('widgets', [])
+
+class ReactflowGraph:
+    def __init__(self, json_data: Dict):
+        self.nodes: List[ReactflowNode] = [
+            ReactflowNode(node) for node in json_data.get('nodes', [])
+        ]
+        self.edges: List[Dict] = json_data.get('edges', [])
+    
+    def get_node_by_id(self, node_id: str) -> Optional[ReactflowNode]:
+        return next((node for node in self.nodes if node.id == node_id), None)
+    
+    def get_connected_nodes(self, node_id: str) -> Dict[str, List[ReactflowNode]]:
+        """Returns dict with 'inputs' and 'outputs' lists of connected nodes"""
+        input_nodes = []
+        output_nodes = []
+        
+        for edge in self.edges:
+            if edge['target'] == node_id:
+                source_node = self.get_node_by_id(edge['source'])
+                if source_node:
+                    input_nodes.append(source_node)
+            if edge['source'] == node_id:
+                target_node = self.get_node_by_id(edge['target'])
+                if target_node:
+                    output_nodes.append(target_node)
+                    
+        return {
+            'inputs': input_nodes,
+            'outputs': output_nodes
+        }
+
+
 
 def get_returned_variables(source_code, function_name):
     """
