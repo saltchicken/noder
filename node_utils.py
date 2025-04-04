@@ -46,24 +46,74 @@ class ReactflowGraph:
     def get_node_by_id(self, node_id: str) -> Optional[ReactflowNode]:
         return next((node for node in self.nodes if node.id == node_id), None)
     
-    def get_connected_nodes(self, node_id: str) -> Dict[str, List[ReactflowNode]]:
-        """Returns dict with 'inputs' and 'outputs' lists of connected nodes"""
-        input_nodes = []
-        output_nodes = []
+    def get_connected_nodes(self, node_id: str) -> Dict[str, List[Dict]]:
+        """
+        Returns dict with 'inputs' and 'outputs' lists of connected nodes.
+        Each connection includes the node, variable names, and slot indices.
+        
+        Returns:
+            {
+                'inputs': [{
+                    'node': ReactflowNode,
+                    'source_handle': str,
+                    'target_handle': str,
+                    'source_index': int,
+                    'target_index': int
+                }],
+                'outputs': [{
+                    'node': ReactflowNode,
+                    'source_handle': str,
+                    'target_handle': str,
+                    'source_index': int,
+                    'target_index': int
+                }]
+            }
+        """
+        input_connections = []
+        output_connections = []
         
         for edge in self.edges:
             if edge['target'] == node_id:
                 source_node = self.get_node_by_id(edge['source'])
                 if source_node:
-                    input_nodes.append(source_node)
+                    source_handle = edge.get('sourceHandle')
+                    target_handle = edge.get('targetHandle')
+                    # Get indices from the node's inputs/outputs lists
+                    source_index = next((i for i, out in enumerate(source_node.outputs) 
+                                      if out.get('name') == source_handle), -1)
+                    target_index = next((i for i, inp in enumerate(self.get_node_by_id(node_id).inputs) 
+                                      if inp.get('name') == target_handle), -1)
+                    
+                    input_connections.append({
+                        'node': source_node,
+                        'source_handle': source_handle,
+                        'target_handle': target_handle,
+                        'source_index': source_index,
+                        'target_index': target_index
+                    })
+                    
             if edge['source'] == node_id:
                 target_node = self.get_node_by_id(edge['target'])
                 if target_node:
-                    output_nodes.append(target_node)
+                    source_handle = edge.get('sourceHandle')
+                    target_handle = edge.get('targetHandle')
+                    # Get indices from the node's inputs/outputs lists
+                    source_index = next((i for i, out in enumerate(self.get_node_by_id(node_id).outputs) 
+                                      if out.get('name') == source_handle), -1)
+                    target_index = next((i for i, inp in enumerate(target_node.inputs) 
+                                      if inp.get('name') == target_handle), -1)
+                    
+                    output_connections.append({
+                        'node': target_node,
+                        'source_handle': source_handle,
+                        'target_handle': target_handle,
+                        'source_index': source_index,
+                        'target_index': target_index
+                    })
                     
         return {
-            'inputs': input_nodes,
-            'outputs': output_nodes
+            'inputs': input_connections,
+            'outputs': output_connections
         }
 
     def get_execution_order(self) -> List[ReactflowNode]:
@@ -107,6 +157,8 @@ class ReactflowGraph:
             raise ValueError("Graph contains cycles")
             
         return execution_order
+
+
 
 
 

@@ -63,20 +63,27 @@ async def websocket_endpoint(websocket: WebSocket):
                 json_data = json.loads(data)
                 graph = ReactflowGraph(json_data)
                 
-                # Get execution order
                 try:
+                    # Execute all nodes
+                    # results = graph.execute_nodes()
                     ordered_nodes = graph.get_execution_order()
-                    print("Execution order:")
-                    for node in ordered_nodes:
-                        print(f"  {node.id} ({node.label})")
-                        connected = graph.get_connected_nodes(node.id)
-                        print(f"    Input nodes: {[n.id for n in connected['inputs']]}")
-                        print(f"    Output nodes: {[n.id for n in connected['outputs']]}")
+                    print(ordered_nodes)
+                    
+                    # Send success response
+                    # await websocket.send_json({
+                    #     "status": "success",
+                    #     "results": {
+                    #         node_id: {
+                    #             "outputs": [str(output) for output in outputs]
+                    #         } for node_id, outputs in results.items()
+                    #     }
+                    # })
+                    
                 except ValueError as e:
-                    print(f"Error determining execution order: {e}")
+                    print(f"Error in execution: {e}")
                     await websocket.send_json({
                         "status": "error",
-                        "message": "Graph contains cycles"
+                        "message": str(e)
                     })
                     
             except json.JSONDecodeError as e:
