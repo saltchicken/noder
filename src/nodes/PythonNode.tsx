@@ -3,6 +3,7 @@ import { useCallback, memo, useMemo } from 'react';
 import { NodeResizeControl} from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
 import DropdownWidget from './widgets/DropdownWidget.tsx';
+import SliderWidget from './widgets/SliderWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -16,6 +17,8 @@ function PythonNode({ data }) {
     switch (widget.type) {
       case 'dropdown':
         return <DropdownWidget key={widget.name} widget={widget} onChange={onChange} />;
+      case 'slider':
+        return <SliderWidget key={widget.name} widget={widget} onChange={onChange} />;
       default:
         return <InputWidget key={widget.name} widget={widget} onChange={onChange} />;
     }
