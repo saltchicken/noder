@@ -4,6 +4,7 @@ import { NodeResizeControl} from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
 import DropdownWidget from './widgets/DropdownWidget.tsx';
 import SliderWidget from './widgets/SliderWidget.tsx';
+import TextAreaWidget from './widgets/TextAreaWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -61,6 +62,12 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
         />;
       case 'slider':
         return <SliderWidget 
+          key={widget.name} 
+          widget={widgetWithValues}
+          onChange={onChange} 
+        />;
+      case 'textarea':
+        return <TextAreaWidget 
           key={widget.name} 
           widget={widgetWithValues}
           onChange={onChange} 

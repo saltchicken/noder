@@ -93,7 +93,6 @@ class OllamaQuery(Node):
 
 class ShowText(Node):
     async def run(self, text: str) -> str:
-        what_to_name = self.widgets[0]
-        await self.update_widget("what_to_name", text);
-        display_text = text
+        display_text = self.widgets[0] # {"type": "textarea", "value": ""}
+        await self.update_widget("display_text", text);
         return display_text
