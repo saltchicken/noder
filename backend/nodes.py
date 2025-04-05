@@ -22,10 +22,6 @@ class Node:
                 }
             })
 
-    async def update_widget(self, name, value):
-        """Update a widget's value and notify frontend"""
-        await self.send_message("widget_update", {"name": name, "value": value})
-
     async def set_status(self, status):
         """Update node's running status"""
         await self.send_message("status", status)
@@ -49,8 +45,6 @@ class Foo(Node):
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
         await asyncio.sleep(2)  # Wait 2 seconds
-        new_no = no[::-1]
-        await self.update_widget("no", new_no);
         FooOutput = first
         FooOutput2 = second
 

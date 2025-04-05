@@ -59,29 +59,19 @@ const handleNodeMessage = useCallback((messageData) => {
     nodes.map((node) => {
       if (node.id === messageData.nodeId) {
         const { type, data } = messageData.message;
-        if (type === 'widget_update' && data.name && data.value !== undefined) {
-          console.log("Received a widget update");
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              widgetValues: {
-                ...node.data.widgetValues,
-                [data.name]: data.value
-              }
-            }
-          };
-        } else if (type === 'status') {
+        if (type === 'status') {
           console.log("Received status update");
           return {
             ...node,
             className: data
           };
+        } else {
+          console.log("Received unknown message type");
+          return node;
         }
-        console.log("Received unknown message type");
+      } else {
         return node;
-      }
-      return node;
+        }
     })
   );
 }, []);
@@ -223,7 +213,7 @@ const onRestore = useCallback(() => {
     };
     const json = JSON.stringify(flow, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
-    // console.log(json);
+    console.log(json);
     sendToWebSocket(json);
   }, [nodes, edges, sendToWebSocket]);
 
