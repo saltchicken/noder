@@ -10,6 +10,7 @@ import NodeOutput from './handles/NodeOutput.tsx';
 
 function PythonNode({ id, data, onWidgetValuesChange }) {
   const [widgetValues, setWidgetValues] = useState(() => {
+    // Initialize with either existing widgetValues or default values
     if (data.widgetValues && Object.keys(data.widgetValues).length > 0) {
       return {...data.widgetValues};
     }
@@ -21,10 +22,19 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
         ''
       );
     });
-    // Instead of mutating props, call the callback
     onWidgetValuesChange?.(values);
     return values;
   });
+
+  // Sync widgetValues when updates come from backend
+  useEffect(() => {
+    if (data.widgetValues) {
+      setWidgetValues(prev => ({
+        ...prev,
+        ...data.widgetValues
+      }));
+    }
+  }, [data.widgetValues]);
 
   const onChange = useCallback((evt) => {
     const { name, value } = evt.target;
@@ -33,28 +43,32 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       [name]: value
     };
     setWidgetValues(newValues);
-    // Replace direct mutation with callback
     onWidgetValuesChange?.(newValues);
   }, [widgetValues, onWidgetValuesChange]);
 
   const renderWidget = (widget) => {
+    const widgetWithValues = {
+      ...widget,
+      widgetValues: widgetValues  // Use local state instead of data.widgetValues
+    };
+
     switch (widget.type) {
       case 'dropdown':
         return <DropdownWidget 
           key={widget.name} 
-          widget={{...widget, value: widgetValues[widget.name]}} 
+          widget={widgetWithValues}
           onChange={onChange} 
         />;
       case 'slider':
         return <SliderWidget 
           key={widget.name} 
-          widget={{...widget, value: widgetValues[widget.name]}} 
+          widget={widgetWithValues}
           onChange={onChange} 
         />;
       default:
         return <InputWidget 
           key={widget.name} 
-          widget={{...widget, value: widgetValues[widget.name]}} 
+          widget={widgetWithValues}
           onChange={onChange} 
         />;
     }

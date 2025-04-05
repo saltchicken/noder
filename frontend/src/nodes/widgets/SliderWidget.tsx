@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const SliderWidget = ({ widget, onChange }) => {
-  const [value, setValue] = useState(widget.value || widget.min || 0);
+  const [localValue, setLocalValue] = useState(
+    widget.widgetValues?.[widget.name] ?? widget.value ?? widget.min ?? 0
+  );
+
+  useEffect(() => {
+    setLocalValue(widget.widgetValues?.[widget.name] ?? widget.value ?? widget.min ?? 0);
+  }, [widget.widgetValues, widget.name]);
 
   const handleChange = (evt) => {
     const newValue = evt.target.value;
-    setValue(newValue);
+    setLocalValue(newValue);
     onChange(evt);
   };
 
   return (
-    <div key={widget.name} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
+    <div style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
       <span style={{
         position: 'absolute',
         left: '20px',
@@ -36,7 +42,7 @@ const SliderWidget = ({ widget, onChange }) => {
           min={widget.min || 0}
           max={widget.max || 100}
           step={widget.step || 1}
-          value={value}
+          value={localValue}
           onChange={handleChange}
           className="nodrag"
           style={{
@@ -51,7 +57,7 @@ const SliderWidget = ({ widget, onChange }) => {
           minWidth: '40px',
           textAlign: 'right'
         }}>
-          {value}
+          {localValue}
         </output>
       </div>
     </div>

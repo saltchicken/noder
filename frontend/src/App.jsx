@@ -86,6 +86,17 @@ const handleNodeMessage = useCallback((messageData) => {
             ...node,
             className: data
           };
+        } else if (type === 'widget_update') {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              widgetValues: {
+                ...node.data.widgetValues,
+                [data.name]: data.value
+              }
+            }
+          };
         } else {
           console.log("Received unknown message type");
           return node;

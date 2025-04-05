@@ -26,6 +26,13 @@ class Node:
         """Update node's running status"""
         await self.send_message("status", status)
 
+    async def update_widget(self, widget_name, value):
+        """Update a widget's value during node execution"""
+        await self.send_message("widget_update", {
+            "name": widget_name,
+            "value": value
+        })
+
     async def run(self, *args, **kwargs):
         pass
 
@@ -45,6 +52,8 @@ class Foo(Node):
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
         await asyncio.sleep(2)  # Wait 2 seconds
+        new_no = no[::-1]
+        await self.update_widget("no", new_no)
         FooOutput = first
         FooOutput2 = second
 
@@ -85,6 +94,6 @@ class OllamaQuery(Node):
 class ShowText(Node):
     async def run(self, text: str) -> str:
         what_to_name = self.widgets[0]
-        # await self.send_message({'name': "what_to_name", "value": text})
+        await self.update_widget("what_to_name", text);
         display_text = text
         return display_text

@@ -1,5 +1,5 @@
 const DropdownWidget = ({ widget, onChange }) => (
-  <div key={widget.name} style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
+  <div style={{ padding: '0px 0px 10px 0px', position: 'relative' }}>
     <span style={{
       position: 'absolute',
       left: '20px',
@@ -14,7 +14,7 @@ const DropdownWidget = ({ widget, onChange }) => (
     <select
       id={widget.name}
       name={widget.name}
-      value = {widget.value || widget.options[0]}
+      value={widget.widgetValues?.[widget.name] ?? widget.value ?? widget.options[0]}
       onChange={onChange}
       className="nodrag"
       style={{

@@ -14,7 +14,7 @@ const InputWidget = ({ widget, onChange }) => (
     <input 
       id={widget.name}
       name={widget.name}
-      value={widget.value || ''}
+      value={widget.widgetValues?.[widget.name] ?? widget.value ?? ''}
       onChange={onChange} 
       className="nodrag" 
       style={{
