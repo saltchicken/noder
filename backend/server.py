@@ -25,18 +25,18 @@ app.add_middleware(
 )
 
 # Mount static files from the dist directory
-app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+app.mount("/assets", StaticFiles(directory="../frontend/dist/assets"), name="assets")
 
 @app.get("/")
 async def read_root():
-    return FileResponse("dist/index.html")
+    return FileResponse("../frontend/dist/index.html")
 
 @app.get("/{catch_all:path}")
 async def catch_all(catch_all: str):
     file_path = os.path.join("dist", catch_all)
     if os.path.exists(file_path):
         return FileResponse(file_path)
-    return FileResponse("dist/index.html")
+    return FileResponse("../frontend/dist/index.html")
 
 # WebSocket connection manager
 class ConnectionManager:
