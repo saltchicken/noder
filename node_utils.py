@@ -38,11 +38,12 @@ class ReactflowNode:
         return self.data.get('widgets', [])
 
 class ReactflowGraph:
-    def __init__(self, json_data: Dict, python_classes):
+    def __init__(self, json_data: Dict, python_classes, websocket=None):
         self.python_classes = python_classes
         self.nodes: List[ReactflowNode] = []
         self.edges: List[Dict] = []
         self.node_instances = {}  # Store instantiated node classes
+        self.websocket = websocket
         self.update_from_json(json_data)
 
     def update_from_json(self, json_data: Dict):
@@ -75,6 +76,7 @@ class ReactflowGraph:
                         if hasattr(new_node.python_class, 'instantiated'):
                             # Create new instance only for new nodes
                             new_node.python_class = new_node.python_class()
+                            new_node.python_class.websocket = self.websocket
                 updated_nodes.append(new_node)
         
         # Remove nodes that no longer exist in the new data
@@ -195,7 +197,7 @@ class ReactflowGraph:
             
         return execution_order
 
-    def execute_nodes(self):
+    async def execute_nodes(self):
         """
         Executes all nodes in order, passing outputs to connected inputs.
         """
@@ -205,6 +207,7 @@ class ReactflowGraph:
         for node in ordered_nodes:
             if not hasattr(node.python_class, 'instantiated'):
                 node.python_class = node.python_class()
+                node.python_class.websocket = self.websocket
                 
             node.python_class.widgets = list(node.widget_values.values())
             
@@ -225,7 +228,7 @@ class ReactflowGraph:
                     )
             
             try:
-                result = node.python_class._run(**input_args)
+                result = await node.python_class._run(**input_args)
                 # Ensure result is always a list
                 node_results[node.id] = list(result) if isinstance(result, (list, tuple)) else [result]
                 
@@ -251,7 +254,7 @@ def get_returned_variables(source_code, function_name):
     widgets = []
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef) and node.name == function_name:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == function_name:
             for stmt in ast.walk(node):
                 if isinstance(stmt, ast.Return):
                     if isinstance(stmt.value, ast.Name):
