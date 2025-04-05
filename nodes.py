@@ -7,7 +7,7 @@ class Node:
         print(f"Node initialized {self.__class__.__name__}")
         self.widgets = []
 
-    def _send_message(self, message):
+    def send_message(self, message):
         message_queue.put(message)
 
     def run(self, *args, **kwargs):
@@ -70,6 +70,6 @@ class OllamaQuery(Node):
 class ShowText(Node):
     def run(self, text: str) -> str:
         what_to_name = self.widgets[0]
-        self._send_message({'name': "what_to_name", "value": text})
+        self.send_message({'name': "what_to_name", "value": text})
         display_text = text
         return display_text

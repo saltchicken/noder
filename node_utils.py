@@ -206,7 +206,6 @@ class ReactflowGraph:
             if not hasattr(node.python_class, 'instantiated'):
                 node.python_class = node.python_class()
                 
-            node.python_class.send_message = lambda msg: print(f"Message from {node.label}: {msg}")
             node.python_class.widgets = list(node.widget_values.values())
             
             connections = self.get_connected_nodes(node.id)
