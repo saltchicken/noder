@@ -61,7 +61,7 @@ const handleNodeMessage = useCallback((messageData) => {
         const { type, data } = messageData.message;
         console.log(type);
         console.log(data);
-        if (type === 'widget_update' && data.name && (data.value || data.value === '' || data.value === 0)) {
+        if (type === 'widget_update' && data.name && data.value !== undefined) {
           console.log("Received a widget update");
           return {
             ...node,
@@ -69,7 +69,7 @@ const handleNodeMessage = useCallback((messageData) => {
               ...node.data,
               widgetValues: {
                 ...node.data.widgetValues,
-                [data.name]: data.value  // Fix: Use data.name instead of messageData.name
+                [data.name]: data.value
               }
             }
           };
