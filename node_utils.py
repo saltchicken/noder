@@ -59,6 +59,7 @@ class ReactflowGraph:
             existing_node = next((node for node in self.nodes if node.id == node_id), None)
             
             if existing_node:
+                print("Node already existed")
                 # Update existing node's data
                 existing_node.position = node_data.get('position', {})
                 existing_node.data = node_data.get('data', {})

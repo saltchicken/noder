@@ -1,11 +1,14 @@
 from typing import Tuple
+from message_queue import message_queue
 
 class Node:
     def __init__(self):
         self.instantiated = True
         print(f"Node initialized {self.__class__.__name__}")
-        self.send_message = lambda msg: None
         self.widgets = []
+
+    def _send_message(self, message):
+        message_queue.put(message)
 
     def run(self, *args, **kwargs):
         pass
@@ -67,6 +70,6 @@ class OllamaQuery(Node):
 class ShowText(Node):
     def run(self, text: str) -> str:
         what_to_name = self.widgets[0]
-        self.send_message({'name': "what_to_name", "value": text})
+        self._send_message({'name': "what_to_name", "value": text})
         display_text = text
         return display_text

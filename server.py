@@ -8,6 +8,9 @@ import os
 import json
 from node_utils import get_python_classes, ReactflowGraph, ReactflowNode  # Updated import path
 
+from message_queue import message_queue
+import asyncio
+
 python_classes = get_python_classes()
 global_graph = ReactflowGraph({"nodes": [], "edges": []}, python_classes)
 
@@ -60,8 +63,14 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
+            while not message_queue.empty():
+                message = message_queue.get()
+                await websocket.send_json({
+                    "type": "node_message",
+                    "data": message
+                })
             try:
+                data = await websocket.receive_text()
                 json_data = json.loads(data)
                 # Update the existing graph instead of creating a new one
                 global_graph.update_from_json(json_data)
@@ -69,6 +78,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 try:
                     # print(global_graph.nodes)
                     results = global_graph.execute_nodes()
+
+                    
+                    while not message_queue.empty():
+                        message = message_queue.get()
+                        await websocket.send_json({
+                            "type": "node_message",
+                            "data": message
+                        })
+
 
                     # Send success response
                     await websocket.send_json({
@@ -85,6 +103,7 @@ async def websocket_endpoint(websocket: WebSocket):
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
                 await websocket.send_json({
+                    "type": "execution_result",
                     "status": "error",
                     "message": "Invalid JSON format"
                 })
