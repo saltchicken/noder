@@ -64,33 +64,21 @@ async def websocket_endpoint(websocket: WebSocket):
             try:
                 data = await websocket.receive_text()
                 json_data = json.loads(data)
-                # Update the existing graph instead of creating a new one
+                
                 global_graph.websocket = websocket
                 global_graph.update_from_json(json_data)
+                results = await global_graph.execute_nodes()
+                await websocket.send_json({"status": "success"})
+
+            except WebSocketDisconnect:
+                break
                 
-                try:
-                    # print(global_graph.nodes)
-                    results = await global_graph.execute_nodes()
-                    # Send success response
-                    await websocket.send_json({
-                        "status": "success",
-                    })
-                    
-                except ValueError as e:
-                    print(f"Error in execution: {e}")
-                    await websocket.send_json({
-                        "status": "error",
-                        "message": str(e)
-                    })
-                    
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")
+            except Exception as e:
                 await websocket.send_json({
-                    "type": "execution_result",
                     "status": "error",
-                    "message": "Invalid JSON format"
+                    "message": str(e)
                 })
-    except WebSocketDisconnect:
+    finally:
         manager.disconnect(websocket)
 
 @app.post("/python_nodes")
