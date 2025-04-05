@@ -23,7 +23,9 @@ class Node:
         pass
 
     async def _run(self, *args, **kwargs):
+        await self.send_message({"type": "status", "data": "run_start"})
         result = await self.run(*args, **kwargs)
+        await self.send_message({"type": "status", "data": "run_complete"})
         # Don't wrap the result in a list if it's already a tuple/list
         if isinstance(result, (tuple, list)):
             return result
@@ -37,9 +39,7 @@ class Foo(Node):
         yes = self.widgets[2] # { "value": "hello" }
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
-        await self.send_message({"type": "status", "data": "run_start"})
         await asyncio.sleep(2)  # Wait 2 seconds
-        await self.send_message({"type": "status", "data": "run_complete"})
         FooOutput = first
         FooOutput2 = second
 
