@@ -1,6 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { getMaxNodeId } from '../utils/flowUtils';
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 
 export default function ContextMenu({
   id,
@@ -12,7 +20,7 @@ export default function ContextMenu({
   pythonNodes,
   ...props
 }) {
-  const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition, getNodes } = useReactFlow();
+  const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition } = useReactFlow();
   const [showSubmenu, setShowSubmenu] = useState(false);
 
 
@@ -28,10 +36,10 @@ export default function ContextMenu({
       ...node,
       selected: false,
       dragging: false,
-      id: `${getMaxNodeId(getNodes()) + 1}`,
+      id: uuidv4(),
       position,
     });
-  }, [id, getNode, addNodes, getNodes]);
+  }, [id, getNode, addNodes]);
 
   const deleteNode = useCallback(() => {
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
@@ -41,7 +49,7 @@ export default function ContextMenu({
   const addNewNode = useCallback((nodeType) => {
     const pythonNode = pythonNodes.find(node => node.name === nodeType);
     const newNode = {
-      id: `${getMaxNodeId(getNodes()) + 1}`,
+      id: uuidv4(),
       type: 'pythonNode',
       position: screenToFlowPosition({ x: left, y: top }),
       style: { minWidth: '300px', minHeight: `${Math.max(pythonNode.inputs.length, pythonNode.outputs.length) * 15 + 15 + (pythonNode.widgets.length * 50)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
@@ -53,7 +61,7 @@ export default function ContextMenu({
       },
     };
     addNodes(newNode);
-  }, [left, top, addNodes, getNodes, pythonNodes]);
+  }, [left, top, addNodes, pythonNodes]);
 
   const renderSubmenu = () => {
     if (!showSubmenu) return null;
