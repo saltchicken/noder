@@ -5,6 +5,7 @@ import InputWidget from './widgets/InputWidget.tsx';
 import DropdownWidget from './widgets/DropdownWidget.tsx';
 import SliderWidget from './widgets/SliderWidget.tsx';
 import TextAreaWidget from './widgets/TextAreaWidget.tsx';
+import ImageWidget from './widgets/ImageWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -72,6 +73,12 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           widget={widgetWithValues}
           onChange={onChange} 
         />;
+      case 'image':
+      return <ImageWidget 
+        key={widget.name} 
+        widget={widgetWithValues}
+        onChange={onWidgetValuesChange} 
+      />;
       default:
         return <InputWidget 
           key={widget.name} 

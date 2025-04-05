@@ -96,3 +96,9 @@ class ShowText(Node):
         display_text = self.widgets[0] # {"type": "textarea", "value": ""}
         await self.update_widget("display_text", text);
         return display_text
+
+class ShowImage(Node):
+    async def run(self) -> str:
+        test = self.widgets[0] # {"type": "image", "value": "https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_640.jpg"}
+        return test
+
