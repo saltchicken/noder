@@ -40,6 +40,8 @@ class Foo(Node):
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
         await asyncio.sleep(2)  # Wait 2 seconds
+        new_no = no[::-1]
+        await self.send_message({"type": "widget_update", "data": {"name": "no", "value": new_no}})
         FooOutput = first
         FooOutput2 = second
 

@@ -58,32 +58,30 @@ const handleNodeMessage = useCallback((messageData) => {
   setNodes((nodes) => 
     nodes.map((node) => {
       if (node.id === messageData.nodeId) {
-        // Handle different types of node messages
         const { type, data } = messageData.message;
-        if (type == 'widget_update' && data.name && data.value) {
-            console.log("Received a widget update");
-          // Update widget values if name and value are present
+        console.log(type);
+        console.log(data);
+        if (type === 'widget_update' && data.name && (data.value || data.value === '' || data.value === 0)) {
+          console.log("Received a widget update");
           return {
             ...node,
             data: {
               ...node.data,
               widgetValues: {
                 ...node.data.widgetValues,
-                [messageData.name]: messageData.value
+                [data.name]: data.value  // Fix: Use data.name instead of messageData.name
               }
             }
           };
-        } else if (type == 'status') {
-            console.log("Received status update");
-            return {
-              ...node,
-              className: data
-            }
-          }
-        else {
-          console.log("Received unknown message type");
-          return node;
-          }
+        } else if (type === 'status') {
+          console.log("Received status update");
+          return {
+            ...node,
+            className: data
+          };
+        }
+        console.log("Received unknown message type");
+        return node;
       }
       return node;
     })
