@@ -72,7 +72,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
             except WebSocketDisconnect:
                 break
-                
             except Exception as e:
                 await websocket.send_json({
                     "status": "error",
