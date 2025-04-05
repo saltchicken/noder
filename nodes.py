@@ -4,6 +4,7 @@ import asyncio
 class Node:
     def __init__(self):
         self.instantiated = True
+        self.node_id = None
         print(f"Node initialized {self.__class__.__name__}")
         self.widgets = []
         self.websocket = None
@@ -12,7 +13,10 @@ class Node:
         if self.websocket:
             await self.websocket.send_json({
                 "type": "node_message",
-                "data": message
+                "data": {
+                    "nodeId": self.node_id,
+                    "message": message
+                }
             })
 
     async def run(self, *args, **kwargs):

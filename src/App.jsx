@@ -69,8 +69,39 @@ const Flow = () => {
     };
 
     ws.onmessage = (event) => {
-      console.log('Received:', event.data);
-      // Handle incoming messages here
+      try {
+        const message = JSON.parse(event.data);
+
+        switch (message.type) {
+          case 'node_message':
+            console.log('DEBUG: ', 'Node message:', message.data);
+            setNodes((nodes) => 
+              nodes.map((node) => {
+                if (node.id === message.data.nodeId) {
+                  return {
+                    ...node,
+                    style: {
+                      ...node.style,
+                      border: '2px solid #ff0000',  // Change border color/style as needed
+                    }
+                  };
+                }
+                return node;
+              })
+            );
+            break;
+          case 'success':
+            console.log('Success:', message.data);
+            break;
+          case 'error':
+            console.error('Error:', message.data);
+            break;
+          default:
+            console.log('Unknown message type:', message);
+        }
+      } catch (error) {
+        console.error('Error parsing message:', error);
+      }
     };
 
     ws.onerror = (error) => {

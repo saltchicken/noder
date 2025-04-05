@@ -68,7 +68,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 global_graph.websocket = websocket
                 global_graph.update_from_json(json_data)
                 results = await global_graph.execute_nodes()
-                await websocket.send_json({"status": "success"})
+                await websocket.send_json({"type": "success", "data": "Graph completed"})
 
             except WebSocketDisconnect:
                 break

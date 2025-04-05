@@ -77,6 +77,7 @@ class ReactflowGraph:
                             # Create new instance only for new nodes
                             new_node.python_class = new_node.python_class()
                             new_node.python_class.websocket = self.websocket
+                            new_node.python_class.node_id = node_id
                 updated_nodes.append(new_node)
         
         # Remove nodes that no longer exist in the new data
@@ -209,6 +210,7 @@ class ReactflowGraph:
                 node.python_class = node.python_class()
                 node.python_class.websocket = self.websocket
                 
+            node.python_class.node_id = node.id
             node.python_class.widgets = list(node.widget_values.values())
             
             connections = self.get_connected_nodes(node.id)
