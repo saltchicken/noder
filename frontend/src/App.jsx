@@ -52,6 +52,44 @@ const Flow = () => {
     fetchPythonNodes();
   }, []);
 
+const handleNodeMessage = useCallback((messageData) => {
+  console.log('DEBUG: ', 'Node message:', messageData);
+  
+  setNodes((nodes) => 
+    nodes.map((node) => {
+      if (node.id === messageData.nodeId) {
+        // Handle different types of node messages
+        const { type, data } = messageData.message;
+        if (type == 'widget_update' && data.name && data.value) {
+            console.log("Received a widget update");
+          // Update widget values if name and value are present
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              widgetValues: {
+                ...node.data.widgetValues,
+                [messageData.name]: messageData.value
+              }
+            }
+          };
+        } else if (type == 'status') {
+            console.log("Received status update");
+            return {
+              ...node,
+              className: data
+            }
+          }
+        else {
+          console.log("Received unknown message type");
+          return node;
+          }
+      }
+      return node;
+    })
+  );
+}, []);
+
 
   const connectWebSocket = useCallback(() => {
     const WS_URL = `ws://${window.location.hostname}:3000/ws`;
@@ -74,21 +112,7 @@ const Flow = () => {
 
         switch (message.type) {
           case 'node_message':
-            console.log('DEBUG: ', 'Node message:', message.data);
-            setNodes((nodes) => 
-              nodes.map((node) => {
-                if (node.id === message.data.nodeId) {
-                  return {
-                    ...node,
-                    style: {
-                      ...node.style,
-                      border: '2px solid #ff0000',  // Change border color/style as needed
-                    }
-                  };
-                }
-                return node;
-              })
-            );
+            handleNodeMessage(message.data);
             break;
           case 'success':
             console.log('Success:', message.data);

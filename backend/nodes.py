@@ -37,13 +37,9 @@ class Foo(Node):
         yes = self.widgets[2] # { "value": "hello" }
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
-        await self.send_message({"message": "Starting Foo node..."})
+        await self.send_message({"type": "status", "data": "run_start"})
         await asyncio.sleep(2)  # Wait 2 seconds
-        await self.send_message({"message": "Still processing..."})
-        await asyncio.sleep(2)  # Wait 2 more seconds
-        await self.send_message({"message": "Almost done!"})
-        await asyncio.sleep(1)  # Wait 1 second
-        await self.send_message({"message": "Finished!"})
+        await self.send_message({"type": "status", "data": "run_complete"})
         FooOutput = first
         FooOutput2 = second
 

@@ -63,3 +63,12 @@ body {
     stroke: #33FF71; /* You can change this color to whatever you want */
     stroke-width: 3px; /* Optional: you can also adjust the width */
 }
+
+.react-flow__node.run_start {
+    border: 2px solid #00aa00 !important;
+}
+
+.react-flow__node.run_complete {
+    border: var(--xy-node-border-default);
+}
+
