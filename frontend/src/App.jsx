@@ -59,8 +59,6 @@ const handleNodeMessage = useCallback((messageData) => {
     nodes.map((node) => {
       if (node.id === messageData.nodeId) {
         const { type, data } = messageData.message;
-        console.log(type);
-        console.log(data);
         if (type === 'widget_update' && data.name && data.value !== undefined) {
           console.log("Received a widget update");
           return {
