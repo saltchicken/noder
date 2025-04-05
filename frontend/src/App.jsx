@@ -53,14 +53,11 @@ const Flow = () => {
   }, []);
 
 const handleNodeMessage = useCallback((messageData) => {
-  console.log('DEBUG: ', 'Node message:', messageData);
-  
   setNodes((nodes) => 
     nodes.map((node) => {
       if (node.id === messageData.nodeId) {
         const { type, data } = messageData.message;
         if (type === 'status') {
-          console.log("Received status update");
           return {
             ...node,
             className: data
