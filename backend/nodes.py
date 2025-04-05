@@ -99,6 +99,19 @@ class ShowText(Node):
 
 class ShowImage(Node):
     async def run(self) -> str:
+        from PIL import Image, ImageDraw
+        import base64
+        from io import BytesIO
+
+        img = Image.new('RGB', (200, 200), color='white')
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([50, 50, 150, 150], fill='red')
+
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        final_string = f"data:image/png;base64,{img_str}"
         test = self.widgets[0] # {"type": "image", "value": "https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_640.jpg"}
+        await self.update_widget("test", final_string)
         return test
 
