@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Panel,
@@ -16,9 +16,6 @@ import ContextMenu from './components/ContextMenu';
 
 import PythonNode from './nodes/PythonNode.tsx';
 
-const nodeTypes = {
-  pythonNode: PythonNode
-};
 
 
 const Flow = () => {
@@ -30,6 +27,33 @@ const Flow = () => {
   const [pythonNodes, setPythonNodes] = useState([]);
   const ref = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+
+
+  const onWidgetValuesChange = useCallback((nodeId, newValues) => {
+    console.log("Widget values changed");
+  setNodes((nodes) =>
+    nodes.map((node) =>
+      node.id === nodeId
+        ? {
+            ...node,
+            data: {
+              ...node.data,
+              widgetValues: newValues,
+            },
+          }
+        : node
+    )
+  );
+}, []);
+
+  const nodeTypes = useMemo(() => ({
+    pythonNode: (props) => (
+      <PythonNode
+        {...props}
+        onWidgetValuesChange={(values) => onWidgetValuesChange(props.id, values)}
+      />
+    )
+  }), [onWidgetValuesChange]);
 
   useEffect(() => {
     const fetchPythonNodes = async () => {

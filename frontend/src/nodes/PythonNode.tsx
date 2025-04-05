@@ -8,30 +8,23 @@ import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
 
-function PythonNode({ data }) {
-  const [widgetValues, setWidgetValues] = useState(() =>{
-
-    if (data.widgetValues && Object.keys(data.widgetValues). length > 0) {
+function PythonNode({ id, data, onWidgetValuesChange }) {
+  const [widgetValues, setWidgetValues] = useState(() => {
+    if (data.widgetValues && Object.keys(data.widgetValues).length > 0) {
       return {...data.widgetValues};
     }
     const values = {};
     data.widgets?.forEach(widget => {
       values[widget.name] = widget.value || (
-      widget.type === 'dropdown' ? widget.options[0] :
-      widget.type === 'slider' ? (widget.min || 0 ) :
-            ''
+        widget.type === 'dropdown' ? widget.options[0] :
+        widget.type === 'slider' ? (widget.min || 0) :
+        ''
       );
     });
-    data.widgetValues = values;
+    // Instead of mutating props, call the callback
+    onWidgetValuesChange?.(values);
     return values;
   });
-
-  useEffect(() => {
-    if (data.widgetValues) {
-      // console.log("Updating widget values from data:", data.widgetValues);
-      setWidgetValues(data.widgetValues);
-    }
-  }, [data.widgetValues]);
 
   const onChange = useCallback((evt) => {
     const { name, value } = evt.target;
@@ -40,26 +33,27 @@ function PythonNode({ data }) {
       [name]: value
     };
     setWidgetValues(newValues);
-    data.widgetValues = newValues;
-  }, [widgetValues]);
+    // Replace direct mutation with callback
+    onWidgetValuesChange?.(newValues);
+  }, [widgetValues, onWidgetValuesChange]);
 
   const renderWidget = (widget) => {
     switch (widget.type) {
       case 'dropdown':
         return <DropdownWidget 
-          // key={widget.name} 
+          key={widget.name} 
           widget={{...widget, value: widgetValues[widget.name]}} 
           onChange={onChange} 
         />;
       case 'slider':
         return <SliderWidget 
-          // key={widget.name} 
+          key={widget.name} 
           widget={{...widget, value: widgetValues[widget.name]}} 
           onChange={onChange} 
         />;
       default:
         return <InputWidget 
-          // key={widget.name} 
+          key={widget.name} 
           widget={{...widget, value: widgetValues[widget.name]}} 
           onChange={onChange} 
         />;
