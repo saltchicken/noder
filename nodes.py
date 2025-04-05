@@ -1,4 +1,5 @@
 from typing import Tuple
+import asyncio
 
 class Node:
     def __init__(self):
@@ -32,6 +33,13 @@ class Foo(Node):
         yes = self.widgets[2] # { "value": "hello" }
         no = self.widgets[3]
         new = self.widgets[4] # {"type": "dropdown", "options": ["1", "2", "3"]}
+        await self.send_message({"message": "Starting Foo node..."})
+        await asyncio.sleep(2)  # Wait 2 seconds
+        await self.send_message({"message": "Still processing..."})
+        await asyncio.sleep(2)  # Wait 2 more seconds
+        await self.send_message({"message": "Almost done!"})
+        await asyncio.sleep(1)  # Wait 1 second
+        await self.send_message({"message": "Finished!"})
         FooOutput = first
         FooOutput2 = second
 
