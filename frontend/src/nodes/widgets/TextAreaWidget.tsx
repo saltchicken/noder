@@ -44,13 +44,18 @@ const TextAreaWidget = ({ widget, onChange }) => {
           padding: '8px',
           border: '1px solid #333',
           borderRadius: '5px',
-          fontSize: '12px',
+          fontSize: '8px',
           backgroundColor: '#1e1e1e',
           color: '#fff',
           paddingLeft: '7px',
           paddingTop: '12px',
           minHeight: '100px',
-          resize: 'vertical'
+          resize: 'vertical',
+          scrollbarWidth: 'none',  // Firefox
+          msOverflowStyle: 'none',  // IE and Edge
+          '&::-webkit-scrollbar': {  // Chrome, Safari, Opera
+            display: 'none'
+          }
         }}
       />
     </div>
