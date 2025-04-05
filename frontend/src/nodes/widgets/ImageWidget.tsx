@@ -7,17 +7,6 @@ const ImageWidget = ({ widget, onChange }) => {
       position: 'relative',
       height: '100%'
     }}>
-      <span style={{
-        position: 'absolute',
-        left: '20px',
-        top: '5px',
-        fontSize: '6px',
-        color: '#AAA',
-        zIndex: 1,
-        pointerEvents: 'none'
-      }}>
-        {widget.name}
-      </span>
       {imageUrl && (
         <img 
           src={imageUrl}
