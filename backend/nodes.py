@@ -45,7 +45,7 @@ class Node:
         return [result] if result is not None else []
 
 class Foo(Node):
-    async def run(self):
+    async def run(self) -> Tuple[str, int]:
         first = self.widgets[0]
         second = self.widgets[1] # {"type": "slider", "min": 0, "max": 100, "step": 1, "value": 20 }
         yes = self.widgets[2] # { "value": "hello" }
