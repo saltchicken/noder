@@ -1,12 +1,14 @@
 import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import {
+  ReactFlowProvider,
+  useReactFlow,
   ReactFlow,
   Panel,
   Background,
   useNodesState,
   useEdgesState,
   addEdge,
-  Controls,
+  Controls
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -16,9 +18,17 @@ import ContextMenu from './components/ContextMenu';
 
 import PythonNode from './nodes/PythonNode.tsx';
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 
-const Flow = () => {
+
+const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [menu, setMenu] = useState(null);
@@ -27,6 +37,7 @@ const Flow = () => {
   const [pythonNodes, setPythonNodes] = useState([]);
   const ref = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const { addNodes, screenToFlowPosition } = useReactFlow();
 
 
   const onWidgetValuesChange = useCallback((nodeId, newValues) => {
@@ -372,6 +383,58 @@ const Flow = () => {
     event.target.value = '';
   }, [setNodes, setEdges]);
 
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const onDrop = useCallback((event) => {
+    event.preventDefault();
+
+    const file = event.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode = {
+        id: uuidv4(),
+        type: 'pythonNode',
+        position,
+        style: { minWidth: '300px', minHeight: '250px' },
+        data: {
+          label: 'ShowImage',
+          inputs: [],
+          outputs: [
+            {
+              name: 'test',
+              type: '<class \'str\'>'
+            }
+          ],
+          widgets: [
+            {
+              name: 'test',
+              type: 'image',
+              value: e.target.result
+            }
+          ],
+          widgetValues: {
+            test: e.target.result
+          }
+        }
+      };
+
+      addNodes(newNode);
+    };
+
+    reader.readAsDataURL(file);
+  }, [addNodes, screenToFlowPosition]);
+
+
 
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
@@ -392,6 +455,8 @@ const Flow = () => {
         onPaneContextMenu={onPaneContextMenu}
         onMove={onPaneMove}
         onNodeContextMenu={onNodeContextMenu}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
         nodeTypes={nodeTypes}
         fitView
         colorMode="dark"
@@ -423,5 +488,13 @@ const Flow = () => {
     </div>
   );
 };
+
+const Flow = () => {
+  return (
+    <ReactFlowProvider>
+      <FlowContent />
+    </ReactFlowProvider>
+  );
+}
 
 export default Flow;
