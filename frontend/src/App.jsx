@@ -188,10 +188,28 @@ const handleNodeMessage = useCallback((messageData) => {
     }
   }, [socket]);
 
-  const onConnect = useCallback(
-    (params) => setEdges((els) => addEdge(params, els)),
-    [setEdges],
-  );
+  const onConnect = useCallback((params) => {
+    const sourceNode = nodes.find(node => node.id === params.source);
+    const targetNode = nodes.find(node => node.id === params.target);
+
+    const sourceOutput = sourceNode.data.outputs.find(
+      output => output.name === params.sourceHandle
+    );
+    const targetInput = targetNode.data.inputs.find(
+      input => input.name === params.targetHandle
+    );
+
+    const isTypeCompatible = (sourceType, targetType) => {
+      return sourceType === targetType;
+    };
+
+    if (isTypeCompatible(sourceOutput.type, targetInput.type)) {
+      setEdges((els) => addEdge(params, els));
+    } else {
+      console.warn(`Type mismatch: Cannot connect ${sourceOutput.type} to ${targetInput.type}`);
+    }
+  }, [nodes, setEdges]);
+
 
 const onConnectEnd = useCallback(
   (event, params) => {
