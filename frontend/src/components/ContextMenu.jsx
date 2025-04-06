@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { uuidv4 } from '../utils/uuid';
+import { createPythonNode } from '../utils/nodeCreation';
 
 
 export default function ContextMenu({
@@ -42,20 +42,16 @@ export default function ContextMenu({
 
   const addNewNode = useCallback((nodeType) => {
     const pythonNode = pythonNodes.find(node => node.name === nodeType);
-    const newNode = {
-      id: uuidv4(),
-      type: 'pythonNode',
-      position: screenToFlowPosition({ x: left, y: top }),
-      style: { minWidth: '300px', minHeight: `${Math.max(pythonNode.inputs.length, pythonNode.outputs.length) * 15 + 15 + (pythonNode.widgets.length * 50)}px` }, //TODO: Change this dynamic thing to account for widgets of different heights
-      data: {
-        label: nodeType,
-        inputs: pythonNode.inputs,
-        outputs: pythonNode.outputs,
-        widgets: pythonNode.widgets
-      },
-    };
+    const position = screenToFlowPosition({ x: left, y: top });
+
+    const newNode = createPythonNode({
+      position,
+      nodeType,
+      pythonNode
+    });
+
     addNodes(newNode);
-  }, [left, top, addNodes, pythonNodes]);
+  }, [left, top, addNodes, pythonNodes, screenToFlowPosition]);
 
   const filteredNodes = pythonNodes.filter(node =>
     node.name.toLowerCase().includes(searchTerm.toLowerCase())

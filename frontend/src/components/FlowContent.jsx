@@ -14,6 +14,7 @@ import { uuidv4 } from '../utils/uuid';
 import ContextMenu from './ContextMenu';
 import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { createPythonNode } from '../utils/nodeCreation';
 
 
 
@@ -309,32 +310,13 @@ const FlowContent = () => {
         y: event.clientY,
       });
 
-      const newNode = {
-        id: uuidv4(),
-        type: 'pythonNode',
+      const newNode = createPythonNode({
         position,
-        style: { minWidth: '300px', minHeight: '250px' },
-        data: {
-          label: 'ShowImage',
-          inputs: [],
-          outputs: [
-            {
-              name: 'test',
-              type: '<class \'str\'>'
-            }
-          ],
-          widgets: [
-            {
-              name: 'test',
-              type: 'image',
-              value: e.target.result
-            }
-          ],
-          widgetValues: {
-            test: e.target.result
-          }
+        nodeType: 'ShowImage',
+        customData: {
+          imageData: e.target.result
         }
-      };
+      });
 
       addNodes(newNode);
     };
