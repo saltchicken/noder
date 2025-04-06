@@ -374,5 +374,4 @@ def get_python_classes():
         if inspect.isclass(cls_obj) and cls_name != "Node"
     ]
 
-    print(python_classes)
     return python_classes
