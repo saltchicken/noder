@@ -9,7 +9,6 @@ import {
   addEdge,
   Controls
 } from '@xyflow/react';
-import { uuidv4 } from '../utils/uuid';
 
 import ContextMenu from './ContextMenu';
 import PythonNode from '../nodes/PythonNode.tsx';
