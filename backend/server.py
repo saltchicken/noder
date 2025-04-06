@@ -137,7 +137,6 @@ async def import_flow(file: UploadFile):
 
         # Read and parse the file
         content = await file.read()
-        print(content)
         try:
             flow_data = json.loads(content)
         except json.JSONDecodeError:
