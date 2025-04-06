@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 
 function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
@@ -22,6 +22,7 @@ export default function ContextMenu({
 }) {
   const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition } = useReactFlow();
   const [showSubmenu, setShowSubmenu] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
 
 
@@ -52,8 +53,8 @@ export default function ContextMenu({
       id: uuidv4(),
       type: 'pythonNode',
       position: screenToFlowPosition({ x: left, y: top }),
-      style: { minWidth: '300px', minHeight: `${Math.max(pythonNode.inputs.length, pythonNode.outputs.length) * 15 + 15 + (pythonNode.widgets.length * 50)}px`}, //TODO: Change this dynamic thing to account for widgets of different heights
-      data: { 
+      style: { minWidth: '300px', minHeight: `${Math.max(pythonNode.inputs.length, pythonNode.outputs.length) * 15 + 15 + (pythonNode.widgets.length * 50)}px` }, //TODO: Change this dynamic thing to account for widgets of different heights
+      data: {
         label: nodeType,
         inputs: pythonNode.inputs,
         outputs: pythonNode.outputs,
@@ -63,20 +64,34 @@ export default function ContextMenu({
     addNodes(newNode);
   }, [left, top, addNodes, pythonNodes]);
 
+  const filteredNodes = pythonNodes.filter(node =>
+    node.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const renderSubmenu = () => {
     if (!showSubmenu) return null;
 
     return (
       <div className="context-submenu">
-        {pythonNodes.map(node => (
-          <div 
-            key={node.name}
-            className="context-menu-item" 
-            onClick={() => addNewNode(node.name)}
-          >
-            {node.name}
-          </div>
-        ))}
+        <input
+          type="text"
+          placeholder="Search nodes..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="context-menu-search"
+          onClick={(e) => e.stopPropagation()}
+        />
+        <div className="context-menu-items">
+          {filteredNodes.map(node => (
+            <div
+              key={node.name}
+              className="context-menu-item"
+              onClick={() => addNewNode(node.name)}
+            >
+              {node.name}
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
