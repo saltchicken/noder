@@ -30,7 +30,6 @@ const Flow = () => {
 
 
   const onWidgetValuesChange = useCallback((nodeId, newValues) => {
-    console.log("Widget values changed");
   setNodes((nodes) =>
     nodes.map((node) =>
       node.id === nodeId
@@ -213,8 +212,8 @@ const handleNodeMessage = useCallback((messageData) => {
 
 const onConnectEnd = useCallback(
   (event, params) => {
-      console.log(event);
-      console.log(params);
+      // console.log(event);
+      // console.log(params);
   },
   []
 );
@@ -263,7 +262,8 @@ const onRestore = useCallback(() => {
     };
     const json = JSON.stringify(flow, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
-    console.log(json);
+    // console.log(json);
+    console.log('Widget Values:', nodes.map(node => node.data.widgetValues));
     sendToWebSocket(json);
   }, [nodes, edges, sendToWebSocket]);
 
