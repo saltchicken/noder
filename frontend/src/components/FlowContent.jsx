@@ -2,7 +2,6 @@ import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react'
 import {
   useReactFlow,
   ReactFlow,
-  Panel,
   Background,
   useNodesState,
   useEdgesState,
@@ -16,10 +15,6 @@ import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { createPythonNode } from '../utils/nodeCreation';
 
-
-
-
-
 const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -27,7 +22,6 @@ const FlowContent = () => {
   const [pythonNodes, setPythonNodes] = useState([]);
   const ref = useRef(null);
   const { addNodes, screenToFlowPosition } = useReactFlow();
-
 
   const onWidgetValuesChange = useCallback((nodeId, newValues) => {
     setNodes((nodes) =>
@@ -105,8 +99,6 @@ const FlowContent = () => {
 
   const { isConnected, sendToWebSocket } = useWebSocket(handleNodeMessage);
 
-
-
   const onConnect = useCallback((params) => {
     const sourceNode = nodes.find(node => node.id === params.source);
     const targetNode = nodes.find(node => node.id === params.target);
@@ -129,7 +121,6 @@ const FlowContent = () => {
     }
   }, [nodes, setEdges]);
 
-
   const onConnectEnd = useCallback(
     (event, params) => {
       // console.log(event);
@@ -137,7 +128,6 @@ const FlowContent = () => {
     },
     []
   );
-
 
   const onNodeContextMenu = useCallback(
     (event, node) => {
@@ -172,7 +162,6 @@ const FlowContent = () => {
     [setMenu],
   );
 
-
   const onDragOver = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
@@ -205,12 +194,9 @@ const FlowContent = () => {
     reader.readAsDataURL(file);
   }, [addNodes, screenToFlowPosition]);
 
-
-
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
   const onPaneMove = useCallback(() => setMenu(null), [setMenu]);
-
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
