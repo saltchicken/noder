@@ -30,20 +30,20 @@ const Flow = () => {
 
 
   const onWidgetValuesChange = useCallback((nodeId, newValues) => {
-  setNodes((nodes) =>
-    nodes.map((node) =>
-      node.id === nodeId
-        ? {
+    setNodes((nodes) =>
+      nodes.map((node) =>
+        node.id === nodeId
+          ? {
             ...node,
             data: {
               ...node.data,
               widgetValues: newValues,
             },
           }
-        : node
-    )
-  );
-}, []);
+          : node
+      )
+    );
+  }, []);
 
   const nodeTypes = useMemo(() => ({
     pythonNode: (props) => (
@@ -75,43 +75,43 @@ const Flow = () => {
     fetchPythonNodes();
   }, []);
 
-const handleNodeMessage = useCallback((messageData) => {
-  setNodes((nodes) => 
-    nodes.map((node) => {
-      if (node.id === messageData.nodeId) {
-        const { type, data } = messageData.message;
-        if (type === 'status') {
-          return {
-            ...node,
-            className: data
-          };
-        } else if (type === 'widget_update') {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              widgetValues: {
-                ...node.data.widgetValues,
-                [data.name]: data.value
+  const handleNodeMessage = useCallback((messageData) => {
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id === messageData.nodeId) {
+          const { type, data } = messageData.message;
+          if (type === 'status') {
+            return {
+              ...node,
+              className: data
+            };
+          } else if (type === 'widget_update') {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                widgetValues: {
+                  ...node.data.widgetValues,
+                  [data.name]: data.value
+                }
               }
-            }
-          };
+            };
+          } else {
+            console.log("Received unknown message type");
+            return node;
+          }
         } else {
-          console.log("Received unknown message type");
           return node;
         }
-      } else {
-        return node;
-        }
-    })
-  );
-}, []);
+      })
+    );
+  }, []);
 
 
   const connectWebSocket = useCallback(() => {
     const WS_URL = `ws://${window.location.hostname}:3000/ws`;
     const ws = new WebSocket(WS_URL);
-    
+
     ws.onopen = () => {
       console.log('Connected to WebSocket');
       setSocket(ws);
@@ -154,7 +154,7 @@ const handleNodeMessage = useCallback((messageData) => {
       console.log('Disconnected from WebSocket');
       setIsConnected(false);
       setSocket(null);
-      
+
       // Schedule reconnection attempt
       reconnectTimeoutRef.current = setTimeout(() => {
         console.log('Attempting to reconnect...');
@@ -210,13 +210,13 @@ const handleNodeMessage = useCallback((messageData) => {
   }, [nodes, setEdges]);
 
 
-const onConnectEnd = useCallback(
-  (event, params) => {
+  const onConnectEnd = useCallback(
+    (event, params) => {
       // console.log(event);
       // console.log(params);
-  },
-  []
-);
+    },
+    []
+  );
 
   const onSave = useCallback(() => {
     const flow = {
@@ -228,25 +228,25 @@ const onConnectEnd = useCallback(
   }, [nodes, edges]);
 
 
-const onRestore = useCallback(() => {
-  const flowString = localStorage.getItem('flow');
-  if (!flowString) return;
-  
-  const flow = JSON.parse(flowString);
-  if (flow) {
-    // Ensure widgetValues are properly restored for each node
-    const nodesWithRestoredWidgets = flow.nodes.map(node => ({
-      ...node,
-      data: {
-        ...node.data,
-        widgetValues: node.data.widgetValues || {}  // Preserve or initialize widgetValues
-      }
-    }));
-    
-    setNodes(nodesWithRestoredWidgets);
-    setEdges(flow.edges);
-  }
-}, [setNodes, setEdges]);
+  const onRestore = useCallback(() => {
+    const flowString = localStorage.getItem('flow');
+    if (!flowString) return;
+
+    const flow = JSON.parse(flowString);
+    if (flow) {
+      // Ensure widgetValues are properly restored for each node
+      const nodesWithRestoredWidgets = flow.nodes.map(node => ({
+        ...node,
+        data: {
+          ...node.data,
+          widgetValues: node.data.widgetValues || {}  // Preserve or initialize widgetValues
+        }
+      }));
+
+      setNodes(nodesWithRestoredWidgets);
+      setEdges(flow.edges);
+    }
+  }, [setNodes, setEdges]);
 
   const onProcess = useCallback(() => {
     const flow = {
@@ -300,6 +300,79 @@ const onRestore = useCallback(() => {
     [setMenu],
   );
 
+  const onExportFlow = useCallback(async () => {
+    const flow = {
+      nodes: nodes,
+      edges: edges,
+    };
+
+    try {
+      const response = await fetch(`http://${window.location.hostname}:3000/export_flow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flow),
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        // Create a download link for the exported file
+        const downloadUrl = `http://${window.location.hostname}:3000/saved_flows/${data.filename}`;
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = data.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('Export failed:', data.message);
+      }
+    } catch (error) {
+      console.error('Error exporting flow:', error);
+    }
+  }, [nodes, edges]);
+
+  const onImportFlow = useCallback(async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`http://${window.location.hostname}:3000/import_flow`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        // Ensure widgetValues are properly restored for each node
+        const nodesWithRestoredWidgets = data.flow.nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            widgetValues: node.data.widgetValues || {}
+          }
+        }));
+
+        setNodes(nodesWithRestoredWidgets);
+        setEdges(data.flow.edges);
+      } else {
+        console.error('Import failed:', data.message);
+      }
+    } catch (error) {
+      console.error('Error importing flow:', error);
+    }
+
+    // Reset the file input
+    event.target.value = '';
+  }, [setNodes, setEdges]);
+
+
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
   const onPaneMove = useCallback(() => setMenu(null), [setMenu]);
@@ -331,6 +404,17 @@ const onRestore = useCallback(() => {
           <button onClick={onRestore}>Restore</button>
           <button onClick={onSave}>Save</button>
           <button onClick={onProcess}>Process</button>
+          <button onClick={onExportFlow}>Export Flow</button>
+          <button onClick={() => document.getElementById('file-input').click()}>
+            Import Flow
+          </button>
+          <input
+            id="file-input"
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={onImportFlow}
+          />
           <div style={{ color: 'white' }}>
             Status: {isConnected ? 'Connected' : 'Disconnected'}
           </div>

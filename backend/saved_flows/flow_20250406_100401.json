@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "f5042463-2fb4-46fc-b3f9-6427c9a3ced0",
+      "type": "pythonNode",
+      "position": {
+        "x": 255,
+        "y": 151
+      },
+      "style": {
+        "minWidth": "300px",
+        "minHeight": "295px"
+      },
+      "data": {
+        "label": "Foo",
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "FooOutput",
+            "type": "<class 'str'>"
+          },
+          {
+            "name": "FooOutput2",
+            "type": "<class 'int'>"
+          }
+        ],
+        "widgets": [
+          {
+            "name": "first"
+          },
+          {
+            "name": "second",
+            "type": "slider",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "value": 20
+          },
+          {
+            "name": "yes",
+            "value": "hello"
+          },
+          {
+            "name": "no"
+          },
+          {
+            "name": "new",
+            "type": "dropdown",
+            "options": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        ],
+        "widgetValues": {
+          "first": "",
+          "second": 20,
+          "yes": "hello",
+          "no": "",
+          "new": "1"
+        }
+      },
+      "measured": {
+        "width": 300,
+        "height": 295
+      }
+    }
+  ],
+  "edges": []
+}
