@@ -13,30 +13,33 @@ body {
 }
 
 .context-menu {
-  background: white;
-  border-style: solid;
-  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  background: #1e1e1e; /* Dark background */
+  border: 1px solid #333; /* Darker border */
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 30%);
   position: absolute;
   z-index: 10;
+  color: #fff; /* Light text */
 }
 
 .context-submenu {
   position: absolute;
   left: calc(100% - 1px);
   top: -1px;
-  background: white;
-  border: 1px solid #ccc;
-  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
-  min-width: 200px; /* Increased width to accommodate search */
+  background: #1e1e1e; /* Dark background */
+  border: 1px solid #333; /* Darker border */
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 30%);
+  min-width: 200px;
 }
 
 .context-menu-search {
-  width: calc(100% - 16px);
+  width: calc(100% - 36px);
   padding: 8px;
   margin: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #444;
   border-radius: 4px;
   font-size: 12px;
+  background: #2a2a2a; /* Dark input background */
+  color: #fff; /* Light text */
 }
 
 .context-menu-items {
@@ -51,7 +54,7 @@ body {
 }
 
 .context-menu-item:hover {
-  background: #f0f0f0;
+  background: #2a2a2a; /* Darker hover state */
 }
 
 
