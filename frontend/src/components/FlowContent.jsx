@@ -12,6 +12,7 @@ import {
 
 import ContextMenu from './ContextMenu';
 import PythonNode from '../nodes/PythonNode.tsx';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 
 function uuidv4() {
@@ -28,11 +29,8 @@ const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [menu, setMenu] = useState(null);
-  const [socket, setSocket] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [pythonNodes, setPythonNodes] = useState([]);
   const ref = useRef(null);
-  const reconnectTimeoutRef = useRef(null);
   const { addNodes, screenToFlowPosition } = useReactFlow();
 
 
@@ -103,96 +101,16 @@ const FlowContent = () => {
                 }
               }
             };
-          } else {
-            console.log("Received unknown message type");
-            return node;
           }
-        } else {
-          return node;
         }
+        return node;
       })
     );
   }, []);
 
+  const { isConnected, sendToWebSocket } = useWebSocket(handleNodeMessage);
 
-  const connectWebSocket = useCallback(() => {
-    const WS_URL = `ws://${window.location.hostname}:3000/ws`;
-    const ws = new WebSocket(WS_URL);
 
-    ws.onopen = () => {
-      console.log('Connected to WebSocket');
-      setSocket(ws);
-      setIsConnected(true);
-      // Clear any existing reconnection timeout
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-
-        switch (message.type) {
-          case 'node_message':
-            handleNodeMessage(message.data);
-            break;
-          case 'success':
-            console.log('Success:', message.data);
-            break;
-          case 'error':
-            console.error('Error:', message.data);
-            break;
-          default:
-            console.log('Unknown message type:', message);
-        }
-      } catch (error) {
-        console.error('Error parsing message:', error);
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      setIsConnected(false);
-    };
-
-    ws.onclose = () => {
-      console.log('Disconnected from WebSocket');
-      setIsConnected(false);
-      setSocket(null);
-
-      // Schedule reconnection attempt
-      reconnectTimeoutRef.current = setTimeout(() => {
-        console.log('Attempting to reconnect...');
-        connectWebSocket();
-      }, 2000); // Try to reconnect after 2 seconds
-    };
-
-    return ws;
-  }, []);
-
-  useEffect(() => {
-    const ws = connectWebSocket();
-
-    // Cleanup on component unmount
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      setIsConnected(false);
-      setSocket(null);
-    };
-  }, [connectWebSocket]);
-
-  const sendToWebSocket = useCallback((data) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(data);
-    }
-  }, [socket]);
 
   const onConnect = useCallback((params) => {
     const sourceNode = nodes.find(node => node.id === params.source);
