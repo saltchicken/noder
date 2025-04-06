@@ -290,6 +290,8 @@ def get_run_methods(module):
     run_methods = {}
 
     for class_name, cls in inspect.getmembers(module, inspect.isclass):
+        if class_name == "Node":
+            continue
         for method_name, method in inspect.getmembers(cls, inspect.isfunction):
             if method_name == "run":
                 signature = inspect.signature(method)
@@ -310,16 +312,21 @@ def get_run_methods(module):
                     if param_name != 'self':  # Skip self parameter
                         input_dict = {
                             'name': param_name,
-                            'type': "STRING"  # Default to STRING for now
+                            'type': str(param.annotation)
                         }
                         inputs.append(input_dict)
 
                 # Handle outputs
+
                 outputs = []
-                if hasattr(cls, 'outputs'):
-                    outputs = cls.outputs
-                elif returned_vars:
-                    outputs = [{"name": var, "type": "STRING"} for var in returned_vars]
+                if returned_vars:
+                    if hasattr(return_annotation, '__args__'):
+                        print(return_annotation.__args__)
+                        for var, type_arg in zip(returned_vars, return_annotation.__args__):
+                            outputs.append({"name": var, "type": str(type_arg)})
+                    else:
+                        for var in returned_vars:
+                            outputs.append({"name": var, "type": str(return_annotation)})
 
                 run_methods[f"{class_name}.run"] = {
                     "parameters": inputs,
@@ -367,4 +374,5 @@ def get_python_classes():
         if inspect.isclass(cls_obj) and cls_name != "Node"
     ]
 
+    print(python_classes)
     return python_classes
