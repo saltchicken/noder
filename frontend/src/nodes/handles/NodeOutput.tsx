@@ -1,4 +1,5 @@
 import { Handle, Position } from '@xyflow/react';
+import { getTypeColor } from './utils/handleColors.tsx';
 
 
 const NodeOutput = ({ output, topPadding, index, spacing }) => (
@@ -6,7 +7,7 @@ const NodeOutput = ({ output, topPadding, index, spacing }) => (
     <Handle  
       type="source" 
       position={Position.Right} 
-      style={{ top: `${topPadding + (index * spacing)}px` }} 
+      style={{ top: `${topPadding + (index * spacing)}px`, background: getTypeColor(output.type), borderColor: getTypeColor(output.type) }} 
       id={output.name}
       data-type={output.type}
     />
