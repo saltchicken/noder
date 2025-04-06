@@ -8,6 +8,7 @@ const NodeOutput = ({ output, topPadding, index, spacing }) => (
       position={Position.Right} 
       style={{ top: `${topPadding + (index * spacing)}px` }} 
       id={output.name}
+      data-type={output.type}
     />
     <span style={{
       position: 'absolute',
@@ -17,7 +18,7 @@ const NodeOutput = ({ output, topPadding, index, spacing }) => (
       fontSize: '8px',
       pointerEvents: 'none'
     }}>
-      {output.name}
+      {output.name}: {output.type}
     </span>
   </div>
 );

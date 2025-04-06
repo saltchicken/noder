@@ -8,6 +8,7 @@ const NodeInput = ({ input, topPadding, index, spacing }) => (
       position={Position.Left} 
       style={{ top: `${topPadding + (index * spacing)}px` }} 
       id={input.name}
+      data-type={input.type}
     />
     <span style={{
       position: 'absolute',
@@ -17,7 +18,7 @@ const NodeInput = ({ input, topPadding, index, spacing }) => (
       fontSize: '8px',
       pointerEvents: 'none'
     }}>
-      {input.name}
+      {input.name}: {input.type}
     </span>
   </div>
 );
