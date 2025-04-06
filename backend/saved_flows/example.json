@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "c68b2d85-c453-46a7-823c-cc357f34d709",
+      "type": "pythonNode",
+      "position": {
+        "x": 225.75,
+        "y": 359.25
+      },
+      "style": {
+        "minWidth": "300px",
+        "minHeight": "295px"
+      },
+      "data": {
+        "label": "Foo",
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "FooOutput",
+            "type": "<class 'str'>"
+          },
+          {
+            "name": "FooOutput2",
+            "type": "<class 'int'>"
+          }
+        ],
+        "widgets": [
+          {
+            "name": "first"
+          },
+          {
+            "name": "second"
+          },
+          {
+            "name": "yes",
+            "value": "hello"
+          },
+          {
+            "name": "no"
+          },
+          {
+            "name": "new",
+            "type": "dropdown",
+            "options": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        ],
+        "widgetValues": {
+          "first": "This actually works",
+          "second": "",
+          "yes": "hello",
+          "no": "",
+          "new": "1"
+        }
+      },
+      "measured": {
+        "width": 300,
+        "height": 295
+      },
+      "selected": true,
+      "dragging": false,
+      "className": "run_complete"
+    },
+    {
+      "id": "3b89a069-0135-44d6-8790-1623b686b62a",
+      "type": "pythonNode",
+      "position": {
+        "x": 587.25,
+        "y": 351.75
+      },
+      "style": {
+        "minWidth": "300px",
+        "minHeight": "80px"
+      },
+      "data": {
+        "label": "ShowText",
+        "inputs": [
+          {
+            "name": "text",
+            "type": "<class 'str'>"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "display_text",
+            "type": "<class 'str'>"
+          }
+        ],
+        "widgets": [
+          {
+            "name": "display_text",
+            "type": "textarea",
+            "value": ""
+          }
+        ],
+        "widgetValues": {
+          "display_text": "This actually works"
+        }
+      },
+      "measured": {
+        "width": 300,
+        "height": 80
+      },
+      "selected": false,
+      "dragging": false,
+      "className": "run_complete"
+    }
+  ],
+  "edges": [
+    {
+      "source": "c68b2d85-c453-46a7-823c-cc357f34d709",
+      "sourceHandle": "FooOutput",
+      "target": "3b89a069-0135-44d6-8790-1623b686b62a",
+      "targetHandle": "text",
+      "id": "xy-edge__c68b2d85-c453-46a7-823c-cc357f34d709FooOutput-3b89a069-0135-44d6-8790-1623b686b62atext"
+    }
+  ]
+}
