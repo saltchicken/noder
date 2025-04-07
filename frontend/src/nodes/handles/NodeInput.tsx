@@ -14,7 +14,7 @@ const NodeInput = ({ input, spacing }) => (
       position={Position.Left}
       style={{
         position: 'absolute',
-        left: '-8px',
+        left: '-15px',
         top: '50%',
         transform: 'translateY(-50%)',
         background: getTypeColor(input.type),

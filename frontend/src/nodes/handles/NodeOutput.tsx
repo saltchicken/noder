@@ -13,7 +13,7 @@ const NodeOutput = ({ output, spacing }) => (
       position={Position.Right}
       style={{
         position: 'absolute',
-        right: '-8px',
+        right: '-15px',
         top: '50%',
         transform: 'translateY(-50%)',
         background: getTypeColor(output.type),
