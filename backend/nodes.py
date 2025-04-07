@@ -111,10 +111,14 @@ class ShowText(Node):
 
 class ShowImage(Node):
     async def run(self) -> str:
-        test = self.widgets[0]  # {"type": "image", "value": ""}
-        file_upload = self.widgets[1]  # {"type": "file_upload", "value": ""}
-        await self.update_widget("test", file_upload)
-        return test
+        image = self.widgets[0]  # {"type": "image", "value": ""}
+        return image
+
+
+class ImageSource(Node):
+    async def run(self) -> str:
+        image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
+        return image_upload
 
 
 class TestImageEdit(Node):

@@ -7,6 +7,7 @@ import SliderWidget from './widgets/SliderWidget.tsx';
 import TextAreaWidget from './widgets/TextAreaWidget.tsx';
 import ImageWidget from './widgets/ImageWidget.tsx';
 import FileUploadWidget from './widgets/FileUploadWidget.tsx';
+import ImageFileUploadWidget from './widgets/ImageFileUploadWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -83,6 +84,12 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
         />;
       case 'file_upload':
         return <FileUploadWidget
+          key={widget.name}
+          widget={widgetWithValues}
+          onChange={onChange}
+        />;
+      case 'image_file_upload':
+        return <ImageFileUploadWidget
           key={widget.name}
           widget={widgetWithValues}
           onChange={onChange}
