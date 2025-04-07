@@ -1,4 +1,4 @@
-import { useCallback, memo, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, memo, useMemo, useState, useEffect } from 'react';
 
 import { NodeResizeControl } from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
