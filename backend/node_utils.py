@@ -320,28 +320,92 @@ def get_returned_variables(source_code, function_name):
                             if isinstance(stmt.value, ast.Subscript):
                                 if "value" in stmt.value.value.__dict__:
                                     if stmt.value.value.attr == "widgets":
+                                        # Get the widget index from the assignment
+                                        widget_index = None
+                                        if isinstance(stmt.value.slice, ast.Constant):
+                                            widget_index = stmt.value.slice.value
+
                                         widget = {"name": target.id}
                                         lineno = stmt.lineno
                                         source_lines = source_code.splitlines()
-                                        if lineno - 1 < len(source_lines):
-                                            line = source_lines[lineno - 1]
-                                            if "#" in line:
-                                                comment = line[
-                                                    line.index("#") + 1 :
+
+                                        # Look for comments in current and next lines
+                                        comment = None
+                                        in_json_block = False
+
+                                        for i in range(
+                                            3
+                                        ):  # Check current line and 2 lines after
+                                            if lineno - 1 + i < len(source_lines):
+                                                line = source_lines[
+                                                    lineno - 1 + i
                                                 ].strip()
-                                                try:
-                                                    widget = {
-                                                        **widget,
-                                                        **json.loads(comment),
-                                                    }
-                                                except:
-                                                    print(
-                                                        "Failed to parse comment as JSON:",
-                                                        comment,
-                                                    )
+
+                                                # Skip empty lines
+                                                if not line:
+                                                    continue
+
+                                                # Check if this line contains self.widgets[index]
+                                                if "self.widgets[" in line:
+                                                    try:
+                                                        line_index = int(
+                                                            line[
+                                                                line.index("[")
+                                                                + 1 : line.index("]")
+                                                            ]
+                                                        )
+                                                        if line_index != widget_index:
+                                                            break
+                                                    except ValueError:
+                                                        continue
+
+                                                if "#" in line:
+                                                    comment_part = line[
+                                                        line.index("#") + 1 :
+                                                    ].strip()
+
+                                                    # Check if this starts a JSON block
+                                                    if comment_part.strip().startswith(
+                                                        "{"
+                                                    ):
+                                                        in_json_block = True
+                                                        comment = comment_part
+                                                    # If we're in a JSON block and line contains only commas and values
+                                                    elif in_json_block and (
+                                                        comment_part.strip().endswith(
+                                                            ","
+                                                        )
+                                                        or comment_part.strip().endswith(
+                                                            "}"
+                                                        )
+                                                    ):
+                                                        comment += " " + comment_part
+                                                        if comment_part.strip().endswith(
+                                                            "}"
+                                                        ):
+                                                            break
+                                                    # If it's a standalone comment not part of JSON block
+                                                    elif not in_json_block:
+                                                        comment = comment_part
+                                                        break
+
+                                        if comment:
+                                            try:
+                                                # Clean up any line continuations or extra whitespace
+                                                comment = comment.replace(
+                                                    "\\", ""
+                                                ).strip()
+                                                widget = {
+                                                    **widget,
+                                                    **json.loads(comment),
+                                                }
+                                            except json.JSONDecodeError:
+                                                print(
+                                                    "Failed to parse comment as JSON:",
+                                                    comment,
+                                                )
                                         widgets.append(widget)
 
-    # print(widgets)
     return returned_vars, widgets
 
 
