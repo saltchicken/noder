@@ -118,11 +118,11 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateRows: 'auto 1fr',
-      gap: '10px',
+      gridTemplateRows: 'auto auto 1fr',
+      gap: '0px',
       width: '100%',
       height: '100%',
-      padding: '15px'
+      padding: '0px 15px 15px 15px'
     }}>
       <div style={{
         display: 'grid',
@@ -139,7 +139,7 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+        <div style={{ textAlign: 'center', fontSize: '8px', fontWeight: 'bold', position: 'sticky', top: '0', backgroundColor: '#1e1e1e', padding: '0px', borderRadius: '5px', zIndex: -1 }}>
           {data.label}
         </div>
 

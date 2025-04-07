@@ -24,10 +24,10 @@ const NodeOutput = ({ output, spacing }) => (
     />
     <span style={{
       position: 'absolute',
-      right: '20px',
+      right: '10px',
       top: '50%',
       transform: 'translateY(-50%)',
-      fontSize: '8px',
+      fontSize: '6px',
       whiteSpace: 'nowrap'
     }}>
       {output.name}: {output.type}

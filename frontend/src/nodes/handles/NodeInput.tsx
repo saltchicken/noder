@@ -1,3 +1,4 @@
+import React from 'react';
 import { Position } from '@xyflow/react';
 import SingleConnectionHandle from './SingleConnectionHandle.jsx'
 import { getTypeColor } from './utils/handleColors.tsx';
@@ -24,10 +25,10 @@ const NodeInput = ({ input, spacing }) => (
     />
     <span style={{
       position: 'absolute',
-      left: '20px',
+      left: '10px',
       top: '50%',
       transform: 'translateY(-50%)',
-      fontSize: '8px',
+      fontSize: '6px',
       whiteSpace: 'nowrap'
     }}>
       {input.name}: {input.type}
