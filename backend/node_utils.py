@@ -1,4 +1,5 @@
 import ast
+import os
 import inspect
 import importlib.util
 import textwrap
@@ -230,29 +231,49 @@ def load_script(script_path):
 
 
 def get_python_classes():
-    script_path = "nodes.py"
-    module = load_script(script_path)
-    run_methods = get_run_methods(module)
+    node_directory = "nodes"  # Directory containing node files
+    python_classes = []
 
-    inputs = {}
-    outputs = {}
-    widgets = {}
-    for name, info in run_methods.items():
-        cls_name = name.split(".")[0]
-        inputs[cls_name] = info["parameters"]
-        outputs[cls_name] = info["outputs"]
-        widgets[cls_name] = info["widgets"]
+    # Create nodes directory if it doesn't exist
+    # os.makedirs(node_directory, exist_ok=True)
+    # TODO: Handle error handling if directory doesn't exists because then there are no nodes to declare
 
-    python_classes = [
-        {
-            "name": cls_name,
-            "inputs": inputs[cls_name],
-            "outputs": outputs[cls_name],
-            "widgets": widgets[cls_name],
-            "class": cls_obj,
-        }
-        for cls_name, cls_obj in inspect.getmembers(sys.modules["nodes"])
-        if inspect.isclass(cls_obj) and cls_name != "Node"
-    ]
+    # Scan all Python files in the nodes directory
+    for file_name in os.listdir(node_directory):
+        if file_name.endswith(".py"):
+            script_path = os.path.join(node_directory, file_name)
+            try:
+                module = load_script(script_path)
+                run_methods = get_run_methods(module)
+
+                inputs = {}
+                outputs = {}
+                widgets = {}
+                for name, info in run_methods.items():
+                    cls_name = name.split(".")[0]
+                    inputs[cls_name] = info["parameters"]
+                    outputs[cls_name] = info["outputs"]
+                    widgets[cls_name] = info["widgets"]
+
+                # Add classes from this module
+                module_classes = [
+                    {
+                        "name": cls_name,
+                        "inputs": inputs.get(cls_name, []),
+                        "outputs": outputs.get(cls_name, []),
+                        "widgets": widgets.get(cls_name, []),
+                        "class": cls_obj,
+                        "source_file": file_name,  # Add source file information
+                    }
+                    for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
+                    if inspect.isclass(cls_obj)
+                    and cls_name != "Node"
+                    and hasattr(cls_obj, "run")  # Only include classes with run method
+                ]
+
+                python_classes.extend(module_classes)
+
+            except Exception as e:
+                print(f"Error loading {file_name}: {str(e)}")
 
     return python_classes
