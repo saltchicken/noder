@@ -182,7 +182,7 @@ const FlowContent = () => {
 
       const newNode = createPythonNode({
         position,
-        nodeType: 'ShowImage',
+        nodeType: 'ImageSource',
         customData: {
           imageData: e.target.result
         }

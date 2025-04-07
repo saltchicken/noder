@@ -42,19 +42,19 @@ export function createPythonNode({
         inputs: [],
         outputs: [
           {
-            name: 'test',
+            name: 'image_upload',
             type: '<class \'str\'>'
           }
         ],
         widgets: [
           {
-            name: 'test',
-            type: 'image',
+            name: 'image_upload',
+            type: 'image_file_upload',
             value: customData.imageData || ''
           }
         ],
         widgetValues: {
-          test: customData.imageData || ''
+          image_upload: customData.imageData || ''
         }
       }
     };
