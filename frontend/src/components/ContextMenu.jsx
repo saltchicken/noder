@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { createPythonNode } from '../utils/nodeCreation';
 
-
 export default function ContextMenu({
   id,
   top,
@@ -14,10 +13,19 @@ export default function ContextMenu({
   ...props
 }) {
   const { getNode, setNodes, addNodes, setEdges, screenToFlowPosition } = useReactFlow();
-  const [showSubmenu, setShowSubmenu] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [activeClassification, setActiveClassification] = useState(null);
 
-
+  const nodesByClassification = React.useMemo(() => {
+    return pythonNodes.reduce((acc, node) => {
+      const classification = node.classification || 'Other';
+      if (!acc[classification]) {
+        acc[classification] = [];
+      }
+      acc[classification].push(node);
+      return acc;
+    }, {});
+  }, [pythonNodes]);
 
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
@@ -31,9 +39,7 @@ export default function ContextMenu({
       position,
       nodeType: node.data.label,
       pythonNode,
-      customData: {
-        ...node.data.widgetValues
-      }
+      customData: { ...node.data.widgetValues }
     });
 
     addNodes(newNode);
@@ -47,44 +53,50 @@ export default function ContextMenu({
   const addNewNode = useCallback((nodeType) => {
     const pythonNode = pythonNodes.find(node => node.name === nodeType);
     const position = screenToFlowPosition({ x: left, y: top });
-
     const newNode = createPythonNode({
       position,
       nodeType,
       pythonNode
     });
-
     addNodes(newNode);
   }, [left, top, addNodes, pythonNodes, screenToFlowPosition]);
 
-  const filteredNodes = pythonNodes.filter(node =>
-    node.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const renderSubmenu = () => {
-    if (!showSubmenu) return null;
+  const renderClassificationSubmenu = () => {
+    if (!activeSubmenu) return null;
 
     return (
-      <div className="context-submenu">
-        <input
-          type="text"
-          placeholder="Search nodes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="context-menu-search"
-          onClick={(e) => e.stopPropagation()}
-        />
-        <div className="context-menu-items">
-          {filteredNodes.map(node => (
-            <div
-              key={node.name}
-              className="context-menu-item"
-              onClick={() => addNewNode(node.name)}
-            >
-              {node.name}
-            </div>
-          ))}
-        </div>
+      <div
+        className="context-submenu classification-menu"
+        onMouseEnter={() => setActiveSubmenu('add')}
+        onMouseLeave={() => {
+          if (!activeClassification) {
+            setActiveSubmenu(null);
+          }
+        }}
+      >
+        {Object.keys(nodesByClassification).map(classification => (
+          <div
+            key={classification}
+            className="context-menu-item"
+            onMouseEnter={() => setActiveClassification(classification)}
+            onMouseLeave={() => setActiveClassification(null)}
+          >
+            {classification} ►
+            {activeClassification === classification && (
+              <div className="context-submenu nodes-menu">
+                {nodesByClassification[classification].map(node => (
+                  <div
+                    key={node.name}
+                    className="context-menu-item"
+                    onClick={() => addNewNode(node.name)}
+                  >
+                    {node.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     );
   };
@@ -106,11 +118,15 @@ export default function ContextMenu({
           <>
             <div
               className="context-menu-item"
-              onMouseEnter={() => setShowSubmenu(true)}
-              onMouseLeave={() => setShowSubmenu(false)}
+              onMouseEnter={() => setActiveSubmenu('add')}
+              onMouseLeave={() => {
+                if (!activeClassification) {
+                  setActiveSubmenu(null);
+                }
+              }}
             >
               add node ►
-              {renderSubmenu()}
+              {renderClassificationSubmenu()}
             </div>
           </>
         );
@@ -118,6 +134,7 @@ export default function ContextMenu({
         return null;
     }
   };
+
   return (
     <div
       style={{ top, left, right, bottom }}
@@ -128,3 +145,4 @@ export default function ContextMenu({
     </div>
   );
 }
+

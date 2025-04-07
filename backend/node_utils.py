@@ -11,6 +11,46 @@ import nodes
 from typing import Union
 
 
+class Node:
+    def __init__(self):
+        self.instantiated = True
+        self.node_id = None
+        print(f"Node initialized {self.__class__.__name__}")
+        self.widgets = []
+        self.websocket = None
+
+    async def send_message(self, message_type: str, data: dict):
+        if self.websocket:
+            await self.websocket.send_json(
+                {
+                    "type": "node_message",
+                    "data": {
+                        "nodeId": self.node_id,
+                        "message": {"type": message_type, "data": data},
+                    },
+                }
+            )
+
+    async def set_status(self, status):
+        """Update node's running status"""
+        await self.send_message("status", status)
+
+    async def update_widget(self, widget_name, value):
+        """Update a widget's value during node execution"""
+        await self.send_message("widget_update", {"name": widget_name, "value": value})
+
+    async def run(self, *args, **kwargs):
+        pass
+
+    async def _run(self, *args, **kwargs):
+        await self.set_status("run_start")
+        result = await self.run(*args, **kwargs)
+        await self.set_status("run_complete")
+        if isinstance(result, (tuple, list)):
+            return result
+        return [result] if result is not None else []
+
+
 def get_returned_variables(source_code, function_name):
     """
     Parses the function's AST to extract returned variable names, text variables, and number variables.
@@ -231,18 +271,18 @@ def load_script(script_path):
 
 
 def get_python_classes():
-    node_directory = "nodes"  # Directory containing node files
+    node_directory = "nodes"
     python_classes = []
 
-    # Create nodes directory if it doesn't exist
-    # os.makedirs(node_directory, exist_ok=True)
-    # TODO: Handle error handling if directory doesn't exists because then there are no nodes to declare
-
-    # Scan all Python files in the nodes directory
     for file_name in os.listdir(node_directory):
         if file_name.endswith(".py"):
             script_path = os.path.join(node_directory, file_name)
             try:
+                # Get classification from filename (remove .py and convert to title case)
+                classification = (
+                    os.path.splitext(file_name)[0].replace("_", " ").title()
+                )
+
                 module = load_script(script_path)
                 run_methods = get_run_methods(module)
 
@@ -255,7 +295,7 @@ def get_python_classes():
                     outputs[cls_name] = info["outputs"]
                     widgets[cls_name] = info["widgets"]
 
-                # Add classes from this module
+                # Add classes from this module with classification
                 module_classes = [
                     {
                         "name": cls_name,
@@ -263,12 +303,13 @@ def get_python_classes():
                         "outputs": outputs.get(cls_name, []),
                         "widgets": widgets.get(cls_name, []),
                         "class": cls_obj,
-                        "source_file": file_name,  # Add source file information
+                        "source_file": file_name,
+                        "classification": classification,  # Add classification field
                     }
                     for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
                     if inspect.isclass(cls_obj)
                     and cls_name != "Node"
-                    and hasattr(cls_obj, "run")  # Only include classes with run method
+                    and hasattr(cls_obj, "run")
                 ]
 
                 python_classes.extend(module_classes)
@@ -276,4 +317,5 @@ def get_python_classes():
             except Exception as e:
                 print(f"Error loading {file_name}: {str(e)}")
 
+    print(python_classes)
     return python_classes

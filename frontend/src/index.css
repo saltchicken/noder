@@ -12,25 +12,53 @@ body {
   height: 100vh;
 }
 
+/* Base Context Menu */
 .context-menu {
-  background: #1e1e1e; /* Dark background */
-  border: 1px solid #333; /* Darker border */
+  background: #1e1e1e;
+  border: 1px solid #333;
   box-shadow: 10px 19px 20px rgba(0, 0, 0, 30%);
   position: absolute;
-  z-index: 10;
-  color: #fff; /* Light text */
+  z-index: 1000;
+  color: #fff;
+  min-width: 150px;
 }
 
+/* Menu Items */
+.context-menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  font-size: 13px;
+}
+
+.context-menu-item:hover {
+  background: #2a2a2a;
+}
+
+/* Submenus */
 .context-submenu {
   position: absolute;
   left: calc(100% - 1px);
   top: -1px;
-  background: #1e1e1e; /* Dark background */
-  border: 1px solid #333; /* Darker border */
+  background: #1e1e1e;
+  border: 1px solid #333;
   box-shadow: 10px 19px 20px rgba(0, 0, 0, 30%);
+  min-width: 200px;
+  z-index: 1001;
+}
+
+/* Classification Menu */
+.classification-menu {
+  min-width: 150px;
+}
+
+/* Nodes Menu */
+.nodes-menu {
   min-width: 200px;
 }
 
+/* Search Input */
 .context-menu-search {
   width: calc(100% - 36px);
   padding: 8px;
@@ -38,25 +66,42 @@ body {
   border: 1px solid #444;
   border-radius: 4px;
   font-size: 12px;
-  background: #2a2a2a; /* Dark input background */
-  color: #fff; /* Light text */
+  background: #2a2a2a;
+  color: #fff;
 }
 
+/* Categories */
+.context-menu-category {
+  margin-bottom: 8px;
+}
+
+.context-menu-category-header {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #888;
+  background: #252525;
+  border-bottom: 1px solid #333;
+}
+
+/* Scrollable menu items container */
 .context-menu-items {
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
-.context-menu-item {
-  padding: 0.5em;
-  cursor: pointer;
-  user-select: none;
+/* Subitems (nodes within categories) */
+.context-menu-subitem {
+  padding-left: 16px;
+  font-size: 12px;
 }
 
-.context-menu-item:hover {
-  background: #2a2a2a; /* Darker hover state */
+/* Arrow indicator for submenus */
+.context-menu-item[data-has-submenu]::after {
+  content: '►';
+  position: absolute;
+  right: 8px;
+  color: #888;
 }
-
 
 .react-flow__edge.selectable:hover .react-flow__edge-path,
 .react-flow__edge.selectable.selected .react-flow__edge-path {

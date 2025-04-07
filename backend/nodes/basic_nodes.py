@@ -1,72 +1,7 @@
 from typing import Tuple, Union, List
 import asyncio
 
-
-class Node:
-    def __init__(self):
-        self.instantiated = True
-        self.node_id = None
-        print(f"Node initialized {self.__class__.__name__}")
-        self.widgets = []
-        self.websocket = None
-
-    async def send_message(self, message_type: str, data: dict):
-        if self.websocket:
-            await self.websocket.send_json(
-                {
-                    "type": "node_message",
-                    "data": {
-                        "nodeId": self.node_id,
-                        "message": {"type": message_type, "data": data},
-                    },
-                }
-            )
-
-    async def set_status(self, status):
-        """Update node's running status"""
-        await self.send_message("status", status)
-
-    async def update_widget(self, widget_name, value):
-        """Update a widget's value during node execution"""
-        await self.send_message("widget_update", {"name": widget_name, "value": value})
-
-    async def run(self, *args, **kwargs):
-        pass
-
-    async def _run(self, *args, **kwargs):
-        await self.set_status("run_start")
-        result = await self.run(*args, **kwargs)
-        await self.set_status("run_complete")
-        if isinstance(result, (tuple, list)):
-            return result
-        return [result] if result is not None else []
-
-
-class Foo(Node):
-    async def run(self) -> Tuple[str, int]:
-        first = self.widgets[0]
-        second = self.widgets[
-            1
-        ]  # {"type": "slider", "min": 0, "max": 100, "step": 1, "value": 20 }
-        yes = self.widgets[2]  # { "value": "hello" }
-        no = self.widgets[3]
-        new = self.widgets[4]  # {"type": "dropdown", "options": ["1", "2", "3"]}
-        await asyncio.sleep(2)  # Wait 2 seconds
-        new_no = no[::-1]
-        await self.update_widget("no", new_no)
-        FooOutput = first
-        FooOutput2 = second
-
-        return FooOutput, FooOutput2
-
-
-class Bar(Node):
-    async def run(self, BarInput: str, BarInput2: str) -> Tuple[str, str]:
-        BarOutput = BarInput[::-1]
-        BarOutput2 = BarInput2[::-1]
-        test_test = self.widgets[0]
-
-        return BarOutput, BarOutput2
+from node_utils import Node
 
 
 class OllamaQuery(Node):
