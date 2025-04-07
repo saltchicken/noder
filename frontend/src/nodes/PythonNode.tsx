@@ -116,32 +116,63 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
 
 
   return (
-    <>
-      {inputs.map((input, index) => (
-        <NodeInput
-          key={input.name}
-          input={input}
-          topPadding={topPadding}
-          index={index}
-          spacing={spacing}
-        />
-      ))}
-      {outputs.map((output, index) => (
-        <NodeOutput
-          key={output.name}
-          output={output}
-          topPadding={topPadding}
-          index={index}
-          spacing={spacing}
-        />
-      ))}
-      <div style={{ width: '100%', position: 'absolute', top: `${widgetTopPadding}px` }}>
+    <div style={{
+      display: 'grid',
+      gridTemplateRows: 'auto 1fr',
+      gap: '10px',
+      width: '100%',
+      height: '100%',
+      padding: '15px'
+    }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '50px 1fr 50px',
+        position: 'relative'
+      }}>
+        <div style={{ position: 'relative' }}>
+          {inputs.map((input, index) => (
+            <NodeInput
+              key={input.name}
+              input={input}
+              spacing={spacing}
+            />
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+          {data.label}
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          {outputs.map((output, index) => (
+            <NodeOutput
+              key={output.name}
+              output={output}
+              spacing={spacing}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        padding: '10px 0'
+      }}>
         {widgets.map((widget) => renderWidget(widget))}
       </div>
-      <NodeResizeControl style={{ background: 'transparent', border: 'none' }} minWidth={100} minHeight={50}>
+
+      <NodeResizeControl style={{
+        background: 'transparent',
+        border: 'none',
+        position: 'absolute',
+        bottom: '5px',
+        right: '5px'
+      }} minWidth={100}>
         <ResizeIcon />
       </NodeResizeControl>
-    </>
+    </div>
   );
 }
 

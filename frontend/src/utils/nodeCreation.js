@@ -10,7 +10,7 @@ export function createPythonNode({
     id: uuidv4(),
     type: 'pythonNode',
     position,
-    style: { minWidth: '300px' }
+    style: { width: 'auto', minWidth: '300px' }
   };
 
   if (pythonNode) {
@@ -19,7 +19,6 @@ export function createPythonNode({
       ...baseNode,
       style: {
         ...baseNode.style,
-        minHeight: `${Math.max(pythonNode.inputs.length, pythonNode.outputs.length) * 15 + 15 + (pythonNode.widgets.length * 50)}px`
       },
       data: {
         label: nodeType,
@@ -35,7 +34,6 @@ export function createPythonNode({
       ...baseNode,
       style: {
         ...baseNode.style,
-        minHeight: '350px'
       },
       data: {
         label: nodeType,
