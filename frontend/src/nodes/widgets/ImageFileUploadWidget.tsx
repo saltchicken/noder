@@ -1,18 +1,27 @@
+import { validateImage } from '../../utils/imageValidation';
+
 const ImageFileUploadWidget = ({ widget, onChange }) => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        onChange({
-          target: {
-            name: widget.name,
-            value: e.target.result
-          }
-        });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const validation = validateImage(file);
+    if (!validation.isValid) {
+      console.warn(validation.error);
+      event.target.value = ''; // Reset the input
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      onChange({
+        target: {
+          name: widget.name,
+          value: e.target.result
+        }
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   const imageUrl = widget.widgetValues?.[widget.name] ?? widget.value ?? '';

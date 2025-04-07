@@ -14,6 +14,7 @@ import PanelControls from './PanelControls';
 import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { createPythonNode } from '../utils/nodeCreation';
+import { validateImage } from '../utils/imageValidation';
 
 const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -173,25 +174,9 @@ const FlowContent = () => {
     const file = event.dataTransfer.files[0];
     if (!file) return;
 
-    // List of allowed image MIME types
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'image/svg+xml',
-      'image/bmp'
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      console.warn('Invalid file type. Please drop an image file.');
-      return;
-    }
-
-    // Check file size (optional, adjust limit as needed)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      console.warn('File too large. Maximum size is 5MB.');
+    const validation = validateImage(file);
+    if (!validation.isValid) {
+      console.warn(validation.error);
       return;
     }
 
