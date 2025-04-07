@@ -109,12 +109,6 @@ class ShowText(Node):
         return display_text
 
 
-class ShowImage(Node):
-    async def run(self) -> str:
-        image = self.widgets[0]  # {"type": "image", "value": ""}
-        return image
-
-
 class ImageSource(Node):
     async def run(self) -> str:
         image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
