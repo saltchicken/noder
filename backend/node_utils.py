@@ -229,7 +229,6 @@ def load_script(script_path):
     return module
 
 
-# Example usage
 def get_python_classes():
     script_path = "nodes.py"
     module = load_script(script_path)
@@ -256,7 +255,4 @@ def get_python_classes():
         if inspect.isclass(cls_obj) and cls_name != "Node"
     ]
 
-    print("--------------------")
-    print(python_classes)
-    print("--------------------")
     return python_classes
