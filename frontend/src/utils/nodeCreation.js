@@ -35,7 +35,7 @@ export function createPythonNode({
       ...baseNode,
       style: {
         ...baseNode.style,
-        minHeight: '250px'
+        minHeight: '350px'
       },
       data: {
         label: nodeType,

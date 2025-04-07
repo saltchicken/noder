@@ -171,7 +171,29 @@ const FlowContent = () => {
     event.preventDefault();
 
     const file = event.dataTransfer.files[0];
-    if (!file || !file.type.startsWith('image/')) return;
+    if (!file) return;
+
+    // List of allowed image MIME types
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+      'image/bmp'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      console.warn('Invalid file type. Please drop an image file.');
+      return;
+    }
+
+    // Check file size (optional, adjust limit as needed)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      console.warn('File too large. Maximum size is 5MB.');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (e) => {
