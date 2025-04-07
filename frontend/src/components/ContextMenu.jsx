@@ -26,14 +26,18 @@ export default function ContextMenu({
       y: node.position.y + 50,
     };
 
-    addNodes({
-      ...node,
-      selected: false,
-      dragging: false,
-      id: uuidv4(),
+    const pythonNode = pythonNodes.find(pNode => pNode.name === node.data.label);
+    const newNode = createPythonNode({
       position,
+      nodeType: node.data.label,
+      pythonNode,
+      customData: {
+        ...node.data.widgetValues
+      }
     });
-  }, [id, getNode, addNodes]);
+
+    addNodes(newNode);
+  }, [id, getNode, addNodes, pythonNodes]);
 
   const deleteNode = useCallback(() => {
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
