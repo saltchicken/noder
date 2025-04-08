@@ -105,3 +105,9 @@ class GrayscaleImage(Node):
         await self.update_widget("display_image", img_str)
 
         return img_str
+
+
+class String(Node):
+    async def run(self) -> str:
+        string = self.widgets[0]
+        return string
