@@ -205,23 +205,21 @@ def get_run_methods(module):
                         # Handle Union types
                         if hasattr(param_type, "__origin__"):
                             if param_type.__origin__ is Union:
-                                # Extract the str type from Union[str, List[str]]
-                                base_type = next(
-                                    (t for t in param_type.__args__ if t is str), None
+                                # Get the base type (either str or custom class)
+                                base_type = param_type.__args__[0]
+                                type_str = str(base_type)
+
+                                # Check if List[type] is in the Union
+                                list_type = next(
+                                    (
+                                        t
+                                        for t in param_type.__args__
+                                        if hasattr(t, "__origin__")
+                                        and t.__origin__ is list
+                                    ),
+                                    None,
                                 )
-                                if base_type:
-                                    type_str = str(base_type)
-                                    # Check if List[str] is in the Union
-                                    list_type = next(
-                                        (
-                                            t
-                                            for t in param_type.__args__
-                                            if hasattr(t, "__origin__")
-                                            and t.__origin__ is list
-                                        ),
-                                        None,
-                                    )
-                                    accepts_multiple = bool(list_type)
+                                accepts_multiple = bool(list_type)
 
                         input_dict = {
                             "name": param_name,
