@@ -42,7 +42,6 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
 
   const onChange = useCallback((evt) => {
     const { name, value } = evt.target;
-    console.log('onChange', name, value, widgetValues)
     const newValues = {
       ...widgetValues,
       [name]: value
