@@ -88,7 +88,9 @@ class SaveImage(Node):
 
 
 class SaveCaptionedImages(Node):
-    async def run(self, captioned_images: Union[CaptionedImage, List[CaptionedImage]]) -> List[str]:
+    async def run(
+        self, captioned_images: Union[CaptionedImage, List[CaptionedImage]]
+    ) -> List[str]:
         import base64
         import os
         from datetime import datetime
@@ -110,7 +112,6 @@ class SaveCaptionedImages(Node):
             else captioned_images
         )
         saved_paths = []
-
 
         for idx, img_data in enumerate(images):
             base64_data = img_data.image.split(",")[1]
