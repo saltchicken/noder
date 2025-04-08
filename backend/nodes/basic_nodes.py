@@ -59,52 +59,81 @@ class OllamaQuery(Node):
         return (response, debug_text)
 
 
-class SaveCaptionedVideos(Node):
+class SaveCaptionedMedia(Node):
     async def run(
-        self, captioned_videos: Union[CaptionedVideo, List[CaptionedVideo]]
+        self,
+        captioned_images: Union[CaptionedImage, List[CaptionedImage]] = None,
+        captioned_videos: Union[CaptionedVideo, List[CaptionedVideo]] = None,
     ) -> List[str]:
         import base64
         import os
         from datetime import datetime
+        from io import BytesIO
+        from PIL import Image
 
         # Create output directory if it doesn't exist
-        base_output_dir = os.path.join("output")  # Base output directory
-        output_dir = self.widgets[0]  # Directory path
-
+        base_output_dir = os.path.join("output")
+        output_dir = self.widgets[0]
         full_output_dir = os.path.join(base_output_dir, output_dir)
 
         if not os.path.exists(full_output_dir):
             os.makedirs(full_output_dir)
 
-        videos = (
-            [captioned_videos]
-            if isinstance(captioned_videos, CaptionedVideo)
-            else captioned_videos
-        )
         saved_paths = []
 
-        for idx, video_data in enumerate(videos):
-            # Extract the base64 data from the data URL
-            base64_data = video_data.video.split(",")[1]
-            video_bytes = base64.b64decode(base64_data)
+        # Handle images if present
+        if captioned_images is not None:
+            images = (
+                [captioned_images]
+                if isinstance(captioned_images, CaptionedImage)
+                else captioned_images
+            )
 
-            # Generate filename with timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"video_{timestamp}_{idx}"
+            for idx, img_data in enumerate(images):
+                base64_data = img_data.image.split(",")[1]
+                image_data = base64.b64decode(base64_data)
+                img = Image.open(BytesIO(image_data))
 
-            # Save video file
-            video_filename = f"{filename}.mp4"  # Default to mp4
-            video_path = os.path.join(full_output_dir, video_filename)
-            with open(video_path, "wb") as f:
-                f.write(video_bytes)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"image_{timestamp}_{idx}"
 
-            # Save caption to accompanying text file
-            text_filename = f"{filename}.txt"
-            text_path = os.path.join(full_output_dir, text_filename)
-            with open(text_path, "w") as f:
-                f.write(video_data.caption)
+                image_filename = f"{filename}.png"
+                output_path = os.path.join(full_output_dir, image_filename)
+                img.save(output_path)
 
-            saved_paths.append(video_path)
+                text_filename = f"{filename}.txt"
+                text_path = os.path.join(full_output_dir, text_filename)
+                with open(text_path, "w") as f:
+                    f.write(img_data.caption)
+
+                saved_paths.append(output_path)
+
+        # Handle videos if present
+        if captioned_videos is not None:
+            videos = (
+                [captioned_videos]
+                if isinstance(captioned_videos, CaptionedVideo)
+                else captioned_videos
+            )
+
+            for idx, video_data in enumerate(videos):
+                base64_data = video_data.video.split(",")[1]
+                video_bytes = base64.b64decode(base64_data)
+
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"video_{timestamp}_{idx}"
+
+                video_filename = f"{filename}.mp4"
+                video_path = os.path.join(full_output_dir, video_filename)
+                with open(video_path, "wb") as f:
+                    f.write(video_bytes)
+
+                text_filename = f"{filename}.txt"
+                text_path = os.path.join(full_output_dir, text_filename)
+                with open(text_path, "w") as f:
+                    f.write(video_data.caption)
+
+                saved_paths.append(video_path)
 
         return saved_paths
 
@@ -149,54 +178,6 @@ class SaveImage(Node):
 
         # Return the saved file path
         return output_path
-
-
-class SaveCaptionedImages(Node):
-    async def run(
-        self, captioned_images: Union[CaptionedImage, List[CaptionedImage]]
-    ) -> List[str]:
-        import base64
-        import os
-        from datetime import datetime
-        from io import BytesIO
-        from PIL import Image
-
-        # Create output directory if it doesn't exist
-        base_output_dir = os.path.join("output")  # Base output directory
-        output_dir = self.widgets[0]  # Directory path
-
-        full_output_dir = os.path.join(base_output_dir, output_dir)
-
-        if not os.path.exists(full_output_dir):
-            os.makedirs(full_output_dir)
-
-        images = (
-            [captioned_images]
-            if isinstance(captioned_images, CaptionedImage)
-            else captioned_images
-        )
-        saved_paths = []
-
-        for idx, img_data in enumerate(images):
-            base64_data = img_data.image.split(",")[1]
-            image_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(image_data))
-
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"image_{timestamp}_{idx}"
-
-            image_filename = f"{filename}.png"
-            output_path = os.path.join(full_output_dir, image_filename)
-            img.save(output_path)
-
-            text_filename = f"{filename}.txt"
-            text_path = os.path.join(full_output_dir, text_filename)
-            with open(text_path, "w") as f:
-                f.write(img_data.caption)
-
-            saved_paths.append(output_path)
-
-        return saved_paths
 
 
 class ShowText(Node):
