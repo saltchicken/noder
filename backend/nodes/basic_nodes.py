@@ -224,3 +224,9 @@ class String(Node):
     async def run(self) -> str:
         string = self.widgets[0]
         return string
+
+
+class VideoSource(Node):
+    async def run(self) -> str:
+        video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
+        return video_upload
