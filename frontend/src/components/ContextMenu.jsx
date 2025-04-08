@@ -39,7 +39,9 @@ export default function ContextMenu({
       position,
       nodeType: node.data.label,
       pythonNode,
-      customData: { ...node.data.widgetValues }
+      customData: {
+        widgetValues: node.data.widgetValues // Pass the entire widgetValues object
+      }
     });
 
     addNodes(newNode);

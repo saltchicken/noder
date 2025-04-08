@@ -25,7 +25,7 @@ export function createPythonNode({
         inputs: pythonNode.inputs,
         outputs: pythonNode.outputs,
         widgets: pythonNode.widgets,
-        widgetValues: {}
+        widgetValues: customData.widgetValues || {} // Use provided widget values if available
       }
     };
   } else {
