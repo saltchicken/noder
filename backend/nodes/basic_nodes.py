@@ -71,6 +71,8 @@ class SaveCaptionedMedia(Node):
         from io import BytesIO
         from PIL import Image
 
+        # TODO: Handle if nothing is passed to the input
+
         # Create output directory if it doesn't exist
         base_output_dir = os.path.join("output")
         output_dir = self.widgets[0]
