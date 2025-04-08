@@ -12,6 +12,20 @@ class CaptionedImage:
     caption: str
 
 
+@dataclass
+class CaptionedVideo:
+    video: str
+    caption: str
+
+
+class CaptionedVideoSource(Node):
+    async def run(self) -> CaptionedVideo:
+        video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
+        caption = self.widgets[1]
+        captioned_video = CaptionedVideo(video_upload, caption)
+        return captioned_video
+
+
 class OllamaQuery(Node):
     async def run(self) -> Tuple[str, str]:
         from ollama_query import ollama_query
@@ -43,6 +57,56 @@ class OllamaQuery(Node):
         )
 
         return (response, debug_text)
+
+
+class SaveCaptionedVideos(Node):
+    async def run(
+        self, captioned_videos: Union[CaptionedVideo, List[CaptionedVideo]]
+    ) -> List[str]:
+        import base64
+        import os
+        from datetime import datetime
+
+        # Create output directory if it doesn't exist
+        base_output_dir = os.path.join("output")  # Base output directory
+        output_dir = self.widgets[0]  # Directory path
+
+        full_output_dir = os.path.join(base_output_dir, output_dir)
+
+        if not os.path.exists(full_output_dir):
+            os.makedirs(full_output_dir)
+
+        videos = (
+            [captioned_videos]
+            if isinstance(captioned_videos, CaptionedVideo)
+            else captioned_videos
+        )
+        saved_paths = []
+
+        for idx, video_data in enumerate(videos):
+            # Extract the base64 data from the data URL
+            base64_data = video_data.video.split(",")[1]
+            video_bytes = base64.b64decode(base64_data)
+
+            # Generate filename with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"video_{timestamp}_{idx}"
+
+            # Save video file
+            video_filename = f"{filename}.mp4"  # Default to mp4
+            video_path = os.path.join(full_output_dir, video_filename)
+            with open(video_path, "wb") as f:
+                f.write(video_bytes)
+
+            # Save caption to accompanying text file
+            text_filename = f"{filename}.txt"
+            text_path = os.path.join(full_output_dir, text_filename)
+            with open(text_path, "w") as f:
+                f.write(video_data.caption)
+
+            saved_paths.append(video_path)
+
+        return saved_paths
 
 
 class SaveImage(Node):
