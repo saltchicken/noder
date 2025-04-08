@@ -8,7 +8,7 @@ import json
 import sys
 import nodes
 
-from typing import Union
+from typing import Union, Any
 
 
 class Node:
@@ -39,7 +39,7 @@ class Node:
         """Update a widget's value during node execution"""
         await self.send_message("widget_update", {"name": widget_name, "value": value})
 
-    async def run(self, *args, **kwargs):
+    async def run(self, *args, **kwargs) -> Any:
         pass
 
     async def _run(self, *args, **kwargs):
