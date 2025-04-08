@@ -87,8 +87,8 @@ class SaveImage(Node):
         return output_path
 
 
-class SaveCaptionedImage(Node):
-    async def run(self, captioned_image: Union[CaptionedImage, List[CaptionedImage]]) -> str:
+class SaveCaptionedImages(Node):
+    async def run(self, captioned_images: Union[CaptionedImage, List[CaptionedImage]]) -> List[str]:
         import base64
         import os
         from datetime import datetime
@@ -98,37 +98,40 @@ class SaveCaptionedImage(Node):
         # Create output directory if it doesn't exist
         base_output_dir = os.path.join("output")  # Base output directory
         output_dir = self.widgets[0]  # Directory path
-        filename = self.widgets[1]  # Base filename (optional)
 
         full_output_dir = os.path.join(base_output_dir, output_dir)
 
         if not os.path.exists(full_output_dir):
             os.makedirs(full_output_dir)
 
-        input_image = captioned_image.image
+        images = (
+            [captioned_images]
+            if isinstance(captioned_images, CaptionedImage)
+            else captioned_images
+        )
+        saved_paths = []
 
-        # Extract the base64 data from the data URL
-        base64_data = input_image.split(",")[1]
 
-        # Convert base64 to PIL Image
-        image_data = base64.b64decode(base64_data)
-        img = Image.open(BytesIO(image_data))
+        for idx, img_data in enumerate(images):
+            base64_data = img_data.image.split(",")[1]
+            image_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(image_data))
 
-        # Generate filename if not provided
-        if not filename:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"image_{timestamp}"
+            filename = f"image_{timestamp}_{idx}"
 
-        image_filename = f"{filename}.png"
-        output_path = os.path.join(full_output_dir, image_filename)
-        img.save(output_path)
+            image_filename = f"{filename}.png"
+            output_path = os.path.join(full_output_dir, image_filename)
+            img.save(output_path)
 
-        text_filename = f"{filename}.txt"
-        text_path = os.path.join(full_output_dir, text_filename)
-        with open(text_path, "w") as f:
-            f.write(captioned_image.caption)
+            text_filename = f"{filename}.txt"
+            text_path = os.path.join(full_output_dir, text_filename)
+            with open(text_path, "w") as f:
+                f.write(img_data.caption)
 
-        return output_path
+            saved_paths.append(output_path)
+
+        return saved_paths
 
 
 class ShowText(Node):
