@@ -3,6 +3,14 @@ import asyncio
 
 from node_utils import Node
 
+from dataclasses import dataclass
+
+
+@dataclass
+class CaptionedImage:
+    image: str
+    caption: str
+
 
 class OllamaQuery(Node):
     async def run(self) -> Tuple[str, str]:
@@ -49,14 +57,29 @@ class MultiInputNode(Node):
         # Handle both single value and list of values
         if isinstance(input_values, list):
             print("This was a list")
-            return " ".join(input_values)
-        return input_values
+            input_values = " ".join(input_values)
+        display_text = self.widgets[0]  # {"type": "textarea", "value": ""}
+        await self.update_widget("display_text", input_values)
 
 
 class ImageSource(Node):
     async def run(self) -> str:
         image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
         return image_upload
+
+
+class CaptionedImageSource(Node):
+    async def run(self) -> CaptionedImage:
+        image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
+        caption = self.widgets[1]
+        captioned_image = CaptionedImage(image_upload, caption)
+        return captioned_image
+
+
+class CaptionedImageSink(Node):
+    async def run(self, captioned_image: CaptionedImage):
+        display_text = self.widgets[0]  # {"type": "textarea", "value": ""}
+        await self.update_widget("display_text", captioned_image.caption)
 
 
 class TestImageEdit(Node):
