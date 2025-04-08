@@ -29,7 +29,25 @@ export function createPythonNode({
       }
     };
   } else {
-    // For image drop or other custom node types
+    // For file drop or other custom node types
+    const fileConfig = {
+      ImageSource: {
+        outputName: 'image_upload',
+        widgetType: 'image_file_upload',
+        dataKey: 'imageData'
+      },
+      VideoSource: {
+        outputName: 'video_upload',
+        widgetType: 'video_file_upload',
+        dataKey: 'videoData'
+      }
+    };
+
+    const config = fileConfig[nodeType];
+    if (!config) {
+      throw new Error(`Unsupported node type: ${nodeType}`);
+    }
+
     return {
       ...baseNode,
       style: {
@@ -40,19 +58,19 @@ export function createPythonNode({
         inputs: [],
         outputs: [
           {
-            name: 'image_upload',
+            name: config.outputName,
             type: '<class \'str\'>'
           }
         ],
         widgets: [
           {
-            name: 'image_upload',
-            type: 'image_file_upload',
-            value: customData.imageData || ''
+            name: config.outputName,
+            type: config.widgetType,
+            value: customData[config.dataKey] || ''
           }
         ],
         widgetValues: {
-          image_upload: customData.imageData || ''
+          [config.outputName]: customData[config.dataKey] || ''
         }
       }
     };

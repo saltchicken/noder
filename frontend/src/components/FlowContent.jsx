@@ -15,6 +15,7 @@ import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { createPythonNode } from '../utils/nodeCreation';
 import { validateImage } from '../utils/imageValidation';
+import { validateVideo } from '../utils/videoValidation';
 
 const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -174,31 +175,64 @@ const FlowContent = () => {
     const file = event.dataTransfer.files[0];
     if (!file) return;
 
-    const validation = validateImage(file);
-    if (!validation.isValid) {
-      console.warn(validation.error);
+    // Handle video files
+    if (file.type.startsWith('video/')) {
+      const validation = validateVideo(file);
+      if (!validation.isValid) {
+        console.warn(validation.error);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const position = screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
+
+        const newNode = createPythonNode({
+          position,
+          nodeType: 'VideoSource',
+          customData: {
+            videoData: e.target.result
+          }
+        });
+
+        addNodes(newNode);
+      };
+
+      reader.readAsDataURL(file);
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+    // Existing image files
+    if (file.type.startsWith('image/')) {
+      const validation = validateImage(file);
+      if (!validation.isValid) {
+        console.warn(validation.error);
+        return;
+      }
 
-      const newNode = createPythonNode({
-        position,
-        nodeType: 'ImageSource',
-        customData: {
-          imageData: e.target.result
-        }
-      });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const position = screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
 
-      addNodes(newNode);
-    };
+        const newNode = createPythonNode({
+          position,
+          nodeType: 'ImageSource',
+          customData: {
+            imageData: e.target.result
+          }
+        });
 
-    reader.readAsDataURL(file);
+        addNodes(newNode);
+      };
+
+      reader.readAsDataURL(file);
+    }
   }, [addNodes, screenToFlowPosition]);
 
   // Close the context menu if it's open whenever the window is clicked.
