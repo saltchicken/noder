@@ -1,15 +1,15 @@
 import React from 'react';
+import { validateVideo } from '../../utils/mediaValidation';
 
 const VideoFileUploadWidget = ({ widget, onChange }) => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // TODO: Add validation from mediaValidation
-    // Basic validation
-    if (!file.type.startsWith('video/')) {
-      console.warn('Please upload a valid video file');
-      event.target.value = '';
+    const validation = validateVideo(file);
+    if (!validation.isValid) {
+      console.warn(validation.error);
+      event.target.value = ''; // Reset the input
       return;
     }
 

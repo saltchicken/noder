@@ -7,6 +7,14 @@ export const ALLOWED_IMAGE_TYPES = [
   'image/bmp'
 ];
 
+export const ALLOWED_VIDEO_TYPES = [
+  'video/mp4',
+  'video/quicktime',
+  'video/x-msvideo',
+  'video/webm',
+  'video/ogg'
+];
+
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 export const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -27,10 +35,10 @@ export const validateImage = (file) => {
 export const validateVideo = (file) => {
   if (!file) return { isValid: false, error: 'No file provided' };
 
-  if (!file.type.startsWith('video/')) {
+  if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
     return {
       isValid: false,
-      error: 'Please upload a valid video file'
+      error: 'Invalid file type. Please upload a video in MP4, MOV, AVI, WebM, or OGG format.'
     };
   }
 
