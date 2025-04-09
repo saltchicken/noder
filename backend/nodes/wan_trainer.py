@@ -116,18 +116,41 @@ class SaveCaptionedMedia(Node):
 
 
 class WanVideoTrainer(Node):
-    async def run(self, directory_path: str) -> str:
-        config_path = self.widgets[0]
-        path_to_wan_video = self.widgets[1]
-        create_dataset_toml(config_path, directory_path)
-        create_wan_video_toml(
-            config_path, directory_path, config_path, model_ckpt_path=path_to_wan_video
+    async def run(self, dataset_path: str) -> str:
+        import os
+        import toml
+
+        output_path = self.widgets[0]
+        output_dir = self.widgets[1]
+        path_to_wan_video = self.widgets[2]
+
+        if os.path.exists(output_path):
+            # await self.set_status("Output path already exists. Please choose a different path.")
+            print("output path already exists.")
+            return None
+
+        print("Creating output directory if it doesn't exist")
+        os.makedirs(output_path, exist_ok=True)
+
+        dataset_config = create_dataset_toml(dataset_path)
+
+        # Write the TOML file
+        with open(os.path.join(output_path, "dataset.toml"), "w") as f:
+            toml.dump(dataset_config, f)
+
+        config = create_wan_video_toml(
+            output_dir=output_dir,
+            dataset_path=dataset_path,
+            model_ckpt_path=path_to_wan_video,
         )
-        return config_path
+
+        with open(os.path.join(output_path, "wan_video.toml"), "w") as f:
+            toml.dump(config, f)
+
+        return output_path
 
 
 def create_dataset_toml(
-    output_path: str,
     directory_path: str,
     resolutions: List[int] = [256],
     min_ar: float = 0.5,
@@ -135,7 +158,7 @@ def create_dataset_toml(
     num_ar_buckets: int = 7,
     frame_buckets: List[int] = [1, 33],
     num_repeats: int = 5,
-) -> str:
+) -> dict:
     """
     Creates a dataset.toml file for training configuration.
 
@@ -150,10 +173,8 @@ def create_dataset_toml(
         num_repeats: Number of repeats for directory
 
     Returns:
-        str: Path to the created TOML file
+        dict: TOML file
     """
-    import toml
-    import os
 
     dataset_config = {
         "resolutions": resolutions,
@@ -164,18 +185,10 @@ def create_dataset_toml(
         "directory": {"path": directory_path, "num_repeats": num_repeats},
     }
 
-    # Ensure the output directory exists
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-    # Write the TOML file
-    with open(output_path, "w") as f:
-        toml.dump(dataset_config, f)
-
-    return output_path
+    return dataset_config
 
 
 def create_wan_video_toml(
-    output_path: str,
     output_dir: str,
     dataset_path: str,
     epochs: int = 100,
@@ -190,7 +203,7 @@ def create_wan_video_toml(
     model_ckpt_path: str = "/path/to/Wan2.1-T2V-14B-480P",
     learning_rate: float = 2e-5,
     weight_decay: float = 0.01,
-) -> str:
+) -> dict:
     """
     Creates a wan_video.toml file for training configuration.
 
@@ -212,10 +225,8 @@ def create_wan_video_toml(
         weight_decay: Weight decay for optimizer
 
     Returns:
-        str: Path to the created TOML file
+        dict: TOML file
     """
-    import toml
-    import os
 
     config = {
         "output_dir": output_dir,
@@ -255,11 +266,4 @@ def create_wan_video_toml(
         },
     }
 
-    # Ensure the output directory exists
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-    # Write the TOML file
-    with open(output_path, "w") as f:
-        toml.dump(config, f)
-
-    return output_path
+    return config
