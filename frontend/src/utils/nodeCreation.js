@@ -77,3 +77,19 @@ export function createPythonNode({
   }
 }
 
+export function duplicateNode(node, pythonNodes, offset = { x: 50, y: 50 }) {
+  const pythonNode = pythonNodes.find(pNode => pNode.name === node.data.label);
+  const position = {
+    x: node.position.x + offset.x,
+    y: node.position.y + offset.y,
+  };
+
+  return createPythonNode({
+    position,
+    nodeType: node.data.label,
+    pythonNode,
+    customData: {
+      widgetValues: node.data.widgetValues
+    }
+  });
+}

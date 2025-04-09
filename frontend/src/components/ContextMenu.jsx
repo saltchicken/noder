@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { createPythonNode } from '../utils/nodeCreation';
+import { createPythonNode, duplicateNode } from '../utils/nodeCreation';
 
 export default function ContextMenu({
   id,
@@ -27,23 +27,9 @@ export default function ContextMenu({
     }, {});
   }, [pythonNodes]);
 
-  const duplicateNode = useCallback(() => {
+  const handleDuplicate = useCallback(() => {
     const node = getNode(id);
-    const position = {
-      x: node.position.x + 50,
-      y: node.position.y + 50,
-    };
-
-    const pythonNode = pythonNodes.find(pNode => pNode.name === node.data.label);
-    const newNode = createPythonNode({
-      position,
-      nodeType: node.data.label,
-      pythonNode,
-      customData: {
-        widgetValues: node.data.widgetValues // Pass the entire widgetValues object
-      }
-    });
-
+    const newNode = duplicateNode(node, pythonNodes);
     addNodes(newNode);
   }, [id, getNode, addNodes, pythonNodes]);
 
@@ -111,7 +97,7 @@ export default function ContextMenu({
             <p style={{ margin: '0.5em' }}>
               <small>node: {id}</small>
             </p>
-            <div className="context-menu-item" onClick={duplicateNode}>duplicate</div>
+            <div className="context-menu-item" onClick={handleDuplicate}>duplicate</div>
             <div className="context-menu-item" onClick={deleteNode}>delete</div>
           </>
         );
