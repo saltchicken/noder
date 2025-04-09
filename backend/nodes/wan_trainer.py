@@ -1,5 +1,6 @@
 from typing import Tuple, Union, List
 import asyncio
+import os
 
 from node_utils import Node
 
@@ -113,6 +114,49 @@ class SaveCaptionedMedia(Node):
                 saved_paths.append(video_path)
 
         return full_output_dir, saved_paths
+
+
+class CondaCommand(Node):
+    async def run(self, command: str) -> Tuple[str, str]:
+        conda_env = self.widgets[0]  # Name of conda environment
+        working_dir = self.widgets[1]  # Working directory (optional)
+        status = self.widgets[2]  # {"type": "textarea", "value": ""}
+
+        # Construct the conda run command
+        conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
+        full_command = f"{conda_exec} run -n {conda_env} {command}"
+
+        try:
+            # Run the command asynchronously
+            process = await asyncio.create_subprocess_shell(
+                full_command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=working_dir if working_dir else None,
+            )
+
+            # Wait for the command to complete and get output
+            stdout, stderr = await process.communicate()
+
+            # Decode the output
+            stdout_str = stdout.decode() if stdout else ""
+            stderr_str = stderr.decode() if stderr else ""
+
+            # Update status widget with output
+            status_text = f"Exit code: {process.returncode}\n\nSTDOUT:\n{stdout_str}\n\nSTDERR:\n{stderr_str}"
+            await self.update_widget("status", status_text)
+
+            if process.returncode != 0:
+                raise Exception(
+                    f"Command failed with exit code {process.returncode}\n{stderr_str}"
+                )
+
+            return stdout_str, stderr_str
+
+        except Exception as e:
+            error_msg = f"Error running command: {str(e)}"
+            await self.update_widget("status", error_msg)
+            raise
 
 
 class WanVideoTrainer(Node):
