@@ -118,22 +118,21 @@ class SaveCaptionedMedia(Node):
 
 class CondaCommand(Node):
     async def run(self, command: str) -> Tuple[str, str]:
-        import sys, asyncio.subprocess
         conda_env = self.widgets[0]  # Name of conda environment
         diffusion_pipe_dir = self.widgets[1]
         status = self.widgets[2]  # {"type": "textarea", "value": ""}
 
-        # Construct the conda run command
         conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
-        # full_command = f"{conda_exec} run -n {conda_env} {command}"
-        #
+
         custom_env = os.environ.copy()
         custom_env["NCCL_P2P_DISABLE"] = "1"
         custom_env["NCCL_IB_DISABLE"] = "1"
 
         full_command = f"{conda_exec} run --live-stream -n {conda_env} deepspeed --num_gpus=1 {diffusion_pipe_dir}/train.py --deepspeed --config /home/saltchicken/.local/hunyuan_training/test/hunyuan_video.toml"
         command_list = full_command.split()
+        await run_command(command_list)
 
+async def run_command(command_list):
         try:
             process = await asyncio.create_subprocess_exec(
                 *command_list, # Unpack the list into arguments
@@ -150,7 +149,7 @@ class CondaCommand(Node):
                 # Decode the bytes to string (assuming utf-8) and strip whitespace
                 line_content = line_bytes.decode('utf-8', errors='replace').strip()
                 print(f"Received: {line_content}")
-                await self.update_widget("status", line_content)
+                # await self.update_widget("status", line_content)
 
                 if "error" in line_content.lower():
                     print(f"ACTION: Found 'error'!")
