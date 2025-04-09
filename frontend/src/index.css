@@ -39,13 +39,21 @@ body {
 /* Submenus */
 .context-submenu {
   position: absolute;
-  left: calc(100% - 1px);
   top: -1px;
   background: #1e1e1e;
   border: 1px solid #333;
   box-shadow: 10px 19px 20px rgba(0, 0, 0, 30%);
   min-width: 200px;
   z-index: 1001;
+}
+
+/* Position submenu based on parent menu position */
+.context-menu:not([style*="right:"]) .context-submenu {
+  left: calc(100% - 1px); /* Default: open to the right */
+}
+
+.context-menu[style*="right:"] .context-submenu {
+  right: calc(100% - 1px); /* When parent is right-aligned: open to the left */
 }
 
 /* Classification Menu */

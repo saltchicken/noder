@@ -135,14 +135,18 @@ const FlowContent = () => {
     (event, node) => {
       event.preventDefault();
       const pane = ref.current.getBoundingClientRect();
+      const menuWidth = 200; // Approximate menu width
+
+      // If menu would overflow right edge, position from right instead of left
+      const isCloseToRightEdge = event.clientX + menuWidth > pane.width;
+
       setMenu({
         id: node.id,
         type: 'node',
         top: event.clientY < pane.height - 200 && event.clientY,
-        left: event.clientX < pane.width - 200 && event.clientX,
-        right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-        bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+        left: !isCloseToRightEdge && event.clientX,
+        right: isCloseToRightEdge && (pane.width - event.clientX),
+        bottom: event.clientY >= pane.height - 200 && pane.height - event.clientY,
       });
     },
     [setMenu],
@@ -152,13 +156,17 @@ const FlowContent = () => {
     (event) => {
       event.preventDefault();
       const pane = ref.current.getBoundingClientRect();
+      const menuWidth = 200; // Approximate menu width
+
+      // If menu would overflow right edge, position from right instead of left
+      const isCloseToRightEdge = event.clientX + menuWidth > pane.width;
+
       setMenu({
         type: 'pane',
         top: event.clientY < pane.height - 200 && event.clientY,
-        left: event.clientX < pane.width - 200 && event.clientX,
-        right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
-        bottom:
-          event.clientY >= pane.height - 200 && pane.height - event.clientY,
+        left: !isCloseToRightEdge && event.clientX,
+        right: isCloseToRightEdge && (pane.width - event.clientX),
+        bottom: event.clientY >= pane.height - 200 && pane.height - event.clientY,
       });
     },
     [setMenu],
