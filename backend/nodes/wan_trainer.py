@@ -1,6 +1,7 @@
 from typing import Tuple, Union, List
 import asyncio
 import os
+import toml
 
 from node_utils import Node
 
@@ -51,10 +52,20 @@ class RealWanTrainer(Node):
         # Create output directory if it doesn't exist
         base_output_dir = os.path.join("output")
         output_dir = self.widgets[0]
+        path_to_wan_video = self.widgets[1]
+        diffusion_pipe_dir = self.widgets[2]
+        status = self.widgets[3]  # {"type": "textarea", "value": ""}
         output_dir_dataset_input = os.path.join(base_output_dir, output_dir, 'input')
 
-        if not os.path.exists(output_dir_dataset_input):
-            os.makedirs(output_dir_dataset_input)
+        if os.path.exists(os.path.join(base_output_dir, output_dir)):
+            # await self.set_status("Output path already exists. Please choose a different path.")
+            print("output path already exists.")
+            # TODO: Better handling for directories that already exist
+            return None
+
+        print("Creating output directories since it doesn't exist")
+        os.makedirs(os.path.join(base_output_dir, output_dir), exist_ok=True)
+        os.makedirs(output_dir_dataset_input)
 
         # Handle images if present
         if captioned_images is not None:
@@ -73,6 +84,39 @@ class RealWanTrainer(Node):
                 else captioned_videos
             )
             save_captioned_videos(videos, output_dir_dataset_input)
+
+
+        dataset_config = create_dataset_toml(output_dir_dataset_input)
+
+        # Write the TOML file
+        data_set_toml_path = os.path.join(base_output_dir, output_dir, "dataset.toml")
+        with open(os.path.join(data_set_toml_path), "w") as f:
+            toml.dump(dataset_config, f)
+
+        config = create_wan_video_toml(
+            output_dir=os.path.join(base_output_dir, output_dir, 'output'),
+            dataset_path=data_set_toml_path,
+            model_ckpt_path=path_to_wan_video,
+        )
+
+        video_toml_path = os.path.join(base_output_dir, output_dir, "wan_video.toml")
+        with open(os.path.join(video_toml_path), "w") as f:
+            toml.dump(config, f)
+
+
+        conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
+
+        custom_env = os.environ.copy()
+        custom_env["NCCL_P2P_DISABLE"] = "1"
+        custom_env["NCCL_IB_DISABLE"] = "1"
+
+        conda_env = "diffusion-pipe"
+        print("RUNNING")
+        full_command = f"{conda_exec} run --live-stream -n {conda_env} deepspeed --num_gpus=1 {diffusion_pipe_dir}/train.py --deepspeed --config {video_toml_path}"
+        print(full_command)
+        print("RUNNING")
+        command_list = full_command.split()
+        await run_command(command_list)
 
         return output_dir_dataset_input
 
@@ -125,6 +169,9 @@ class CondaCommand(Node):
         custom_env["NCCL_IB_DISABLE"] = "1"
 
         full_command = f"{conda_exec} run --live-stream -n {conda_env} deepspeed --num_gpus=1 {diffusion_pipe_dir}/train.py --deepspeed --config /home/saltchicken/.local/hunyuan_training/test/hunyuan_video.toml"
+        print("RUNNING")
+        print(full_command)
+        print("RUNNING")
         command_list = full_command.split()
         await run_command(command_list)
 
@@ -179,40 +226,6 @@ async def run_command(command_list):
             print(f"An error occurred: {e}", file=sys.stderr)
             # Ensure process is cleaned up if an error occurred during execution
             if process and process.returncode is None: process.kill()
-
-class WanVideoTrainer(Node):
-    async def run(self, dataset_path: str) -> str:
-        import os
-        import toml
-
-        output_path = self.widgets[0]
-        output_dir = self.widgets[1]
-        path_to_wan_video = self.widgets[2]
-
-        if os.path.exists(output_path):
-            # await self.set_status("Output path already exists. Please choose a different path.")
-            print("output path already exists.")
-            return None
-
-        print("Creating output directory if it doesn't exist")
-        os.makedirs(output_path, exist_ok=True)
-
-        dataset_config = create_dataset_toml(dataset_path)
-
-        # Write the TOML file
-        with open(os.path.join(output_path, "dataset.toml"), "w") as f:
-            toml.dump(dataset_config, f)
-
-        config = create_wan_video_toml(
-            output_dir=output_dir,
-            dataset_path=dataset_path,
-            model_ckpt_path=path_to_wan_video,
-        )
-
-        with open(os.path.join(output_path, "wan_video.toml"), "w") as f:
-            toml.dump(config, f)
-
-        return output_path
 
 
 def create_dataset_toml(
