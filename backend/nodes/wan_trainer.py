@@ -39,7 +39,7 @@ class CaptionedImageSource(Node):
         return captioned_image
 
 
-class SaveCaptionedMedia(Node):
+class RealWanTrainer(Node):
     async def run(
         self,
         captioned_images: Union[CaptionedImage, List[CaptionedImage]] = None,
@@ -51,10 +51,10 @@ class SaveCaptionedMedia(Node):
         # Create output directory if it doesn't exist
         base_output_dir = os.path.join("output")
         output_dir = self.widgets[0]
-        full_output_dir = os.path.join(base_output_dir, output_dir)
+        output_dir_dataset_input = os.path.join(base_output_dir, output_dir, 'input')
 
-        if not os.path.exists(full_output_dir):
-            os.makedirs(full_output_dir)
+        if not os.path.exists(output_dir_dataset_input):
+            os.makedirs(output_dir_dataset_input)
 
         # Handle images if present
         if captioned_images is not None:
@@ -63,7 +63,7 @@ class SaveCaptionedMedia(Node):
                 if isinstance(captioned_images, CaptionedImage)
                 else captioned_images
             )
-            save_captioned_images(images, full_output_dir)
+            save_captioned_images(images, output_dir_dataset_input)
 
         # Handle videos if present
         if captioned_videos is not None:
@@ -72,9 +72,9 @@ class SaveCaptionedMedia(Node):
                 if isinstance(captioned_videos, CaptionedVideo)
                 else captioned_videos
             )
-            save_captioned_videos(videos, full_output_dir)
+            save_captioned_videos(videos, output_dir_dataset_input)
 
-        return full_output_dir
+        return output_dir_dataset_input
 
 def save_captioned_images(captioned_images, output_dir):
         for idx, img_data in enumerate(captioned_images):
