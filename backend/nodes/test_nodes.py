@@ -29,3 +29,32 @@ class Bar(Node):
         test_test = self.widgets[0]
 
         return BarOutput, BarOutput2
+
+
+class TestImageEdit(Node):
+    async def run(self) -> str:
+        from PIL import Image, ImageDraw
+        import base64
+        from io import BytesIO
+
+        img = Image.new("RGB", (200, 200), color="white")
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([50, 50, 150, 150], fill="red")
+
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        base64_str = base64.b64encode(buffered.getvalue()).decode()
+        img_str = f"data:image/png;base64,{base64_str}"
+        display_image = self.widgets[0]  # {"type": "image", "value": ""}
+        await self.update_widget("display_image", img_str)
+        return img_str
+
+
+class MultiInputNode(Node):
+    async def run(self, input_values: Union[str, List[str]]) -> str:
+        # Handle both single value and list of values
+        if isinstance(input_values, list):
+            print("This was a list")
+            input_values = " ".join(input_values)
+        display_text = self.widgets[0]  # {"type": "textarea", "value": ""}
+        await self.update_widget("display_text", input_values)
