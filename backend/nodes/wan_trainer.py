@@ -12,6 +12,7 @@ from datetime import datetime
 from io import BytesIO
 from PIL import Image
 
+
 @dataclass
 class CaptionedImage:
     image: str
@@ -46,7 +47,6 @@ class RealWanTrainer(Node):
         captioned_images: Union[CaptionedImage, List[CaptionedImage]] = None,
         captioned_videos: Union[CaptionedVideo, List[CaptionedVideo]] = None,
     ) -> str:
-
         # TODO: Handle if nothing is passed to the input
 
         # Create output directory if it doesn't exist
@@ -55,7 +55,7 @@ class RealWanTrainer(Node):
         path_to_wan_video = self.widgets[1]
         diffusion_pipe_dir = self.widgets[2]
         status = self.widgets[3]  # {"type": "textarea", "value": ""}
-        output_dir_dataset_input = os.path.join(base_output_dir, output_dir, 'input')
+        output_dir_dataset_input = os.path.join(base_output_dir, output_dir, "input")
 
         if os.path.exists(os.path.join(base_output_dir, output_dir)):
             # await self.set_status("Output path already exists. Please choose a different path.")
@@ -85,7 +85,6 @@ class RealWanTrainer(Node):
             )
             save_captioned_videos(videos, output_dir_dataset_input)
 
-
         dataset_config = create_dataset_toml(output_dir_dataset_input)
 
         # Write the TOML file
@@ -94,7 +93,7 @@ class RealWanTrainer(Node):
             toml.dump(dataset_config, f)
 
         config = create_wan_video_toml(
-            output_dir=os.path.join(base_output_dir, output_dir, 'output'),
+            output_dir=os.path.join(base_output_dir, output_dir, "output"),
             dataset_path=data_set_toml_path,
             model_ckpt_path=path_to_wan_video,
         )
@@ -102,7 +101,6 @@ class RealWanTrainer(Node):
         video_toml_path = os.path.join(base_output_dir, output_dir, "wan_video.toml")
         with open(os.path.join(video_toml_path), "w") as f:
             toml.dump(config, f)
-
 
         conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
 
@@ -120,41 +118,44 @@ class RealWanTrainer(Node):
 
         return output_dir_dataset_input
 
+
 def save_captioned_images(captioned_images, output_dir):
-        for idx, img_data in enumerate(captioned_images):
-            base64_data = img_data.image.split(",")[1]
-            image_data = base64.b64decode(base64_data)
-            img = Image.open(BytesIO(image_data))
+    for idx, img_data in enumerate(captioned_images):
+        base64_data = img_data.image.split(",")[1]
+        image_data = base64.b64decode(base64_data)
+        img = Image.open(BytesIO(image_data))
 
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"image_{timestamp}_{idx}"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"image_{timestamp}_{idx}"
 
-            image_filename = f"{filename}.png"
-            output_path = os.path.join(output_dir, image_filename)
-            img.save(output_path)
+        image_filename = f"{filename}.png"
+        output_path = os.path.join(output_dir, image_filename)
+        img.save(output_path)
 
-            text_filename = f"{filename}.txt"
-            text_path = os.path.join(output_dir, text_filename)
-            with open(text_path, "w") as f:
-                f.write(img_data.caption)
+        text_filename = f"{filename}.txt"
+        text_path = os.path.join(output_dir, text_filename)
+        with open(text_path, "w") as f:
+            f.write(img_data.caption)
+
 
 def save_captioned_videos(captioned_videos, output_dir):
-        for idx, video_data in enumerate(captioned_videos):
-            base64_data = video_data.video.split(",")[1]
-            video_bytes = base64.b64decode(base64_data)
+    for idx, video_data in enumerate(captioned_videos):
+        base64_data = video_data.video.split(",")[1]
+        video_bytes = base64.b64decode(base64_data)
 
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"video_{timestamp}_{idx}"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"video_{timestamp}_{idx}"
 
-            video_filename = f"{filename}.mp4"
-            video_path = os.path.join(output_dir, video_filename)
-            with open(video_path, "wb") as f:
-                f.write(video_bytes)
+        video_filename = f"{filename}.mp4"
+        video_path = os.path.join(output_dir, video_filename)
+        with open(video_path, "wb") as f:
+            f.write(video_bytes)
 
-            text_filename = f"{filename}.txt"
-            text_path = os.path.join(output_dir, text_filename)
-            with open(text_path, "w") as f:
-                f.write(video_data.caption)
+        text_filename = f"{filename}.txt"
+        text_path = os.path.join(output_dir, text_filename)
+        with open(text_path, "w") as f:
+            f.write(video_data.caption)
+
 
 class CondaCommand(Node):
     async def run(self, command: str) -> Tuple[str, str]:
@@ -175,57 +176,68 @@ class CondaCommand(Node):
         command_list = full_command.split()
         await run_command(command_list)
 
+
 async def run_command(command_list):
-        try:
-            process = await asyncio.create_subprocess_exec(
-                *command_list, # Unpack the list into arguments
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.STDOUT # Merge stderr into stdout
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *command_list,  # Unpack the list into arguments
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
+        )
+
+        while True:
+            line_bytes = await process.stdout.readline()
+
+            if not line_bytes:
+                break
+
+            # Decode the bytes to string (assuming utf-8) and strip whitespace
+            line_content = line_bytes.decode("utf-8", errors="replace").strip()
+            print(f"Received: {line_content}")
+            # await self.update_widget("status", line_content)
+
+            if "error" in line_content.lower():
+                print(f"ACTION: Found 'error'!")
+                # process.terminate()
+                # try:
+                #     # Wait briefly for graceful termination
+                #     await asyncio.wait_for(process.wait(), timeout=2.0)
+                # except asyncio.TimeoutError:
+                #     print("ACTION: Process did not terminate gracefully, killing.")
+                #     process.kill()
+                # break
+
+            await asyncio.sleep(0.01)  # Yield control briefly
+
+        await process.wait()
+        print(f"--- Command finished with exit code: {process.returncode} ---")
+
+        if process.returncode != 0:
+            print(
+                f"Warning: Command exited with non-zero status ({process.returncode})."
             )
 
-            while True:
-                line_bytes = await process.stdout.readline()
+    except FileNotFoundError:
+        # Check if 'conda' itself wasn't found
+        if command_list[0] == "conda":
+            print(
+                "Error: 'conda' command not found. Is Conda installed and in your PATH?",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"Error: Command or script not found within the environment: {command_list}",
+                file=sys.stderr,
+            )
+        # Ensure process is cleaned up if creation failed partially (unlikely here, but good practice)
+        if process and process.returncode is None:
+            process.kill()
 
-                if not line_bytes:
-                    break
-
-                # Decode the bytes to string (assuming utf-8) and strip whitespace
-                line_content = line_bytes.decode('utf-8', errors='replace').strip()
-                print(f"Received: {line_content}")
-                # await self.update_widget("status", line_content)
-
-                if "error" in line_content.lower():
-                    print(f"ACTION: Found 'error'!")
-                    # process.terminate()
-                    # try:
-                    #     # Wait briefly for graceful termination
-                    #     await asyncio.wait_for(process.wait(), timeout=2.0)
-                    # except asyncio.TimeoutError:
-                    #     print("ACTION: Process did not terminate gracefully, killing.")
-                    #     process.kill()
-                    # break
-
-                await asyncio.sleep(0.01) # Yield control briefly
-
-            await process.wait()
-            print(f"--- Command finished with exit code: {process.returncode} ---")
-
-            if process.returncode != 0:
-                print(f"Warning: Command exited with non-zero status ({process.returncode}).")
-
-        except FileNotFoundError:
-            # Check if 'conda' itself wasn't found
-            if command_list[0] == 'conda':
-                print("Error: 'conda' command not found. Is Conda installed and in your PATH?", file=sys.stderr)
-            else:
-                print(f"Error: Command or script not found within the environment: {command_list}", file=sys.stderr)
-            # Ensure process is cleaned up if creation failed partially (unlikely here, but good practice)
-            if process and process.returncode is None: process.kill()
-
-        except Exception as e:
-            print(f"An error occurred: {e}", file=sys.stderr)
-            # Ensure process is cleaned up if an error occurred during execution
-            if process and process.returncode is None: process.kill()
+    except Exception as e:
+        print(f"An error occurred: {e}", file=sys.stderr)
+        # Ensure process is cleaned up if an error occurred during execution
+        if process and process.returncode is None:
+            process.kill()
 
 
 def create_dataset_toml(
@@ -260,7 +272,7 @@ def create_dataset_toml(
         "max_ar": max_ar,
         "num_ar_buckets": num_ar_buckets,
         "frame_buckets": frame_buckets,
-        "directory": {"path": directory_path, "num_repeats": num_repeats},
+        "directory": [{"path": directory_path, "num_repeats": num_repeats}],
     }
 
     return dataset_config
