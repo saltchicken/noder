@@ -14,8 +14,7 @@ import PanelControls from './PanelControls';
 import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { createPythonNode } from '../utils/nodeCreation';
-import { validateImage } from '../utils/imageValidation';
-import { validateVideo } from '../utils/videoValidation';
+import { validateImage, validateVideo } from '../utils/mediaValidation';
 
 const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);

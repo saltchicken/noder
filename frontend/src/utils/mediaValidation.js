@@ -8,6 +8,7 @@ export const ALLOWED_IMAGE_TYPES = [
 ];
 
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const validateImage = (file) => {
   if (!file) return { isValid: false, error: 'No file provided' };
@@ -21,5 +22,28 @@ export const validateImage = (file) => {
   }
 
   return { isValid: true };
+};
+
+export const validateVideo = (file) => {
+  if (!file) return { isValid: false, error: 'No file provided' };
+
+  if (!file.type.startsWith('video/')) {
+    return {
+      isValid: false,
+      error: 'Please upload a valid video file'
+    };
+  }
+
+  if (file.size > MAX_VIDEO_SIZE) {
+    return {
+      isValid: false,
+      error: 'Video file is too large (max 10MB)'
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null
+  };
 };
 
