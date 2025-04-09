@@ -6,6 +6,10 @@ from node_utils import Node
 
 from dataclasses import dataclass
 
+import base64
+from datetime import datetime
+from io import BytesIO
+from PIL import Image
 
 @dataclass
 class CaptionedImage:
@@ -40,12 +44,7 @@ class SaveCaptionedMedia(Node):
         self,
         captioned_images: Union[CaptionedImage, List[CaptionedImage]] = None,
         captioned_videos: Union[CaptionedVideo, List[CaptionedVideo]] = None,
-    ) -> Tuple[str, List[str]]:
-        import base64
-        import os
-        from datetime import datetime
-        from io import BytesIO
-        from PIL import Image
+    ) -> str:
 
         # TODO: Handle if nothing is passed to the input
 
@@ -57,8 +56,6 @@ class SaveCaptionedMedia(Node):
         if not os.path.exists(full_output_dir):
             os.makedirs(full_output_dir)
 
-        saved_paths = []
-
         # Handle images if present
         if captioned_images is not None:
             images = (
@@ -66,25 +63,7 @@ class SaveCaptionedMedia(Node):
                 if isinstance(captioned_images, CaptionedImage)
                 else captioned_images
             )
-
-            for idx, img_data in enumerate(images):
-                base64_data = img_data.image.split(",")[1]
-                image_data = base64.b64decode(base64_data)
-                img = Image.open(BytesIO(image_data))
-
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"image_{timestamp}_{idx}"
-
-                image_filename = f"{filename}.png"
-                output_path = os.path.join(full_output_dir, image_filename)
-                img.save(output_path)
-
-                text_filename = f"{filename}.txt"
-                text_path = os.path.join(full_output_dir, text_filename)
-                with open(text_path, "w") as f:
-                    f.write(img_data.caption)
-
-                saved_paths.append(output_path)
+            save_captioned_images(images, full_output_dir)
 
         # Handle videos if present
         if captioned_videos is not None:
@@ -93,28 +72,45 @@ class SaveCaptionedMedia(Node):
                 if isinstance(captioned_videos, CaptionedVideo)
                 else captioned_videos
             )
+            save_captioned_videos(videos, full_output_dir)
 
-            for idx, video_data in enumerate(videos):
-                base64_data = video_data.video.split(",")[1]
-                video_bytes = base64.b64decode(base64_data)
+        return full_output_dir
 
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"video_{timestamp}_{idx}"
+def save_captioned_images(captioned_images, output_dir):
+        for idx, img_data in enumerate(captioned_images):
+            base64_data = img_data.image.split(",")[1]
+            image_data = base64.b64decode(base64_data)
+            img = Image.open(BytesIO(image_data))
 
-                video_filename = f"{filename}.mp4"
-                video_path = os.path.join(full_output_dir, video_filename)
-                with open(video_path, "wb") as f:
-                    f.write(video_bytes)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"image_{timestamp}_{idx}"
 
-                text_filename = f"{filename}.txt"
-                text_path = os.path.join(full_output_dir, text_filename)
-                with open(text_path, "w") as f:
-                    f.write(video_data.caption)
+            image_filename = f"{filename}.png"
+            output_path = os.path.join(output_dir, image_filename)
+            img.save(output_path)
 
-                saved_paths.append(video_path)
+            text_filename = f"{filename}.txt"
+            text_path = os.path.join(output_dir, text_filename)
+            with open(text_path, "w") as f:
+                f.write(img_data.caption)
 
-        return full_output_dir, saved_paths
+def save_captioned_videos(captioned_videos, output_dir):
+        for idx, video_data in enumerate(captioned_videos):
+            base64_data = video_data.video.split(",")[1]
+            video_bytes = base64.b64decode(base64_data)
 
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"video_{timestamp}_{idx}"
+
+            video_filename = f"{filename}.mp4"
+            video_path = os.path.join(output_dir, video_filename)
+            with open(video_path, "wb") as f:
+                f.write(video_bytes)
+
+            text_filename = f"{filename}.txt"
+            text_path = os.path.join(output_dir, text_filename)
+            with open(text_path, "w") as f:
+                f.write(video_data.caption)
 
 class CondaCommand(Node):
     async def run(self, command: str) -> Tuple[str, str]:
