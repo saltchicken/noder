@@ -16,6 +16,22 @@ export default function ContextMenu({
   const [activeSubmenu, setActiveSubmenu] = useState(null);
   const [activeClassification, setActiveClassification] = useState(null);
 
+  const toggleCollapse = useCallback(() => {
+    setNodes((nodes) =>
+      nodes.map((node) =>
+        node.id === id
+          ? {
+            ...node,
+            data: {
+              ...node.data,
+              isCollapsed: !node.data.isCollapsed,
+            },
+          }
+          : node
+      )
+    );
+  }, [id, setNodes]);
+
   const nodesByClassification = React.useMemo(() => {
     return pythonNodes.reduce((acc, node) => {
       const classification = node.classification || 'Other';
@@ -92,13 +108,23 @@ export default function ContextMenu({
   const renderMenuContent = () => {
     switch (type) {
       case 'node':
+        const node = getNode(id);
+        const isCollapsed = node?.data?.isCollapsed;
+
         return (
           <>
             <p style={{ margin: '0.5em' }}>
               <small>node: {id}</small>
             </p>
-            <div className="context-menu-item" onClick={handleDuplicate}>duplicate</div>
-            <div className="context-menu-item" onClick={deleteNode}>delete</div>
+            <div className="context-menu-item" onClick={handleDuplicate}>
+              duplicate
+            </div>
+            <div className="context-menu-item" onClick={deleteNode}>
+              delete
+            </div>
+            <div className="context-menu-item" onClick={toggleCollapse}>
+              {isCollapsed ? 'expand' : 'collapse'}
+            </div>
           </>
         );
       case 'pane':

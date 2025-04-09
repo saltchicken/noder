@@ -31,6 +31,14 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
     return values;
   });
 
+  const [isCollapsed, setIsCollapsed] = useState(data.isCollapsed || false)
+
+  useEffect(() => {
+    if (data.isCollapsed !== undefined) {
+      setIsCollapsed(data.isCollapsed);
+    }
+  }, [data.isCollapsed]);
+
   // Sync widgetValues when updates come from backend
   useEffect(() => {
     if (data.widgetValues) {
@@ -160,25 +168,29 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           ))}
         </div>
       </div>
+      {!isCollapsed && (
+        <>
 
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        padding: '10px 0'
-      }}>
-        {widgets.map((widget) => renderWidget(widget))}
-      </div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            padding: '10px 0'
+          }}>
+            {widgets.map((widget) => renderWidget(widget))}
+          </div>
 
-      <NodeResizeControl style={{
-        background: 'transparent',
-        border: 'none',
-        position: 'absolute',
-        bottom: '5px',
-        right: '5px'
-      }} minWidth={100}>
-        <ResizeIcon />
-      </NodeResizeControl>
+          <NodeResizeControl style={{
+            background: 'transparent',
+            border: 'none',
+            position: 'absolute',
+            bottom: '5px',
+            right: '5px'
+          }} minWidth={100}>
+            <ResizeIcon />
+          </NodeResizeControl>
+        </>
+      )}
     </div>
   );
 }
