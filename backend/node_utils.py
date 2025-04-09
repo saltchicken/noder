@@ -228,14 +228,14 @@ def get_run_methods(module):
                         }
                         inputs.append(input_dict)
 
-                print(f"{class_name}.run: {inputs}")
+                # print(f"{class_name}.run: {inputs}")
 
                 # Handle outputs
 
                 outputs = []
                 if returned_vars:
                     if hasattr(return_annotation, "__args__"):
-                        print(return_annotation.__args__)
+                        # print(return_annotation.__args__)
                         for var, type_arg in zip(
                             returned_vars, return_annotation.__args__
                         ):
@@ -315,5 +315,5 @@ def get_python_classes():
             except Exception as e:
                 print(f"Error loading {file_name}: {str(e)}")
 
-    print(python_classes)
+    # print(python_classes)
     return python_classes

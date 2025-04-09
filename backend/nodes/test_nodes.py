@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union, List
 import asyncio
 
 from node_utils import Node
