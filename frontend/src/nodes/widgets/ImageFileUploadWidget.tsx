@@ -1,4 +1,4 @@
-import { validateImage } from '../../utils/imageValidation';
+import { validateImage } from '../../utils/mediaValidation';
 
 const ImageFileUploadWidget = ({ widget, onChange }) => {
   const handleFileChange = (event) => {

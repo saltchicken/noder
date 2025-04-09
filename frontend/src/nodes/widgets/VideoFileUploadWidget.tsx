@@ -5,6 +5,7 @@ const VideoFileUploadWidget = ({ widget, onChange }) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // TODO: Add validation from mediaValidation
     // Basic validation
     if (!file.type.startsWith('video/')) {
       console.warn('Please upload a valid video file');
