@@ -118,45 +118,104 @@ class SaveCaptionedMedia(Node):
 
 class CondaCommand(Node):
     async def run(self, command: str) -> Tuple[str, str]:
+        import shlex, sys, asyncio.subprocess
         conda_env = self.widgets[0]  # Name of conda environment
         working_dir = self.widgets[1]  # Working directory (optional)
         status = self.widgets[2]  # {"type": "textarea", "value": ""}
 
         # Construct the conda run command
         conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
-        full_command = f"{conda_exec} run -n {conda_env} {command}"
+        # full_command = f"{conda_exec} run -n {conda_env} {command}"
+
+        full_command = f"{conda_exec} run --live-stream -n {conda_env} python -u dummy_script.py"
+        command_list = full_command.split()
+
+        # command_str = ' '.join(shlex.quote(arg) for arg in command_list)
+        # print(f"--- Starting command asynchronously: {command_str} ---")
+
+        process = None # Initialize process variable
 
         try:
-            # Run the command asynchronously
-            process = await asyncio.create_subprocess_shell(
-                full_command,
+            # Start the subprocess asynchronously
+            # Use asyncio.subprocess.PIPE and .STDOUT
+            process = await asyncio.create_subprocess_exec(
+                *command_list, # Unpack the list into arguments
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=working_dir if working_dir else None,
+                stderr=asyncio.subprocess.STDOUT # Merge stderr into stdout
+                # Note: create_subprocess_exec handles bytes, so no 'text=True' or 'encoding'.
+                # We will decode manually. 'bufsize' is not typically needed here.
             )
 
-            # Wait for the command to complete and get output
-            stdout, stderr = await process.communicate()
+            # Read output line by line while the process is running
+            # process.stdout is an asyncio.StreamReader
+            while True:
+                # await readline() reads bytes until a newline or EOF
+                # It yields control if no data is available yet (non-blocking)
+                line_bytes = await process.stdout.readline()
 
-            # Decode the output
-            stdout_str = stdout.decode() if stdout else ""
-            stderr_str = stderr.decode() if stderr else ""
+                # If readline returns empty bytes, the stream is closed (EOF)
+                if not line_bytes:
+                    break
 
-            # Update status widget with output
-            status_text = f"Exit code: {process.returncode}\n\nSTDOUT:\n{stdout_str}\n\nSTDERR:\n{stderr_str}"
-            await self.update_widget("status", status_text)
+                # Decode the bytes to string (assuming utf-8) and strip whitespace
+                line_content = line_bytes.decode('utf-8', errors='replace').strip()
+                print(f"Received: {line_content}")
+                await self.update_widget("status", line_content)
+
+                # --- YOUR ASYNCHRONOUS ACTION GOES HERE ---
+                # This block can now 'await' other async operations if needed
+                # without blocking the entire script.
+                if "error" in line_content.lower():
+                    print(f"ACTION: Found 'error'!")
+                    # Example: await send_alert_async("Error found in subprocess!")
+                    # You could also decide to terminate the process:
+                    # print("ACTION: Terminating process due to error.")
+                    # process.terminate()
+                    # try:
+                    #     # Wait briefly for graceful termination
+                    #     await asyncio.wait_for(process.wait(), timeout=2.0)
+                    # except asyncio.TimeoutError:
+                    #     print("ACTION: Process did not terminate gracefully, killing.")
+                    #     process.kill()
+                    # break # Exit reading loop
+
+                elif "warning" in line_content.lower():
+                    print(f"ACTION: Logged a warning: {line_content}")
+                    # Example: await log_warning_async(line_content)
+
+                # Simulate some other async work happening concurrently
+                # await asyncio.sleep(0.01) # Yield control briefly
+
+                # --- END OF YOUR ASYNCHRONOUS ACTION ---
+
+            # Wait for the process to complete and get the exit code
+            # await process.wait() ensures we don't exit before the process finishes
+            await process.wait()
+            print(f"--- Command finished with exit code: {process.returncode} ---")
 
             if process.returncode != 0:
-                raise Exception(
-                    f"Command failed with exit code {process.returncode}\n{stderr_str}"
-                )
+                print(f"Warning: Command exited with non-zero status ({process.returncode}).")
 
-            return stdout_str, stderr_str
+        except FileNotFoundError:
+            # Check if 'conda' itself wasn't found
+            if command_list[0] == 'conda':
+                print("Error: 'conda' command not found. Is Conda installed and in your PATH?", file=sys.stderr)
+            else:
+                print(f"Error: Command or script not found within the environment: {command_list}", file=sys.stderr)
+            # Ensure process is cleaned up if creation failed partially (unlikely here, but good practice)
+            if process and process.returncode is None: process.kill()
 
         except Exception as e:
-            error_msg = f"Error running command: {str(e)}"
-            await self.update_widget("status", error_msg)
-            raise
+            print(f"An error occurred: {e}", file=sys.stderr)
+            # Ensure process is cleaned up if an error occurred during execution
+            if process and process.returncode is None: process.kill()
+
+
+
+
+
+
+
 
 
 class WanVideoTrainer(Node):
