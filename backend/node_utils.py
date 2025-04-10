@@ -188,6 +188,14 @@ def get_returned_variables(source_code, function_name):
 def get_run_methods(module):
     run_methods = {}
 
+    def clean_type_str(type_str):
+        """Helper function to clean type strings"""
+        if type_str.startswith("<class '") and type_str.endswith("'>"):
+            # Extract the class name and remove any module prefix
+            class_name = type_str[8:-2]  # Remove "<class '" and "'>"
+            return f"<class '{class_name.split('.')[-1]}'>"
+        return type_str
+
     for class_name, cls in inspect.getmembers(module, inspect.isclass):
         if class_name == "Node":
             continue
@@ -212,7 +220,7 @@ def get_run_methods(module):
                 for param_name, param in signature.parameters.items():
                     if param_name != "self":  # Skip self parameter
                         param_type = param.annotation
-                        type_str = str(param.annotation)
+                        type_str = clean_type_str(str(param_type))
                         accepts_multiple = False
 
                         # Handle Union types
@@ -220,7 +228,7 @@ def get_run_methods(module):
                             if param_type.__origin__ is Union:
                                 # Get the base type (either str or custom class)
                                 base_type = param_type.__args__[0]
-                                type_str = str(base_type)
+                                type_str = clean_type_str(str(base_type))
 
                                 # Check if List[type] is in the Union
                                 list_type = next(
@@ -241,27 +249,23 @@ def get_run_methods(module):
                         }
                         inputs.append(input_dict)
 
-                # print(f"{class_name}.run: {inputs}")
-
                 # Handle outputs
-
                 outputs = []
                 if returned_vars:
                     if hasattr(return_annotation, "__args__"):
-                        # print(return_annotation.__args__)
                         for var, type_arg in zip(
                             returned_vars, return_annotation.__args__
                         ):
-                            outputs.append({"name": var, "type": str(type_arg)})
+                            type_str = clean_type_str(str(type_arg))
+                            outputs.append({"name": var, "type": type_str})
                     else:
                         for var in returned_vars:
-                            outputs.append(
-                                {"name": var, "type": str(return_annotation)}
-                            )
+                            type_str = clean_type_str(str(return_annotation))
+                            outputs.append({"name": var, "type": type_str})
 
                 run_methods[f"{class_name}.run"] = {
                     "parameters": inputs,
-                    "return_type": str(return_annotation)
+                    "return_type": clean_type_str(str(return_annotation))
                     if return_annotation != inspect.Signature.empty
                     else "None",
                     "returned_variables": returned_vars,

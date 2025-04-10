@@ -39,7 +39,7 @@ export function createPythonNode({
           },
           {
             name: 'captioned_image',
-            type: '<class \'script.CaptionedImage\'>'
+            type: '<class \'CaptionedImage\'>'
           }
         ],
         widgets: [
@@ -64,7 +64,7 @@ export function createPythonNode({
           },
           {
             name: 'captioned_video',
-            type: '<class \'script.CaptionedVideo\'>'
+            type: '<class \'CaptionedVideo\'>'
           }
         ],
         widgets: [
