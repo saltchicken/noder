@@ -281,56 +281,82 @@ def get_run_methods(module):
 def load_script(script_path):
     spec = importlib.util.spec_from_file_location("script", script_path)
     module = importlib.util.module_from_spec(spec)
+    module.Node = Node
+    module.CaptionedImage = CaptionedImage
+    module.CaptionedVideo = CaptionedVideo
     spec.loader.exec_module(module)
     return module
 
 
+def get_node_directories():
+    """Get all node directories including the base nodes dir and plugin directories"""
+    # Base nodes directory
+    node_directories = ["nodes"]
+
+    # Add plugin directories if plugins folder exists
+    plugins_dir = "../plugins"
+    if os.path.exists(plugins_dir) and os.path.isdir(plugins_dir):
+        for item in os.listdir(plugins_dir):
+            full_path = os.path.join(plugins_dir, item)
+            if os.path.isdir(full_path):
+                node_directories.append(full_path)
+
+    return node_directories
+
+
 def get_python_classes():
-    node_directory = "nodes"
     python_classes = []
+    node_directories = get_node_directories()
 
-    for file_name in os.listdir(node_directory):
-        if file_name.endswith(".py"):
-            script_path = os.path.join(node_directory, file_name)
-            try:
-                # Get classification from filename (remove .py and convert to title case)
-                classification = (
-                    os.path.splitext(file_name)[0].replace("_", " ").title()
-                )
+    for node_directory in node_directories:
+        if not os.path.exists(node_directory):
+            continue
 
-                module = load_script(script_path)
-                run_methods = get_run_methods(module)
+        print(f"Get python classes from {node_directory}")
+        for file_name in os.listdir(node_directory):
+            if file_name.endswith(".py"):
+                script_path = os.path.join(node_directory, file_name)
+                try:
+                    # Get classification from filename (remove .py and convert to title case)
+                    classification = (
+                        os.path.splitext(file_name)[0].replace("_", " ").title()
+                    )
 
-                inputs = {}
-                outputs = {}
-                widgets = {}
-                for name, info in run_methods.items():
-                    cls_name = name.split(".")[0]
-                    inputs[cls_name] = info["parameters"]
-                    outputs[cls_name] = info["outputs"]
-                    widgets[cls_name] = info["widgets"]
+                    module = load_script(script_path)
+                    run_methods = get_run_methods(module)
 
-                # Add classes from this module with classification
-                module_classes = [
-                    {
-                        "name": cls_name,
-                        "inputs": inputs.get(cls_name, []),
-                        "outputs": outputs.get(cls_name, []),
-                        "widgets": widgets.get(cls_name, []),
-                        "class": cls_obj,
-                        "source_file": file_name,
-                        "classification": classification,  # Add classification field
-                    }
-                    for cls_name, cls_obj in inspect.getmembers(module, inspect.isclass)
-                    if inspect.isclass(cls_obj)
-                    and cls_name != "Node"
-                    and hasattr(cls_obj, "run")
-                ]
+                    inputs = {}
+                    outputs = {}
+                    widgets = {}
+                    for name, info in run_methods.items():
+                        cls_name = name.split(".")[0]
+                        inputs[cls_name] = info["parameters"]
+                        outputs[cls_name] = info["outputs"]
+                        widgets[cls_name] = info["widgets"]
 
-                python_classes.extend(module_classes)
+                    # Add classes from this module with classification
+                    module_classes = [
+                        {
+                            "name": cls_name,
+                            "inputs": inputs.get(cls_name, []),
+                            "outputs": outputs.get(cls_name, []),
+                            "widgets": widgets.get(cls_name, []),
+                            "class": cls_obj,
+                            "source_file": file_name,
+                            "classification": classification,  # Add classification field
+                        }
+                        for cls_name, cls_obj in inspect.getmembers(
+                            module, inspect.isclass
+                        )
+                        if inspect.isclass(cls_obj)
+                        and cls_name != "Node"
+                        and hasattr(cls_obj, "run")
+                    ]
 
-            except Exception as e:
-                print(f"Error loading {file_name}: {str(e)}")
+                    python_classes.extend(module_classes)
+
+                except Exception as e:
+                    print(f"Error loading {file_name}: {str(e)}")
 
     # print(python_classes)
     return python_classes
