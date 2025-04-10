@@ -1,6 +1,5 @@
 import React, { useCallback, memo, useMemo, useState, useEffect } from 'react';
 
-import { NodeResizeControl } from '@xyflow/react';
 import InputWidget from './widgets/InputWidget.tsx';
 import DropdownWidget from './widgets/DropdownWidget.tsx';
 import SliderWidget from './widgets/SliderWidget.tsx';
@@ -180,42 +179,11 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
             {widgets.map((widget) => renderWidget(widget))}
           </div>
 
-          <NodeResizeControl style={{
-            background: 'transparent',
-            border: 'none',
-            position: 'absolute',
-            bottom: '5px',
-            right: '5px'
-          }} minWidth={100}>
-            <ResizeIcon />
-          </NodeResizeControl>
         </>
       )}
     </div>
   );
 }
-
-const ResizeIcon = memo(() => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    strokeWidth="2"
-    stroke="#ff0071"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ position: 'absolute', right: 5, bottom: 5 }}
-  >
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <polyline points="16 20 20 20 20 16" />
-    <line x1="14" y1="14" x2="20" y2="20" />
-    <polyline points="8 4 4 4 4 8" />
-    <line x1="4" y1="4" x2="10" y2="10" />
-  </svg>
-));
-
 
 export default memo(PythonNode, (prevProps, nextProps) => {
   return JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data);
