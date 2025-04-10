@@ -14,7 +14,6 @@ export function createPythonNode({
   };
 
   if (pythonNode) {
-    // For context menu node creation
     return {
       ...baseNode,
       style: {
@@ -25,22 +24,61 @@ export function createPythonNode({
         inputs: pythonNode.inputs,
         outputs: pythonNode.outputs,
         widgets: pythonNode.widgets,
-        widgetValues: customData.widgetValues || {}, // Use provided widget values if available
+        widgetValues: customData.widgetValues || {},
         isCollapsed: false
       }
     };
   } else {
-    // For file drop or other custom node types
     const fileConfig = {
       ImageSource: {
-        outputName: 'image_upload',
-        widgetType: 'image_file_upload',
-        dataKey: 'imageData'
+        nodeType: 'CaptionedImageSource',
+        outputs: [
+          {
+            name: 'image_upload',
+            type: '<class \'str\'>'
+          },
+          {
+            name: 'captioned_image',
+            type: '<class \'script.CaptionedImage\'>'
+          }
+        ],
+        widgets: [
+          {
+            name: 'image_upload',
+            type: 'image_file_upload',
+            value: ''
+          },
+          {
+            name: 'caption',
+            type: 'textarea',
+            value: ''
+          }
+        ]
       },
       VideoSource: {
-        outputName: 'video_upload',
-        widgetType: 'video_file_upload',
-        dataKey: 'videoData'
+        nodeType: 'CaptionedVideoSource',
+        outputs: [
+          {
+            name: 'video_upload',
+            type: '<class \'str\'>'
+          },
+          {
+            name: 'captioned_video',
+            type: '<class \'script.CaptionedVideo\'>'
+          }
+        ],
+        widgets: [
+          {
+            name: 'video_upload',
+            type: 'video_file_upload',
+            value: ''
+          },
+          {
+            name: 'caption',
+            type: 'textarea',
+            value: ''
+          }
+        ]
       }
     };
 
@@ -55,24 +93,15 @@ export function createPythonNode({
         ...baseNode.style,
       },
       data: {
-        label: nodeType,
+        label: config.nodeType,
         inputs: [],
-        outputs: [
-          {
-            name: config.outputName,
-            type: '<class \'str\'>'
-          }
-        ],
-        widgets: [
-          {
-            name: config.outputName,
-            type: config.widgetType,
-            value: customData[config.dataKey] || ''
-          }
-        ],
+        outputs: config.outputs,
+        widgets: config.widgets,
         widgetValues: {
-          [config.outputName]: customData[config.dataKey] || ''
-        }
+          [config.widgets[0].name]: customData[nodeType === 'ImageSource' ? 'imageData' : 'videoData'] || '',
+          caption: ''
+        },
+        isCollapsed: false
       }
     };
   }

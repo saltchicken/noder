@@ -26,19 +26,19 @@ class CaptionedVideo:
 
 
 class CaptionedVideoSource(Node):
-    async def run(self) -> CaptionedVideo:
+    async def run(self) -> Tuple[str, CaptionedVideo]:
         video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
         caption = self.widgets[1]
         captioned_video = CaptionedVideo(video_upload, caption)
-        return captioned_video
+        return video_upload, captioned_video
 
 
 class CaptionedImageSource(Node):
-    async def run(self) -> CaptionedImage:
+    async def run(self) -> Tuple[str, CaptionedImage]:
         image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
         caption = self.widgets[1]
         captioned_image = CaptionedImage(image_upload, caption)
-        return captioned_image
+        return image_upload, captioned_image
 
 
 class RealWanTrainer(Node):

@@ -11,7 +11,6 @@ import VideoFileUploadWidget from './widgets/VideoFileUploadWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
-
 function PythonNode({ id, data, onWidgetValuesChange }) {
   const [widgetValues, setWidgetValues] = useState(() => {
     // Initialize with either existing widgetValues or default values
@@ -29,14 +28,6 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
     onWidgetValuesChange?.(values);
     return values;
   });
-
-  const [isCollapsed, setIsCollapsed] = useState(data.isCollapsed || false)
-
-  useEffect(() => {
-    if (data.isCollapsed !== undefined) {
-      setIsCollapsed(data.isCollapsed);
-    }
-  }, [data.isCollapsed]);
 
   // Sync widgetValues when updates come from backend
   useEffect(() => {
@@ -64,7 +55,7 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       widgetValues: widgetValues  // Use local state instead of data.widgetValues
     };
 
-    const widgetComponents = useMemo(() => ({
+    const widgetComponents = {
       dropdown: DropdownWidget,
       slider: SliderWidget,
       textarea: TextAreaWidget,
@@ -72,7 +63,7 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       file_upload: FileUploadWidget,
       image_file_upload: ImageFileUploadWidget,
       video_file_upload: VideoFileUploadWidget
-    }), []);
+    };
 
     const Component = widgetComponents[widget.type] || InputWidget;
     return <Component
@@ -93,7 +84,6 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
 
     return { inputs, outputs, widgets, widgetTopPadding, spacing, topPadding };
   }, [data.inputs, data.outputs, data.widgets]);
-
 
   return (
     <div style={{
@@ -133,19 +123,15 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           ))}
         </div>
       </div>
-      {!isCollapsed && (
-        <>
-
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            padding: '10px 0'
-          }}>
-            {widgets.map((widget) => renderWidget(widget))}
-          </div>
-
-        </>
+      {!data.isCollapsed && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          padding: '10px 0'
+        }}>
+          {widgets.map((widget) => renderWidget(widget))}
+        </div>
       )}
     </div>
   );
