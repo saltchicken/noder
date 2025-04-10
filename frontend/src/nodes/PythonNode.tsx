@@ -64,58 +64,24 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       widgetValues: widgetValues  // Use local state instead of data.widgetValues
     };
 
-    switch (widget.type) {
-      case 'dropdown':
-        return <DropdownWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-      case 'slider':
-        return <SliderWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-      case 'textarea':
-        return <TextAreaWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-      case 'image':
-        return <ImageWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onWidgetValuesChange}
-        />;
-      case 'file_upload':
-        return <FileUploadWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-      case 'image_file_upload':
-        return <ImageFileUploadWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
+    const widgetComponents = useMemo(() => ({
+      dropdown: DropdownWidget,
+      slider: SliderWidget,
+      textarea: TextAreaWidget,
+      image: ImageWidget,
+      file_upload: FileUploadWidget,
+      image_file_upload: ImageFileUploadWidget,
+      video_file_upload: VideoFileUploadWidget
+    }), []);
 
-      case 'video_file_upload':
-        return <VideoFileUploadWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-      default:
-        return <InputWidget
-          key={widget.name}
-          widget={widgetWithValues}
-          onChange={onChange}
-        />;
-    }
-  };
+    const Component = widgetComponents[widget.type] || InputWidget;
+    return <Component
+      key={widget.name}
+      widget={widgetWithValues}
+      onChange={widget.type === 'image' ? onWidgetValuesChange : onChange}
+    />;
+  }
+
   const { inputs, outputs, widgets, widgetTopPadding, spacing, topPadding } = useMemo(() => {
     const inputs = Array.isArray(data.inputs) ? data.inputs : ['default'];
     const outputs = Array.isArray(data.outputs) ? data.outputs : ['default'];
