@@ -1,7 +1,7 @@
 from typing import Tuple, Union, List
 import asyncio
 
-from node_utils import Node
+from node_utils import Node, CaptionedImage, CaptionedVideo
 
 
 class ShowText(Node):
@@ -11,22 +11,10 @@ class ShowText(Node):
         return display_text
 
 
-class ImageSource(Node):
-    async def run(self) -> str:
-        image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
-        return image_upload
-
-
 class String(Node):
     async def run(self) -> str:
         string = self.widgets[0]
         return string
-
-
-class VideoSource(Node):
-    async def run(self) -> str:
-        video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
-        return video_upload
 
 
 class SaveImage(Node):
@@ -69,3 +57,19 @@ class SaveImage(Node):
 
         # Return the saved file path
         return output_path
+
+
+class CaptionedVideoSource(Node):
+    async def run(self) -> Tuple[str, CaptionedVideo]:
+        video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
+        caption = self.widgets[1]
+        captioned_video = CaptionedVideo(video_upload, caption)
+        return video_upload, captioned_video
+
+
+class CaptionedImageSource(Node):
+    async def run(self) -> Tuple[str, CaptionedImage]:
+        image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
+        caption = self.widgets[1]
+        captioned_image = CaptionedImage(image_upload, caption)
+        return image_upload, captioned_image

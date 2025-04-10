@@ -3,42 +3,13 @@ import asyncio
 import os
 import toml
 
-from node_utils import Node
+from node_utils import Node, CaptionedImage, CaptionedVideo
 
-from dataclasses import dataclass
 
 import base64
 from datetime import datetime
 from io import BytesIO
 from PIL import Image
-
-
-@dataclass
-class CaptionedImage:
-    image: str
-    caption: str
-
-
-@dataclass
-class CaptionedVideo:
-    video: str
-    caption: str
-
-
-class CaptionedVideoSource(Node):
-    async def run(self) -> Tuple[str, CaptionedVideo]:
-        video_upload = self.widgets[0]  # {"type": "video_file_upload", "value": ""}
-        caption = self.widgets[1]
-        captioned_video = CaptionedVideo(video_upload, caption)
-        return video_upload, captioned_video
-
-
-class CaptionedImageSource(Node):
-    async def run(self) -> Tuple[str, CaptionedImage]:
-        image_upload = self.widgets[0]  # {"type": "image_file_upload", "value": ""}
-        caption = self.widgets[1]
-        captioned_image = CaptionedImage(image_upload, caption)
-        return image_upload, captioned_image
 
 
 class RealWanTrainer(Node):
@@ -155,26 +126,6 @@ def save_captioned_videos(captioned_videos, output_dir):
         text_path = os.path.join(output_dir, text_filename)
         with open(text_path, "w") as f:
             f.write(video_data.caption)
-
-
-class CondaCommand(Node):
-    async def run(self, command: str) -> Tuple[str, str]:
-        conda_env = self.widgets[0]  # Name of conda environment
-        diffusion_pipe_dir = self.widgets[1]
-        status = self.widgets[2]  # {"type": "textarea", "value": ""}
-
-        conda_exec = os.path.join(os.environ.get("CONDA_EXE", "conda"))
-
-        custom_env = os.environ.copy()
-        custom_env["NCCL_P2P_DISABLE"] = "1"
-        custom_env["NCCL_IB_DISABLE"] = "1"
-
-        full_command = f"{conda_exec} run --live-stream -n {conda_env} deepspeed --num_gpus=1 {diffusion_pipe_dir}/train.py --deepspeed --config /home/saltchicken/.local/hunyuan_training/test/hunyuan_video.toml"
-        print("RUNNING")
-        print(full_command)
-        print("RUNNING")
-        command_list = full_command.split()
-        await run_command(command_list)
 
 
 async def run_command(command_list):

@@ -9,6 +9,19 @@ import sys
 import nodes
 
 from typing import Union, Any
+from dataclasses import dataclass
+
+
+@dataclass
+class CaptionedImage:
+    image: str
+    caption: str
+
+
+@dataclass
+class CaptionedVideo:
+    video: str
+    caption: str
 
 
 class Node:
