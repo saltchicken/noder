@@ -1,8 +1,6 @@
 from typing import Tuple
 import asyncio
 
-from node_utils import Node
-
 
 class GrayscaleImage(Node):
     async def run(self, input_image: str) -> str:

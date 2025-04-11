@@ -1,8 +1,6 @@
 from typing import Tuple, Union, List
 import asyncio
 
-from node_utils import Node
-
 
 class Foo(Node):
     async def run(self) -> Tuple[str, int]:

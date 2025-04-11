@@ -1,8 +1,6 @@
 from typing import Tuple
 import asyncio
 
-from node_utils import Node
-
 
 class OllamaQuery(Node):
     async def run(self) -> Tuple[str, str]:
