@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from typing import List
 import os
 import json
-from node_utils import get_python_classes
+from noderizer import get_python_classes
 
 from react_flowgraph import ReactflowGraph
 
