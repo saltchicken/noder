@@ -1,6 +1,8 @@
 from typing import Tuple, Union, List
 import asyncio
 
+OUTPUT_DIR = "../user/output"
+
 
 class ShowText(Node):
     async def run(self, text: str) -> str:
@@ -24,7 +26,7 @@ class SaveImage(Node):
         from PIL import Image
 
         # Create output directory if it doesn't exist
-        base_output_dir = os.path.join("output")  # Base output directory
+        base_output_dir = os.path.join(OUTPUT_DIR)  # Base output directory
         output_dir = self.widgets[0]  # Directory path
         filename = self.widgets[1]  # Base filename (optional)
 
