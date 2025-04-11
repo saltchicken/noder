@@ -21,6 +21,7 @@ class Node:
         print(f"Node initialized {self.__class__.__name__}")
         self.widgets = []
         self.websocket = None
+        self.output_dir = "../user/output"  # TODO: Make this an env variable
 
     async def send_message(self, message_type: str, data: dict):
         if self.websocket:
