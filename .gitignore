@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 __pycache__
-backend/output/*
-backend/saved_flows/*
 plugins/*
+user/*
+
