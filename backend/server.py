@@ -13,6 +13,8 @@ from react_flowgraph import ReactflowGraph
 from datetime import datetime
 from fastapi import UploadFile, HTTPException
 
+SAVED_FLOWS_DIR = "../user/saved_flows"
+
 python_classes = get_python_classes()
 global_graph = ReactflowGraph({"nodes": [], "edges": []}, python_classes)
 
@@ -30,7 +32,7 @@ app.add_middleware(
 
 # Mount static files from the dist directory
 app.mount("/assets", StaticFiles(directory="../frontend/dist/assets"), name="assets")
-app.mount("/saved_flows", StaticFiles(directory="./saved_flows"), name="saved_flows")
+app.mount("/saved_flows", StaticFiles(directory=SAVED_FLOWS_DIR), name="saved_flows")
 
 
 @app.get("/")
@@ -113,11 +115,11 @@ async def python_nodes_handler(request: Request):
 async def export_flow(flow_data: dict):
     try:
         # Ensure the saved_flows directory exists
-        os.makedirs("./saved_flows", exist_ok=True)
+        os.makedirs(SAVED_FLOWS_DIR, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"flow_{timestamp}.json"
-        file_path = f"./saved_flows/{filename}"
+        file_path = f"{SAVED_FLOWS_DIR}/{filename}"
 
         with open(file_path, "w") as f:
             json.dump(flow_data, f, indent=2)
@@ -158,7 +160,7 @@ async def import_flow(file: UploadFile):
 
 @app.get("/saved_flows/{filename}")
 async def get_saved_flow(filename: str):
-    file_path = f"backend/saved_flows/{filename}"
+    file_path = f"user/saved_flows/{filename}"
     if os.path.exists(file_path):
         return FileResponse(file_path, media_type="application/json", filename=filename)
     return {"status": "error", "message": "File not found"}
