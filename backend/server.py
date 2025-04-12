@@ -81,13 +81,14 @@ async def websocket_endpoint(websocket: WebSocket):
             try:
                 data = await websocket.receive_text()
                 json_data = json.loads(data)
-
-                global_graph.websocket = websocket
-                global_graph.update_from_json(json_data)
-                results = await global_graph.execute_nodes()
-                await websocket.send_json(
-                    {"type": "success", "data": "Graph completed"}
-                )
+                # TODO: Add validation that both type and data exist.
+                if json_data["type"] == "process_flow":
+                    global_graph.websocket = websocket
+                    global_graph.update_from_json(json_data["data"])
+                    results = await global_graph.execute_nodes()
+                    await websocket.send_json(
+                        {"type": "success", "data": "Graph completed"}
+                    )
 
             except WebSocketDisconnect:
                 break

@@ -41,7 +41,11 @@ const PanelControls = ({ nodes, edges, setNodes, setEdges, sendToWebSocket, isCo
       })),
       edges: edges,
     };
-    const json = JSON.stringify(flow, (key, value) =>
+    const message = {
+      type: "process_flow",
+      data: flow
+    };
+    const json = JSON.stringify(message, (key, value) =>
       key === "position" || key === "measured" ? undefined : value, 2);
     console.log('Widget Values:', nodes.map(node => node.data.widgetValues));
     sendToWebSocket(json);
