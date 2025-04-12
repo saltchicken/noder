@@ -91,6 +91,18 @@ const FlowContent = () => {
                 }
               }
             };
+          } else if (type === 'widget_update_options') {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                widgets: node.data.widgets.map(widget =>
+                  widget.name === data.name
+                    ? { ...widget, options: data.options }
+                    : widget
+                )
+              }
+            };
           }
         }
         return node;
