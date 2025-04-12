@@ -89,6 +89,13 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json(
                         {"type": "success", "data": "Graph completed"}
                     )
+                elif json_data["type"] == "run_node":
+                    global_graph.websocket = websocket
+                    global_graph.update_node(json_data["data"])
+                    results = await global_graph.execute_node(json_data["data"])
+                    await websocket.send_json(
+                        {"type": "success", "data": "Node executed"}
+                    )
 
             except WebSocketDisconnect:
                 break

@@ -222,6 +222,9 @@ class ReactflowGraph:
 
         return execution_order
 
+    async def execute_node(self, node_data):
+        print(node_data)
+
     async def execute_nodes(self):
         """
         Executes all nodes in order, passing outputs to connected inputs.
