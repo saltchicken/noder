@@ -43,6 +43,12 @@ class Node:
         """Update a widget's value during node execution"""
         await self.send_message("widget_update", {"name": widget_name, "value": value})
 
+    async def update_widget_options(self, widget_name: str, options: list):
+        """Update the options of a dropdown widget"""
+        await self.send_message(
+            "widget_update_options", {"name": widget_name, "options": options}
+        )
+
     async def run(self, *args, **kwargs) -> Any:
         pass
 
