@@ -37,6 +37,35 @@ class ReactflowGraph:
         self.websocket = websocket
         self.update_from_json(json_data)
 
+    def update_node(self, node_data):
+        node_id = node_data["id"]
+
+        # Find existing node with same ID
+        existing_node = next((node for node in self.nodes if node.id == node_id), None)
+
+        if existing_node:
+            print("Node already existed")
+            # Update existing node's data
+            existing_node.position = node_data.get("position", {})
+            existing_node.data = node_data.get("data", {})
+            existing_node.widget_values = node_data.get("data", {}).get(
+                "widgetValues", {}
+            )
+            return existing_node
+        else:
+            # Create new node
+            new_node = ReactflowNode(node_data)
+            # Find and assign python class
+            for python_class in self.python_classes:
+                if new_node.data["label"] == python_class["name"]:
+                    new_node.python_class = python_class["class"]
+                    if hasattr(new_node.python_class, "instantiated"):
+                        # Create new instance only for new nodes
+                        new_node.python_class = new_node.python_class()
+                        new_node.python_class.websocket = self.websocket
+                        new_node.python_class.node_id = node_id
+            return new_node
+
     def update_from_json(self, json_data: Dict):
         """Updates the graph with new JSON data while preserving existing node instances"""
         new_nodes = json_data.get("nodes", [])
@@ -45,35 +74,8 @@ class ReactflowGraph:
         # Update existing nodes and add new ones
         updated_nodes = []
         for node_data in new_nodes:
-            node_id = node_data["id"]
-
-            # Find existing node with same ID
-            existing_node = next(
-                (node for node in self.nodes if node.id == node_id), None
-            )
-
-            if existing_node:
-                print("Node already existed")
-                # Update existing node's data
-                existing_node.position = node_data.get("position", {})
-                existing_node.data = node_data.get("data", {})
-                existing_node.widget_values = node_data.get("data", {}).get(
-                    "widgetValues", {}
-                )
-                updated_nodes.append(existing_node)
-            else:
-                # Create new node
-                new_node = ReactflowNode(node_data)
-                # Find and assign python class
-                for python_class in self.python_classes:
-                    if new_node.data["label"] == python_class["name"]:
-                        new_node.python_class = python_class["class"]
-                        if hasattr(new_node.python_class, "instantiated"):
-                            # Create new instance only for new nodes
-                            new_node.python_class = new_node.python_class()
-                            new_node.python_class.websocket = self.websocket
-                            new_node.python_class.node_id = node_id
-                updated_nodes.append(new_node)
+            updated_node = self.update_node(node_data)
+            updated_nodes.append(updated_node)
 
         # Remove nodes that no longer exist in the new data
         self.nodes = updated_nodes
