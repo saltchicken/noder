@@ -7,6 +7,7 @@ from typing import List
 import os
 import json
 from noderizer import get_python_classes
+from pathlib import Path
 
 from react_flowgraph import ReactflowGraph
 
@@ -42,9 +43,13 @@ async def read_root():
 
 @app.get("/{catch_all:path}")
 async def catch_all(catch_all: str):
-    file_path = os.path.join("dist", catch_all)
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
+    base_dir = Path("../frontend/dist")
+    requested_path = base_dir / catch_all
+    if not requested_path.is_relative_to(base_dir):
+        # Block paths outside the allowed directory
+        return FileResponse("../frontend/dist/index.html")
+    if requested_path.exists():
+        return FileResponse(requested_path)
     return FileResponse("../frontend/dist/index.html")
 
 
