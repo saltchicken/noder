@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from typing import List
+from typing import List, Dict
 import os
 import json
 from noderizer import get_python_classes
@@ -53,21 +53,25 @@ async def catch_all(catch_all: str):
     return FileResponse("../frontend/dist/index.html")
 
 
-# WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: Dict[WebSocket, ReactflowGraph] = {}
+        self.python_classes = get_python_classes()
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections.append(websocket)
+        # Create a new graph instance for this connection
+        self.active_connections[websocket] = ReactflowGraph(
+            {"nodes": [], "edges": []}, self.python_classes
+        )
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        print("Client disconnected")
+        if websocket in self.active_connections:
+            del self.active_connections[websocket]
 
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+    def get_graph(self, websocket: WebSocket) -> ReactflowGraph:
+        return self.active_connections[websocket]
 
 
 manager = ConnectionManager()
@@ -81,21 +85,21 @@ async def websocket_endpoint(websocket: WebSocket):
             try:
                 data = await websocket.receive_text()
                 json_data = json.loads(data)
-                # TODO: Add validation that both type and data exist.
+                # Get the connection-specific graph
+                graph = manager.get_graph(websocket)
+                graph.websocket = websocket
+
                 if json_data["type"] == "process_flow":
-                    global_graph.websocket = websocket
-                    await global_graph.update_from_json(json_data["data"])
-                    results = await global_graph.execute_nodes()
+                    await graph.update_from_json(json_data["data"])
+                    results = await graph.execute_nodes()
                     await websocket.send_json(
                         {"type": "success", "data": "Graph completed"}
                     )
                 elif json_data["type"] == "run_node":
-                    global_graph.websocket = websocket
-                    await global_graph.initialize_node(json_data["data"])
-                    results = await global_graph.execute_node(json_data["data"])
+                    await graph.initialize_node(json_data["data"])
+                    results = await graph.execute_node(json_data["data"])
                 elif json_data["type"] == "init_node":
-                    global_graph.websocket = websocket
-                    await global_graph.initialize_node(json_data["data"])
+                    await graph.initialize_node(json_data["data"])
 
             except WebSocketDisconnect:
                 break
