@@ -8,6 +8,7 @@ import ImageWidget from './widgets/ImageWidget.tsx';
 import FileUploadWidget from './widgets/FileUploadWidget.tsx';
 import ImageFileUploadWidget from './widgets/ImageFileUploadWidget.tsx';
 import VideoFileUploadWidget from './widgets/VideoFileUploadWidget.tsx';
+import ButtonWidget from './widgets/ButtonWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
@@ -62,7 +63,8 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       image: ImageWidget,
       file_upload: FileUploadWidget,
       image_file_upload: ImageFileUploadWidget,
-      video_file_upload: VideoFileUploadWidget
+      video_file_upload: VideoFileUploadWidget,
+      button: ButtonWidget
     };
 
     const Component = widgetComponents[widget.type] || InputWidget;
@@ -70,6 +72,7 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       key={widget.name}
       widget={widgetWithValues}
       onChange={widget.type === 'image' ? onWidgetValuesChange : onChange}
+      nodeId={id}
     />;
   }
 

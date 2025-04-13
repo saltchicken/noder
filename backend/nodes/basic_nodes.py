@@ -71,3 +71,16 @@ class CaptionedImageSource(Node):
         caption = self.widgets[1]
         captioned_image = CaptionedImage(image_upload, caption)
         return image_upload, captioned_image
+
+
+class ButtonTrigger(Node):
+    async def run(self) -> None:
+        button = self.widgets[0]  # {"type": "button", "value": "custom_function"}
+        message = self.widgets[1]  # {"type": "textarea", "value": ""}
+
+        # Update the message widget to show execution
+        # return "Button clicked!"
+        return None
+
+    async def custom_function(self):
+        await self.update_widget("message", "Button was clicked!")

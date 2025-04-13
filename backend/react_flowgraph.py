@@ -66,6 +66,10 @@ class ReactflowGraph:
                         new_node.python_class.node_id = node_id
             return new_node
 
+    def one_shot(self, node_data):
+        node = self.update_node(node_data)
+        self.nodes.append(node)
+
     def update_from_json(self, json_data: Dict):
         """Updates the graph with new JSON data while preserving existing node instances"""
         new_nodes = json_data.get("nodes", [])
@@ -223,7 +227,26 @@ class ReactflowGraph:
         return execution_order
 
     async def execute_node(self, node_data):
-        print(node_data)
+        node = self.get_node_by_id(node_data["id"])
+        if not node:
+            print("Error: Did not find node. Returning nothing")
+            return
+        if not hasattr(node.python_class, "instantiated"):
+            node.python_class = node.python_class()
+            node.python_class.websocket = self.websocket
+
+        node.python_class.node_id = node.id
+        node.python_class.widgets = list(node.widget_values.values())
+        try:
+            function_name = node_data.get("function_name")
+            if function_name and hasattr(node.python_class, function_name):
+                func = getattr(node.python_class, function_name)
+                await func()
+            else:
+                print("That function didn't exist")
+        except Exception as e:
+            print(f"Error executing node {node.label}: {str(e)}")
+            raise
 
     async def execute_nodes(self):
         """

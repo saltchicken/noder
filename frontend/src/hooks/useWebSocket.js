@@ -13,6 +13,8 @@ export const useWebSocket = (handleNodeMessage) => {
       console.log('Connected to WebSocket');
       setSocket(ws);
       setIsConnected(true);
+      // Make WebSocket globally available
+      window.nodeWebSocket = ws;
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
