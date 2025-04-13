@@ -16,6 +16,7 @@ from fastapi import UploadFile, HTTPException
 
 SAVED_FLOWS_DIR = "../user/saved_flows"
 
+python_classes = get_python_classes()
 
 app = FastAPI()
 
@@ -54,7 +55,7 @@ async def catch_all(catch_all: str):
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[WebSocket, ReactflowGraph] = {}
-        self.python_classes = get_python_classes()
+        self.python_classes = python_classes
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
