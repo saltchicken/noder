@@ -193,67 +193,67 @@ const FlowContent = () => {
   const onDrop = useCallback((event) => {
     event.preventDefault();
 
-    const file = event.dataTransfer.files[0];
-    if (!file) return;
+    const files = Array.from(event.dataTransfer.files);
+    if (files.length === 0) return;
 
-    // Handle video files
-    if (file.type.startsWith('video/')) {
-      const validation = validateVideo(file);
-      if (!validation.isValid) {
-        console.warn(validation.error);
+    // Calculate initial position for the first node
+    const initialPosition = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    // Process each file
+    files.forEach((file, index) => {
+      console.log(index);
+      // Calculate offset position for subsequent nodes
+      const position = {
+        x: initialPosition.x + (index * 250), // Offset each node horizontally
+        y: initialPosition.y
+      };
+
+      // Handle video files
+      if (file.type.startsWith('video/')) {
+        const validation = validateVideo(file);
+        if (!validation.isValid) {
+          console.warn(`Video validation failed for ${file.name}:`, validation.error);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const pythonNode = pythonNodes.find(node => node.name === 'CaptionedVideoSource');
+          const newNode = createPythonNode({
+            position,
+            pythonNode
+          });
+          newNode.data.widgetValues['video_upload'] = e.target.result;
+          addNodes(newNode);
+        };
+        reader.readAsDataURL(file);
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const position = screenToFlowPosition({
-          x: event.clientX,
-          y: event.clientY,
-        });
+      // Handle image files
+      if (file.type.startsWith('image/')) {
+        const validation = validateImage(file);
+        if (!validation.isValid) {
+          console.warn(`Image validation failed for ${file.name}:`, validation.error);
+          return;
+        }
 
-
-        const pythonNode = pythonNodes.find(node => node.name === 'CaptionedVideoSource');
-
-        const newNode = createPythonNode({
-          position,
-          pythonNode
-        });
-        console.log(newNode);
-        newNode.data.widgetValues['video_upload'] = e.target.result;
-        addNodes(newNode);
-      };
-
-      reader.readAsDataURL(file);
-      return;
-    }
-
-    // Existing image files
-    if (file.type.startsWith('image/')) {
-      const validation = validateImage(file);
-      if (!validation.isValid) {
-        console.warn(validation.error);
-        return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const pythonNode = pythonNodes.find(node => node.name === 'CaptionedImageSource');
+          const newNode = createPythonNode({
+            position,
+            pythonNode
+          });
+          newNode.data.widgetValues['image_upload'] = e.target.result;
+          addNodes(newNode);
+        };
+        reader.readAsDataURL(file);
       }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const position = screenToFlowPosition({
-          x: event.clientX,
-          y: event.clientY,
-        });
-
-        const pythonNode = pythonNodes.find(node => node.name === 'CaptionedImageSource');
-        const newNode = createPythonNode({
-          position,
-          pythonNode
-        });
-        newNode.data.widgetValues['image_upload'] = e.target.result;
-
-        addNodes(newNode);
-      };
-
-      reader.readAsDataURL(file);
-    }
+    });
   }, [addNodes, screenToFlowPosition, pythonNodes]);
 
   // Close the context menu if it's open whenever the window is clicked.
