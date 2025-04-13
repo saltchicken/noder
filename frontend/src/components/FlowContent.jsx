@@ -209,14 +209,15 @@ const FlowContent = () => {
           y: event.clientY,
         });
 
+
+        const pythonNode = pythonNodes.find(node => node.name === 'CaptionedVideoSource');
+
         const newNode = createPythonNode({
           position,
-          nodeType: 'VideoSource',
-          customData: {
-            videoData: e.target.result
-          }
+          pythonNode
         });
-
+        console.log(newNode);
+        newNode.data.widgetValues['video_upload'] = e.target.result;
         addNodes(newNode);
       };
 
@@ -239,20 +240,19 @@ const FlowContent = () => {
           y: event.clientY,
         });
 
+        const pythonNode = pythonNodes.find(node => node.name === 'CaptionedImageSource');
         const newNode = createPythonNode({
           position,
-          nodeType: 'ImageSource',
-          customData: {
-            imageData: e.target.result
-          }
+          pythonNode
         });
+        newNode.data.widgetValues['image_upload'] = e.target.result;
 
         addNodes(newNode);
       };
 
       reader.readAsDataURL(file);
     }
-  }, [addNodes, screenToFlowPosition]);
+  }, [addNodes, screenToFlowPosition, pythonNodes]);
 
   // Close the context menu if it's open whenever the window is clicked.
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);

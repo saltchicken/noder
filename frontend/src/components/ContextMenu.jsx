@@ -59,7 +59,6 @@ export default function ContextMenu({
     const position = screenToFlowPosition({ x: left, y: top });
     const newNode = createPythonNode({
       position,
-      nodeType,
       pythonNode
     });
     addNodes(newNode);
