@@ -5,6 +5,7 @@ interface ButtonWidgetProps {
   widget: {
     name: string;
     value: string;
+    function_name?: string;  // Optional function name that's different from button text
   };
   nodeId?: string;
 }
@@ -19,14 +20,13 @@ const ButtonWidget = ({ widget, nodeId }: ButtonWidgetProps) => {
     const ws = (window as any).nodeWebSocket;
     if (!ws) return;
 
-    // Include the function name from the widget value
     const message = {
       type: 'run_node',
       data: {
         id: nodeId,
         type: node.type,
         data: node.data,
-        function_name: widget.value  // Use the button text as function name
+        function_name: widget.function_name || widget.value  // Use function_name if provided, fall back to value
       }
     };
     ws.send(JSON.stringify(message));

@@ -75,7 +75,9 @@ class CaptionedImageSource(Node):
 
 class ButtonTrigger(Node):
     async def run(self) -> None:
-        button = self.widgets[0]  # {"type": "button", "value": "custom_function"}
+        button = self.widgets[
+            0
+        ]  # {"type": "button", "value": "Click me!", "function_name": "custom_function"}
         message = self.widgets[1]  # {"type": "textarea", "value": ""}
 
         # Update the message widget to show execution
