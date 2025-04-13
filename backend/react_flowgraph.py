@@ -37,7 +37,7 @@ class ReactflowGraph:
         self.websocket = websocket
         self.update_from_json(json_data)
 
-    def update_node(self, node_data):
+    async def update_node(self, node_data):
         node_id = node_data["id"]
 
         # Find existing node with same ID
@@ -60,17 +60,30 @@ class ReactflowGraph:
                 if new_node.data["label"] == python_class["name"]:
                     new_node.python_class = python_class["class"]
                     if not hasattr(new_node.python_class, "instantiated"):
+                        await self.websocket.send_json(
+                            {
+                                "type": "success",
+                                "data": f"{node_data['data']['label']} initializing",
+                            }
+                        )
                         # Create new instance only for new nodes
                         new_node.python_class = new_node.python_class()
+                        await self.websocket.send_json(
+                            {
+                                "type": "success",
+                                "data": f"{node_data['data']['label']} initialized",
+                            }
+                        )
+
                         new_node.python_class.websocket = self.websocket
                         new_node.python_class.node_id = node_id
             return new_node
 
-    def initialize_node(self, node_data):
-        node = self.update_node(node_data)
+    async def initialize_node(self, node_data):
+        node = await self.update_node(node_data)
         self.nodes.append(node)
 
-    def update_from_json(self, json_data: Dict):
+    async def update_from_json(self, json_data: Dict):
         """Updates the graph with new JSON data while preserving existing node instances"""
         new_nodes = json_data.get("nodes", [])
         self.edges = json_data.get("edges", [])
@@ -78,7 +91,7 @@ class ReactflowGraph:
         # Update existing nodes and add new ones
         updated_nodes = []
         for node_data in new_nodes:
-            updated_node = self.update_node(node_data)
+            updated_node = await self.update_node(node_data)
             updated_nodes.append(updated_node)
 
         # Remove nodes that no longer exist in the new data
@@ -247,6 +260,9 @@ class ReactflowGraph:
         except Exception as e:
             print(f"Error executing node {node.label}: {str(e)}")
             raise
+        await self.websocket.send_json(
+            {"type": "success", "data": f"{node_data['data']['label']} executed"}
+        )
 
     async def execute_nodes(self):
         """

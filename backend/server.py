@@ -84,24 +84,18 @@ async def websocket_endpoint(websocket: WebSocket):
                 # TODO: Add validation that both type and data exist.
                 if json_data["type"] == "process_flow":
                     global_graph.websocket = websocket
-                    global_graph.update_from_json(json_data["data"])
+                    await global_graph.update_from_json(json_data["data"])
                     results = await global_graph.execute_nodes()
                     await websocket.send_json(
                         {"type": "success", "data": "Graph completed"}
                     )
                 elif json_data["type"] == "run_node":
                     global_graph.websocket = websocket
-                    global_graph.initialize_node(json_data["data"])
+                    await global_graph.initialize_node(json_data["data"])
                     results = await global_graph.execute_node(json_data["data"])
-                    await websocket.send_json(
-                        {"type": "success", "data": "Node executed"}
-                    )
                 elif json_data["type"] == "init_node":
                     global_graph.websocket = websocket
-                    global_graph.initialize_node(json_data["data"])
-                    await websocket.send_json(
-                        {"type": "success", "data": "Node initialized"}
-                    )
+                    await global_graph.initialize_node(json_data["data"])
 
             except WebSocketDisconnect:
                 break
