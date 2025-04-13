@@ -59,14 +59,14 @@ class ReactflowGraph:
             for python_class in self.python_classes:
                 if new_node.data["label"] == python_class["name"]:
                     new_node.python_class = python_class["class"]
-                    if hasattr(new_node.python_class, "instantiated"):
+                    if not hasattr(new_node.python_class, "instantiated"):
                         # Create new instance only for new nodes
                         new_node.python_class = new_node.python_class()
                         new_node.python_class.websocket = self.websocket
                         new_node.python_class.node_id = node_id
             return new_node
 
-    def one_shot(self, node_data):
+    def initialize_node(self, node_data):
         node = self.update_node(node_data)
         self.nodes.append(node)
 

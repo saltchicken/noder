@@ -62,6 +62,19 @@ export default function ContextMenu({
       pythonNode
     });
     addNodes(newNode);
+    const ws = window.nodeWebSocket;
+    if (ws) {
+      const message = {
+        type: "init_node",
+        data: {
+          id: newNode.id,
+          type: newNode.type,
+          data: newNode.data
+        }
+      };
+      ws.send(JSON.stringify(message));
+    }
+
   }, [left, top, addNodes, pythonNodes, screenToFlowPosition]);
 
   const renderClassificationSubmenu = () => {
