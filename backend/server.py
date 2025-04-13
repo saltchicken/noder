@@ -16,8 +16,6 @@ from fastapi import UploadFile, HTTPException
 
 SAVED_FLOWS_DIR = "../user/saved_flows"
 
-python_classes = get_python_classes()
-global_graph = ReactflowGraph({"nodes": [], "edges": []}, python_classes)
 
 app = FastAPI()
 
