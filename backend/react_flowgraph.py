@@ -35,7 +35,7 @@ class ReactflowGraph:
         self.edges: List[Dict] = []
         self.node_instances = {}  # Store instantiated node classes
         self.websocket = websocket
-        self.update_from_json(json_data)
+        # self.update_from_json(json_data)
 
     async def update_node(self, node_data):
         node_id = node_data["id"]
