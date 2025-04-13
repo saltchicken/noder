@@ -188,6 +188,8 @@ const FlowContent = () => {
     event.dataTransfer.dropEffect = 'copy';
   }, []);
 
+
+  // TODO: When calling addNodes the node is not initialized automatically like it does when this is called from the ContextMenu because there is an extra websocket function. Make a solid function for creating nodes.
   const onDrop = useCallback((event) => {
     event.preventDefault();
 
