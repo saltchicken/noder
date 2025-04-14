@@ -15,6 +15,7 @@ import PythonNode from '../nodes/PythonNode.tsx';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { createPythonNode } from '../utils/nodeCreation';
 import { validateImage, validateVideo } from '../utils/mediaValidation';
+import Notifications from './Notifications';
 
 const FlowContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -293,6 +294,7 @@ const FlowContent = () => {
           isConnected={isConnected}
         />
       </ReactFlow>
+      <Notifications />
     </div>
   );
 };

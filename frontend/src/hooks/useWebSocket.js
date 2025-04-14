@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export const useWebSocket = (handleNodeMessage) => {
   const [socket, setSocket] = useState(null);
@@ -10,11 +11,11 @@ export const useWebSocket = (handleNodeMessage) => {
     const ws = new WebSocket(WS_URL);
 
     ws.onopen = () => {
-      console.log('Connected to WebSocket');
       setSocket(ws);
       setIsConnected(true);
       // Make WebSocket globally available
       window.nodeWebSocket = ws;
+      toast.success('Connected to server');
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -30,33 +31,40 @@ export const useWebSocket = (handleNodeMessage) => {
             handleNodeMessage(message.data);
             break;
           case 'success':
-            console.log('Success:', message.data);
+            toast.success(message.data);
             break;
           case 'error':
-            console.error('Error:', message.data);
+            toast.error(message.data)
             break;
           default:
-            console.log('Unknown message type:', message);
+            const errorMessage = `Unknown message type: ${event.data}`
+            toast.error(errorMessage);
+            console.log(errorMessage);
         }
       } catch (error) {
-        console.error('Error parsing message:', error);
+        const errorMessage = `Error parsing message: ${error}`
+        toast.error(errorMessage);
+        console.log(errorMessage);
       }
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      const errorMessage = `WebSocket error: ${error}`;
+      toast.error(errorMessage);
+      console.error(errorMessage);
       setIsConnected(false);
     };
 
     ws.onclose = () => {
-      console.log('Disconnected from WebSocket');
+      const warningMessage = 'Disconnect from WebSocket';
+      toast.warn(warningMessage);
       setIsConnected(false);
       setSocket(null);
 
       reconnectTimeoutRef.current = setTimeout(() => {
-        console.log('Attempting to reconnect...');
+        toast.warn('Attempting to reconnect...');
         connectWebSocket();
-      }, 2000);
+      }, 3000);
     };
 
     return ws;
