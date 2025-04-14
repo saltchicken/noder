@@ -6,12 +6,12 @@ const Notifications = () => {
   return (
     <ToastContainer
       position="bottom-right"
-      autoClose={3000}
+      autoClose={2500}
       hideProgressBar={false}
       newestOnTop
       closeOnClick
       rtl={false}
-      pauseOnFocusLoss
+      pauseOnFocusLoss={false}
       draggable
       pauseOnHover
       theme="dark"
