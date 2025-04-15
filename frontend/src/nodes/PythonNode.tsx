@@ -1,4 +1,5 @@
 import React, { useCallback, memo, useMemo, useState, useEffect } from 'react';
+import { useReactFlow } from '@xyflow/react';
 
 import InputWidget from './widgets/InputWidget.tsx';
 import DropdownWidget from './widgets/DropdownWidget.tsx';
@@ -12,7 +13,72 @@ import ButtonWidget from './widgets/ButtonWidget.tsx';
 import NodeInput from './handles/NodeInput.tsx';
 import NodeOutput from './handles/NodeOutput.tsx';
 
+
+const NodeControlPanel = ({ id, onCollapse, isCollapsed }) => {
+  const { setNodes, setEdges } = useReactFlow();
+
+  const handleDelete = useCallback(() => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== id));
+    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+  }, [id, setNodes, setEdges]);
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '-25px',
+      right: '0',
+      display: 'flex',
+      gap: '4px',
+      padding: '2px',
+      backgroundColor: '#1e1e1e',
+      borderRadius: '4px',
+      border: '1px solid #333',
+      zIndex: 10,
+    }}>
+      <button
+        onClick={onCollapse}
+        title={isCollapsed ? "Expand" : "Collapse"}
+        style={{
+          backgroundColor: '#2d2d2d',
+          color: 'white',
+          border: 'none',
+          borderRadius: '3px',
+          padding: '2px 6px',
+          fontSize: '8px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        {isCollapsed ? '▼' : '▲'}
+      </button>
+      <button
+        onClick={handleDelete}
+        title="Delete node"
+        style={{
+          backgroundColor: '#ff4444',
+          color: 'white',
+          border: 'none',
+          borderRadius: '3px',
+          padding: '2px 6px',
+          fontSize: '8px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        ×
+      </button>
+    </div>
+  );
+};
+
 function PythonNode({ id, data, onWidgetValuesChange }) {
+  const [isCollapsed, setIsCollapsed] = useState(data.isCollapsed || false);
+
+  const handleCollapse = useCallback(() => {
+    setIsCollapsed(prev => !prev);
+  }, []);
   const [widgetValues, setWidgetValues] = useState(() => {
     // Initialize with either existing widgetValues or default values
     if (data.widgetValues && Object.keys(data.widgetValues).length > 0) {
@@ -95,8 +161,15 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
       gap: '0px',
       width: '100%',
       height: '100%',
-      padding: '0px 15px 15px 15px'
+      padding: '0px 15px 15px 15px',
+      position: 'relative'
     }}>
+      <NodeControlPanel
+        id={id}
+        onCollapse={handleCollapse}
+        isCollapsed={isCollapsed}
+      />
+
       <div style={{
         display: 'grid',
         gridTemplateColumns: '50px 1fr 50px',
@@ -112,7 +185,17 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: '8px', fontWeight: 'bold', position: 'sticky', top: '0', backgroundColor: '#1e1e1e', padding: '0px', borderRadius: '5px', zIndex: -1 }}>
+        <div style={{
+          textAlign: 'center',
+          fontSize: '8px',
+          fontWeight: 'bold',
+          position: 'sticky',
+          top: '0',
+          backgroundColor: '#1e1e1e',
+          padding: '0px',
+          borderRadius: '5px',
+          zIndex: -1
+        }}>
           {data.label}
         </div>
 
@@ -126,7 +209,8 @@ function PythonNode({ id, data, onWidgetValuesChange }) {
           ))}
         </div>
       </div>
-      {!data.isCollapsed && (
+
+      {!isCollapsed && (
         <div style={{
           display: 'flex',
           flexDirection: 'column',

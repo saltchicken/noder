@@ -23,7 +23,6 @@ export function createPythonNode({
         outputs: pythonNode.outputs,
         widgets: pythonNode.widgets,
         widgetValues: {},
-        isCollapsed: false
       }
     };
   }
